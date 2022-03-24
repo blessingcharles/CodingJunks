@@ -1,0 +1,15 @@
+# main: graph.o main.cpp
+# 	$(CC) main.cpp graph.o -o main
+
+# snake_and_ladders: graph.o snake_and_ladders.cpp
+# 	$(CC) snake_and_ladders.cpp graph.o -o snake_and_ladders
+
+# graph: graph.cpp
+# 	g++ -c graph.cpp -o graph.o
+
+main: main.cpp graph.o
+	g++ -c main.cpp -o main.o
+	g++ graph.o main.o -o main
+
+graph.o: graph.cpp
+	g++ -c graph.cpp -o graph.o
