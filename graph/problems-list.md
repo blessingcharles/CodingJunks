@@ -146,4 +146,13 @@
     Convert the board configuration to string .
     Do BFS and explore all possible ways to move to success
 ```
-14. 
+14. [Snakes and Ladders](https://leetcode.com/problems/snakes-and-ladders/)
+```
+    From a given pos explore the next 6 neighbours and add it to the queue ,
+    Increase the depth for each level 
+```
+15. [Serialize and Deserialize BT](https://leetcode.com/problems/serialize-and-deserialize-binary-tree/)
+16. [Completeness of BT](https://leetcode.com/problems/check-completeness-of-a-binary-tree/)
+17. [Shortest path in Binary Matrix](https://leetcode.com/problems/shortest-path-in-binary-matrix/)
+18. [Shortest path visiting All nodes](https://leetcode.com/problems/shortest-path-visiting-all-nodes/)
+19. 

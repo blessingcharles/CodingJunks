@@ -1,80 +1,101 @@
 #include<iostream>
 #include<bits/stdc++.h>
 using namespace std;
-
 class Solution {
-private:
-    int find_parent(int node , vector<int> &parent){
-        if(parent[node] == -1) return node;
-        return parent[node] = this->find_parent(parent[node] , parent);
-    }
-    void dsu_union(int node1 , int node2 , vector<int> &parent,vector<int> &rank){
-        int s1 = this->find_parent(node1,parent);
-        int s2 = this->find_parent(node2,parent);
-        
-        if(s1 != s2){
-            if(rank[s1] < rank[s2]){
-                parent[s1] = s2 ;
-                rank[s2] += rank[s1];
-            }
-            else{
-                parent[s2] = s1 ;
-                rank[s1] += s2 ;
-            }
-        }
-    }
+    int Keys_Req = 0 ; 
+    vector<vector<bool>> visited ;
+    int keys[26] = {0};
+    int N , M ;
+    int dx[4] = {1,-1,0,0};
+    int dy[4] = {0,0,1,-1};
     
+    bool isInvalid(int row , int col){
+        return row < 0 or col < 0 or row >= this->M or col >= this->N ;
+    }
+    int backtrack(vector<string> &grid , int row , int col , int cur_keys){
+
+        if(isInvalid(row , col) or grid[row][col] == '#' or visited[row][col] == true)
+            return -1 ;
+        cout << row << "  " << col << "  " << cur_keys << endl ;
+        
+        char c = grid[row][col] ;
+        bool found_key_here = false ;
+        if(c <= 122 and c >= 97){
+            cur_keys++ ;
+            if(cur_keys == Keys_Req){
+                return 0 ;
+            }
+            keys[c-'a']++ ;
+            cout << "key found " << c << " " << keys[c-'a'] << endl ;
+            found_key_here = true ;
+        }
+        else if(c >= 65 and c <= 90){
+            // its a lock ! do we have a key ?
+            if(keys[(c + 32)-'a'] == 0){
+                // we don't have a key in this path
+                cout << "locked " << grid[row][col]+32 << endl ;
+                return -1 ;
+            }
+        }
+        visited[row][col] = true ;
+        
+        int temp = 0 , min_vals = INT_MAX;
+        bool valid_path = false ;
+        
+        for(int i = 0 ; i < 4 ; i++){
+            temp = backtrack(grid , row+dx[i] , col+dy[i] ,cur_keys) ;
+            if(temp != -1){
+                min_vals = min(min_vals ,1+temp);
+                valid_path = true ;
+            }    
+        }
+        visited[row][col] = true ;
+        if(found_key_here) keys[c-'a']-- ;
+        return (valid_path)?min_vals:-1 ;
+    }
 public:
-    string smallestStringWithSwaps(string s, vector<vector<int>>& pairs) {
+    int shortestPathAllKeys(vector<string>& grid) {
+
+        memset(keys , 0 , 26);
+        this->M = grid.size();         
+        this->N = grid[0].size();
+        visited.resize(this->M , vector<bool>(this->N , false));
         
-        vector<vector<int>> subsets(s.size());
-        vector<int> parent(s.size(),-1);
-        vector<int> rank(s.size(),1);
-        
-        for(uint32_t i = 0 ; i < s.size() ; i++){
-            parent[i] = -1;
-            rank[i] = 1 ;
-        }
-        // connect all components
-        for(uint32_t i = 0 ; i < s.size();i++){
-            dsu_union(pairs[i][0],pairs[i][1],parent,rank);
-        }
-        
-        //group the connected sets in a list
-        for(uint32_t i = 0 ; i < s.size() ; i++){
-            if(parent[i] == -1){
-                subsets[i].push_back(i);
-            }
-            else{
-                subsets[parent[i]].push_back(i);
+        for(int i = 0 ; i < this->M ; i++){
+            for(int j = 0 ; j <this->N ; j++){
+                if(grid[i][j] <= 122 and grid[i][j] >= 97)
+                    Keys_Req++ ;
+                else if(grid[i][j] == '#'){
+                    visited[i][j] = true ; 
+                }           
             }
         }
-        
-        for(auto &nodes_idxs : subsets){
-            string ss = "" ;
-            for(auto ele_idx : nodes_idxs){
-                ss += s[ele_idx] ;
+
+        for(int i = 0 ; i < this->M ; i++){
+            for(int j = 0 ; j <this->N ; j++){
+                cout << visited[i][j] << " " ;        
             }
-            sort(ss.begin(),ss.end());
-            uint32_t j = 0;
-            for(auto ele_idx : nodes_idxs){
-                s[ele_idx] = ss[j++];
-            }
+            cout << endl ;
         }
+
+        //   for(int i = 0 ; i < 26 ; i++){
+            
+        //     cout << keys[i] << endl ;
+        // }
         
-        return s; 
+        return backtrack(grid , 0 , 0 , 0);
     }
 };
-
 int main(){
 
 	vector<vector<int>> my_board = {{0,3},{1,2}};
 
 	Solution s ;
-    string st = "dcab";
-	cout << s.smallestStringWithSwaps(st,my_board) << endl;
+    vector<string> grid= {"@..aA","..B#.","....b"};
 
-	// for(auto arr : my_board){
+	cout << s.shortestPathAllKeys(grid) << endl;
+
+	// fsor(auto arr : my_board){
 	// 	for(auto ele : arr){
 	// 		cout << ele ;
 	// 	}
