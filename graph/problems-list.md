@@ -155,4 +155,10 @@
 16. [Completeness of BT](https://leetcode.com/problems/check-completeness-of-a-binary-tree/)
 17. [Shortest path in Binary Matrix](https://leetcode.com/problems/shortest-path-in-binary-matrix/)
 18. [Shortest path visiting All nodes](https://leetcode.com/problems/shortest-path-visiting-all-nodes/)
-19. 
+19. [Cousins of BT](https://leetcode.com/problems/cousins-in-binary-tree/)
+20. [Coloring a Border](https://leetcode.com/problems/coloring-a-border/)
+21. [LCA of Deepest leaves](https://leetcode.com/problems/lowest-common-ancestor-of-deepest-leaves/)
+22. [Maximum sum of BT](https://leetcode.com/problems/maximum-level-sum-of-a-binary-tree/)
+23. [Shortest Path Alternating Colors](https://leetcode.com/problems/shortest-path-with-alternating-colors/)
+24. [Count Servers that Communicate](https://leetcode.com/problems/count-servers-that-communicate/)
+25.  
