@@ -25,4 +25,28 @@
 21. [check-if-n-and-its-double-exist](https://leetcode.com/problems/check-if-n-and-its-double-exist/)
 22. [k strongest values in an array](https://leetcode.com/problems/the-k-strongest-values-in-an-array/)
 23. [Range of subsorted sum](https://leetcode.com/problems/range-sum-of-sorted-subarray-sums/)
-24. 
+24. [Get the Maximum Score](https://leetcode.com/problems/get-the-maximum-score/)
+25. [Move zeros](https://leetcode.com/problems/move-zeroes/)
+26. [find median from data stream](https://leetcode.com/problems/find-median-from-data-stream/)
+    ```
+        use two heaps max heap and min heap 
+    ```
+27. [Intersection of two arrays](https://leetcode.com/problems/intersection-of-two-arrays-ii/)
+28. [isSubsequence](https://leetcode.com/problems/is-subsequence/)
+29. [Heaters](https://leetcode.com/problems/heaters/)
+30. [longest word in dict through deleting](https://leetcode.com/problems/longest-word-in-dictionary-through-deleting/)
+31. [k diff pairs in array](https://leetcode.com/problems/k-diff-pairs-in-an-array/)
+32. [permutation in string](https://leetcode.com/problems/permutation-in-string/)
+33. [find all anagrams](https://leetcode.com/problems/find-all-anagrams-in-a-string/)
+    ``` fixed sliding window ```
+34. [count binary string](https://leetcode.com/problems/count-binary-substrings/)
+35. [partition labels](https://leetcode.com/problems/partition-labels/)
+36. [swap-adjacent lr string](https://leetcode.com/problems/swap-adjacent-in-lr-string/)
+37. [Number of subarrays with bounded maximum](https://leetcode.com/problems/number-of-subarrays-with-bounded-maximum/)
+38. [shortest distance to a character](https://leetcode.com/problems/shortest-distance-to-a-character/)
+39. [friends of appropiate age](https://leetcode.com/problems/friends-of-appropriate-ages/)
+40. [Max profit assigning work](https://leetcode.com/problems/most-profit-assigning-work/)
+41. [push dominos](https://leetcode.com/problems/push-dominoes/)
+42. [Backspace string compare](https://leetcode.com/problems/backspace-string-compare/)
+43. [Longest mountain in array](https://leetcode.com/problems/longest-mountain-in-array/)
+44. [Long pressed name](https://leetcode.com/problems/long-pressed-name/)
