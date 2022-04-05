@@ -50,3 +50,12 @@
 42. [Backspace string compare](https://leetcode.com/problems/backspace-string-compare/)
 43. [Longest mountain in array](https://leetcode.com/problems/longest-mountain-in-array/)
 44. [Long pressed name](https://leetcode.com/problems/long-pressed-name/)
+45. [Merge strings alternatively](https://leetcode.com/problems/merge-strings-alternately)
+46. [Interval list intersection](https://leetcode.com/problems/interval-list-intersections/)
+47. [Camel case matching](https://leetcode.com/problems/camelcase-matching/)
+48. [Longest string chain](https://leetcode.com/problems/longest-string-chain/)
+49. [shuffle string](https://leetcode.com/problems/shuffle-string/)
+50. [shortest subarray remove to be sorted](https://leetcode.com/problems/shortest-subarray-to-be-removed-to-make-array-sorted/)
+51. [No. of ways to square to product](https://leetcode.com/problems/number-of-ways-where-square-of-number-is-equal-to-product-of-two-numbers/)
+52. [Largest Merge two strings](https://leetcode.com/problems/largest-merge-of-two-strings/)
+53. 
