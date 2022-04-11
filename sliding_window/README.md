@@ -58,4 +58,8 @@
 50. [shortest subarray remove to be sorted](https://leetcode.com/problems/shortest-subarray-to-be-removed-to-make-array-sorted/)
 51. [No. of ways to square to product](https://leetcode.com/problems/number-of-ways-where-square-of-number-is-equal-to-product-of-two-numbers/)
 52. [Largest Merge two strings](https://leetcode.com/problems/largest-merge-of-two-strings/)
-53. 
+53. [split two strings to palindrome](https://leetcode.com/problems/split-two-strings-to-make-palindrome/)
+54. [max no. of k sum arrays](https://leetcode.com/problems/max-number-of-k-sum-pairs/)
+55. [split array into 3 subarrays](https://leetcode.com/problems/ways-to-split-array-into-three-subarrays/)
+56. [swapping nodes in linked list](https://leetcode.com/problems/swapping-nodes-in-a-linked-list/)
+57. 
