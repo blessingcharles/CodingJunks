@@ -10,3 +10,6 @@ STL : partial_sum(a.begin() , a.end() , b.begin()) ---> to get prefix sum of a i
 7. [Max number of subsequences in string](https://leetcode.com/problems/maximize-number-of-subsequences-in-a-string/)
 8. [Remove minimum number of magic beans](https://leetcode.com/problems/removing-minimum-number-of-magic-beans/)
 9. [Intervals between identical element](https://leetcode.com/problems/intervals-between-identical-elements/)
+10. [subarray sum divisible by k](https://leetcode.com/problems/subarray-sums-divisible-by-k/)
+11. [corporate flight booking](https://leetcode.com/problems/corporate-flight-bookings/)
+12. 
