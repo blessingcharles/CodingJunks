@@ -4,43 +4,56 @@
 using namespace std;
 
 class Solution {
-public:
-    int removeDuplicates(vector<int>& nums) {
-        if(nums.size() < 3) return nums.size();
-        int left = 0 , right = 0;
-        
-        while(right < nums.size()){
-            //check the current window
-            int cur_ele = nums[right];
-			// cout << left << endl ;
-            nums[left] = cur_ele ;
-            
-            int count = 1;
-			right++ ;
-            while(right < nums.size() && cur_ele == nums[right]){
-				count++;
-				right++ ;
-			}
-			cout << left << " " << right << "--" << nums[left] << endl ;
-            if(count >= 2){
-                nums[++left] = cur_ele;
-            }
-            left++ ;
+    int N ; 
+    unordered_map<int , int> memo  ;
+
+
+    bool isPalindrome(string &s , int start , int end){
+        while(start < end){
+            if(s[start] != s[end])
+                return false ;
+            start++ ; end-- ;
         }
-        return left;
+        return true ;
+    }
+    
+    int partition(string &s , int start , int end){
+        // split from the end
+        if(start >= N)
+            return -1 ;
+        if(memo.find(start) != memo.end())
+            return memo[start] ;
+
+        int minVal = INT_MAX ;
+        
+        for(int i = end ; i >= start ; i--){
+            if(isPalindrome(s, start , i)){
+                minVal = min( minVal , 1+partition(s , i+1 , s.size()-1) ) ;
+            }
+        }
+
+        return memo[start] = minVal  ;
+    }
+public:
+    int minCut(string &s) {
+        N = s.size() ; 
+        return partition(s , 0 , s.size()-1) ;
+        
     }
 };
 
+
 int main()
 {
-	vector<int> arr = { 0,0,0,1,1,1,1, 2,2,2,4,5,6,6};
+	string st = "aaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaabbbbbbbbbbbbcccccccccccccccccccbbbbbbbbaaaaaaaaaaabbbbbbbbbbbbbbbcbcbcbcbaaaaaaaaaaaaaaaaaaaaabcbcbcbcbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbddddaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbddddddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbcbcbbcbcbcbcaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcbcbcbcbcbcbbcbcbcbcbcbcbcbbaaaaaaaaaaaaaaa" ;
+    string st1 = "aaaaaaaaaaaaaaaaaaabbbbbbbbbbbbcccccccccccccccccccbbbbbbbbaaaaaaaaaaabbbbbbbbbbbbbbbcbcbcbcbaaaaaaaaaaaaaaaaaaaaabcbcbcbcbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbddddddddddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbcbcbbcbcbcbcbcbcbcbcbcbcbbcbcbcbcbcbcbcbbaaaaaaaaaaaaaaa" ;
+
+    string small = "ab" ;
 
 	Solution s;
 
-	cout << s.removeDuplicates(arr) << endl ;
-	for(auto ele : arr){
+	cout << s.minCut(small) << endl ;
+	// cout << s.minCut("ab") << endl ;
 
-		cout << ele << endl ;
-	}
 	return 0;
 }

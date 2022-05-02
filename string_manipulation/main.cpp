@@ -31,14 +31,21 @@ void lps(vector<int> &table , string &s){
 
 int kmp(string &s , string &pattern){
     int idx = -1;
-    
+    /* eg 
+            string  : ababcabcababde
+
+            pattern : a b a b a b d
+
+            table   : 0 0 1 2 3 4 0 
+    */
+
     vector<int> table(pattern.size() , 0);
 
-    // for(auto ele : table){
-    //     cout << ele << " " ;
-    // }
     lps(table,pattern);
 
+    for(auto ele : table){
+        cout << ele << " " ;
+    }
     int i = 0 , ptr = 0 ;
     while(i < s.size()){
         if(s[i] == pattern[ptr]){
@@ -60,8 +67,8 @@ int kmp(string &s , string &pattern){
 
 int main(int argc , char **argv){
 
-    string s = "adcadcaddcadde";
-    string pattern = "addcadde";
+    string s = "ababcabcababbde";
+    string pattern = "abababd";
 
     // cout << "hello world" ;
     cout << kmp( s,pattern ) << endl ;
