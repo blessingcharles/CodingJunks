@@ -1,4 +1,18 @@
 #### Linear dp
 
 1. [decode ways](https://leetcode.com/problems/decode-ways/)
-2. 
+2. [unique bst](https://leetcode.com/problems/unique-binary-search-trees/)
+3. 
+
+### KnapSack
+1. [house robber 2](https://leetcode.com/problems/house-robber-ii/)
+2. [ones and zeros](https://leetcode.com/problems/ones-and-zeroes/)
+3. [best team no conflicts](https://leetcode.com/problems/best-team-with-no-conflicts/)
+4. [tallest billboard](https://leetcode.com/problems/tallest-billboard/)
+5. [reducing dishes](https://leetcode.com/problems/reducing-dishes/)
+
+### Multidimensional dp
+1. [triangle](https://leetcode.com/problems/triangle/)
+2. [champagne tower](https://leetcode.com/problems/champagne-tower/)
+3. [largest sum of average](https://leetcode.com/problems/largest-sum-of-averages/)
+4. 
