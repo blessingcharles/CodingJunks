@@ -15,4 +15,5 @@
 1. [triangle](https://leetcode.com/problems/triangle/)
 2. [champagne tower](https://leetcode.com/problems/champagne-tower/)
 3. [largest sum of average](https://leetcode.com/problems/largest-sum-of-averages/)
-4. 
+4. [video stitching](https://leetcode.com/problems/video-stitching/)
+5. 
