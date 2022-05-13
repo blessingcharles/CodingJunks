@@ -17,3 +17,11 @@
 3. [largest sum of average](https://leetcode.com/problems/largest-sum-of-averages/)
 4. [video stitching](https://leetcode.com/problems/video-stitching/)
 5. 
+
+### digitsdp
+1. https://leetcode.com/problems/numbers-at-most-n-given-digit-set/
+
+### dp on trees
+1. [split bt](https://leetcode.com/problems/maximum-product-of-splitted-binary-tree/)
+2. [zigzag path in bt](https://leetcode.com/problems/longest-zigzag-path-in-a-binary-tree/)
+3. 

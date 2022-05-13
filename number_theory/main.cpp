@@ -3,7 +3,6 @@
 
 using namespace std ;
 
-
 void seive_of_erasthonis(int n){
     vector<int> seive(n+1 , 1);
 
