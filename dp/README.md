@@ -24,4 +24,7 @@
 ### dp on trees
 1. [split bt](https://leetcode.com/problems/maximum-product-of-splitted-binary-tree/)
 2. [zigzag path in bt](https://leetcode.com/problems/longest-zigzag-path-in-a-binary-tree/)
-3. 
+3. [distribute coin in bt](https://leetcode.com/problems/distribute-coins-in-binary-tree/)
+4. [bt cameras](https://leetcode.com/problems/binary-tree-cameras/)
+5. [max-sum-bst][https://leetcode.com/problems/maximum-sum-bst-in-binary-tree/]
+6. 
