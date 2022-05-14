@@ -28,3 +28,14 @@
 4. [bt cameras](https://leetcode.com/problems/binary-tree-cameras/)
 5. [max-sum-bst][https://leetcode.com/problems/maximum-sum-bst-in-binary-tree/]
 6. 
+
+### dp on grids
+1. [max non negative product](https://leetcode.com/problems/maximum-non-negative-product-in-a-matrix/)
+2. [No of Paths with Max Score](https://leetcode.com/problems/number-of-paths-with-max-score/)
+3. [Pick Cherry](https://leetcode.com/problems/cherry-pickup/)
+4. [Pick Cherry 2](https://leetcode.com/problems/cherry-pickup-ii/)
+
+### Interval dp
+1. [arithmetic slices](https://leetcode.com/problems/arithmetic-slices/)
+2. [stone games](https://leetcode.com/problems/stone-game/)
+3. 
