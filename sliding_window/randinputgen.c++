@@ -22,7 +22,7 @@ int main(int argc , char **argv){
         start =  stol(argv[1]) ;
         end = stol(argv[2]);
     }
-
+    
     for(int i = start ; i < end ; i++){
         cout << (rand()%end) << "," ; 
     }
