@@ -43,3 +43,5 @@
 21. [k-radius-subarray-averages](https://leetcode.com/problems/k-radius-subarray-averages/)
 22. [min-swaps-to-group-1s](https://leetcode.com/problems/minimum-swaps-to-group-all-1s-together-ii/)
 23. [min-consecutive-cards-to-pick-up](https://leetcode.com/problems/minimum-consecutive-cards-to-pick-up/)
+24. [sub-arrays-with-k-distinct](https://leetcode.com/problems/subarrays-with-k-different-integers/)
+25. 
