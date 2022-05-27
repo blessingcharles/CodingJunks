@@ -3,7 +3,8 @@
 ### Easy
 
 1. [remove-duplicates](https://leetcode.com/problems/remove-duplicates-from-sorted-list/)
-2. 
+2. [bin-to-int](https://leetcode.com/problems/convert-binary-number-in-a-linked-list-to-integer/)
+
 ### Medium
 
 1. [merge-zero-nodes](https://leetcode.com/problems/merge-nodes-in-between-zeros/)
@@ -30,4 +31,8 @@ while(fast and fast->next){
 14. [design-circular-deque](https://leetcode.com/problems/design-circular-deque/)
 15. [design-hashset](https://leetcode.com/problems/design-hashset/)
 16. [design-hashmap](https://leetcode.com/problems/design-hashmap/)
-17. 
+17. [split-ll-in-parts](https://leetcode.com/problems/split-linked-list-in-parts/)
+18. [linked-list-components](https://leetcode.com/problems/linked-list-components/)
+19. [next-greater-node](https://leetcode.com/problems/next-greater-node-in-linked-list/)
+20. [remove-zero-sum](https://leetcode.com/problems/remove-zero-sum-consecutive-nodes-from-linked-list/)
+21. 
