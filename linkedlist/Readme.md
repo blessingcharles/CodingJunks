@@ -35,4 +35,7 @@ while(fast and fast->next){
 18. [linked-list-components](https://leetcode.com/problems/linked-list-components/)
 19. [next-greater-node](https://leetcode.com/problems/next-greater-node-in-linked-list/)
 20. [remove-zero-sum](https://leetcode.com/problems/remove-zero-sum-consecutive-nodes-from-linked-list/)
-21. 
+21. [reverse-nodes-even](https://leetcode.com/problems/reverse-nodes-in-even-length-groups/)
+22. [local-max-min](https://leetcode.com/problems/find-the-minimum-and-maximum-number-of-nodes-between-critical-points/)
+23. [merge-ll](https://leetcode.com/problems/merge-in-between-linked-lists/)
+24. 
