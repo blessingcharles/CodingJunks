@@ -11,3 +11,7 @@
 5. [delete-node-bst](https://leetcode.com/problems/delete-node-in-a-bst/)
 6. [max-binary-tree](https://leetcode.com/problems/maximum-binary-tree/)
 7. 
+
+## Hard
+1. [sum-of-dist-tree](https://leetcode.com/problems/sum-of-distances-in-tree/)
+2. 
