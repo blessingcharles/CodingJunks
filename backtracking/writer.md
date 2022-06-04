@@ -9,3 +9,5 @@
 9. [iterator-for-combination](https://leetcode.com/problems/iterator-for-combination/)
 10. [happy strings](https://leetcode.com/problems/the-k-th-lexicographical-string-of-all-happy-strings-of-length-n/)
 11. [split-substr](https://leetcode.com/problems/split-a-string-into-the-max-number-of-unique-substrings/)
+12. [binary-watch](https://leetcode.com/problems/binary-watch/)
+13. 
