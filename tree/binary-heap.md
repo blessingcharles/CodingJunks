@@ -25,4 +25,9 @@
 ### Problems
 
 1. [top-k-frequent](https://leetcode.com/problems/top-k-frequent-elements/)
-2. 
+2. [relative-raning](https://leetcode.com/problems/relative-ranks/)
+3. [importance-of-roads](https://leetcode.com/problems/maximum-total-importance-of-roads/)
+4. [max-product-after-k-incre](https://leetcode.com/problems/maximum-product-after-k-increments/)
+5. [dig-swap-parity]9https://leetcode.com/problems/largest-number-after-digit-swaps-by-parity/
+6. [ugly-number-ii](https://leetcode.com/problems/ugly-number-ii/)
+7. 
