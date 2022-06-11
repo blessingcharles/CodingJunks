@@ -513,4 +513,131 @@ vector<int> Solution::subUnsort(vector<int> &A) {
 }
 ```
 
-6.  
+### Simulation Array
+
+1. [perfect-peak-arr](https://www.interviewbit.com/problems/perfect-peak-of-array/)
+
+```cpp
+int Solution::perfectPeak(vector<int> &A) {
+    int N = A.size() ;
+    
+    vector<int> prefix(N) ; // stores previous larger elements
+    vector<int> suffix(N) ; // contains smaller future elements
+    
+    prefix[0] = INT_MIN ;
+    suffix[N-1] = INT_MAX ;
+    for(int i = 1 , j = N-2 ; i < N ; i++ , j--){
+        prefix[i] = max(A[i-1] , prefix[i-1]);
+        suffix[j] = min(A[j+1] , suffix[j+1]);
+    } 
+    for(int i = 1 ; i < N-1 ; i++){
+        if(A[i] > prefix[i] and A[i] < suffix[i]){
+            return 1 ;
+        }
+    }
+    return 0 ;
+}
+```
+2. [kth-row-pascal](https://www.interviewbit.com/problems/kth-row-of-pascals-triangle/)
+```cpp
+vector<int> Solution::getRow(int A) {
+    vector<vector<int>> memo(A+1) ;
+    memo[0] = {1} ;
+    for(int i = 1 ; i <= A ; i++){
+        vector<int> temp ;
+        temp.push_back(1);
+        for(int j = 1 ; j < i ; j++){
+            temp.push_back(memo[i-1][j] + memo[i-1][j-1]);
+        }
+        temp.push_back(1);
+        memo[i] = temp ;
+    }
+    return memo[A] ;
+}
+```
+
+3. [spiral-order-matrix](https://www.interviewbit.com/problems/spiral-order-matrix-ii/)
+```cpp
+vector<vector<int> > Solution::generateMatrix(int A) {
+    vector<vector<int>> matrix(A , vector<int>(A));
+    int cur_val = 1 ;
+    int rowBegin = 0 , rowEnd = A-1 ;
+    int colBegin = 0 , colEnd = A-1 ;
+    
+    while(rowBegin <= rowEnd and colBegin <= colEnd){
+        // traverse colBegin to colEnd on rowBegin
+        for(int i = colBegin ; i <= colEnd ; i++){
+            matrix[rowBegin][i] = cur_val ;
+            cur_val++ ;
+        }    
+        rowBegin++ ;
+        
+        // traverse rowBegin to rowEnd on colEnd
+        for(int i = rowBegin ; i <= rowEnd ; i++){
+            matrix[i][colEnd] = cur_val ;
+            cur_val++ ;
+        }
+        colEnd-- ;
+        
+        // traverse colEnd to colBegin on rowEnd 
+        if(rowEnd >= rowBegin){
+            for(int i = colEnd ; i >= colBegin ; i--){
+                matrix[rowEnd][i] = cur_val ;
+                cur_val++ ;
+            }
+        }
+        rowEnd-- ;
+        // traverse rowEnd to rowBegin on colBegin
+        if(colBegin <= colEnd){
+            for(int i = rowEnd; i >= rowBegin ; i--){
+                matrix[i][colBegin] = cur_val ;
+                cur_val++ ;
+            }
+        }
+        colBegin++ ;
+    }
+    
+    return matrix ;
+}
+```
+4. pascals-traingle : already done
+
+5. [anti-diagonals](https://www.interviewbit.com/problems/anti-diagonals/)
+```cpp
+vector<vector<int> > Solution::diagonal(vector<vector<int> > &A) {
+    N = A.size() ;
+    
+    vector<vector<int>> res((N*2)-1);
+    int idx = 0 ;
+    
+    int cur_row , cur_col ;
+    // traverse the top row
+    for(int col = 0 ; col < N ; col++){
+        cur_row = 0 ;
+        cur_col = col ;
+        vector<int> temp ;        
+        while(not isInValid(cur_row , cur_col)){
+            temp.push_back(A[cur_row][cur_col]);
+            cur_row += 1 ;
+            cur_col -= 1 ;        
+        }
+        res[idx++] = temp ;
+    }
+    
+    // traverse the last col
+    for(int row = 1 ; row < N ; row++){
+        cur_row = row ;
+        cur_col = N-1 ;
+        vector<int> temp ;
+        while(not isInValid(cur_row , cur_col)){
+            temp.push_back(A[cur_row][cur_col]);
+            cur_row += 1 ;
+            cur_col -= 1 ;  
+        }        
+        res[idx++] = temp ;
+    }
+    
+    return res ;
+}
+```
+
