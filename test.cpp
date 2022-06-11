@@ -1,42 +1,32 @@
-#include<iostream>
-#include<bits/stdc++.h>
+#include <iostream>
+#include <bits/stdc++.h>
 
-using namespace std ;
-
-vector<int> solve(vector<int> &A) {
-    vector<int> ans ;
-    int carry = 0 , temp ;
-    // remove all starting zeros
-    int end = 0 ;
-    
-    for(int end = 0 ; end < A.size() ; end++){
-        if(A[end] != 0) break ;
-    }    
-    cout << end << endl ;
-    
-    for(int i = A.size()-1 ; i >= end ; i--){
-        if(i == A.size()-1){
-            cout << "hii" << endl ;
-            temp = A[i] + 1 ;
-            carry = temp/10 ;
-            ans.push_back(temp%10);
-        }
-        else{
-            temp = A[i] + carry ;
-            carry = temp/10 ;
-            ans.push_back(temp%10);
-        }
+using namespace std;
+void printvec(vector<int> &arr){
+    for(auto ele : arr){
+        cout << ele << " " ;
     }
-    
-    if(carry) ans.push_back(carry);
-    
-    reverse(ans.begin() , ans.end());
-    return ans ;
+    cout << endl ;
 }
 
-int main(){
-    vector<int> arr = {0, 3, 7, 6, 4, 0, 5, 5, 5};
-    for(int ele : solve(arr)){
-        cout << ele << " " ;
-    } 
+int solve(vector<int> &A) {
+    set<int> arr(A.begin() , A.end());
+    int idx = 0 ;
+    int N = arr.size() ;
+    for(auto ele : arr){
+        cout << ele << endl ;
+    }
+    for(auto it = arr.begin() ; it != arr.end() ; it++ , idx++ ){
+        if(*it == (N-idx-1)){
+            return 1 ;
+        }
+    }
+    return -1 ;
+}
+
+
+int main()
+{
+    vector<int> arr = {1, 2, 7, 0, 9, 3, 6, 0, 6 };
+    cout << solve(arr) ;
 }

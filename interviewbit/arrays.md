@@ -186,4 +186,331 @@ int Solution::maxArr(vector<int> &A) {
 }
 ```
 
-8. 
+8. [flip-bits](https://www.interviewbit.com/problems/flip/)
+```cpp
+vector<int> Solution::flip(string str) {
+        int left_ptr = -1 , right_ptr = -1 ;
+        vector<int> memo(str.size()+1 , 0);
+        int ltemp = 0 , count = 0 , maxlen = 0 ;
+        
+        bool flag = true ;
+        
+        for(int i = 0 ; i < str.size() ; i++){
+            if(str[i] == '0'){
+                count++ ;
+            }
+            else{
+                count-- ;
+            }
+            if(count < 0){
+                ltemp = i+1 ;    
+                count = 0 ;
+            }
+            else if(count > maxlen){ 
+                flag = false ;
+                right_ptr = i ;
+                left_ptr = ltemp ;
+                maxlen = count ;
+            }
+        }
+        
+        if(flag){
+            return {} ;
+        }
+        
+        return {left_ptr+1 , right_ptr+1} ;
+}
+```
+
+### value ranges
+
+1. [max-min](https://www.interviewbit.com/problems/max-min-05542f2f-69aa-4253-9cc7-84eb7bf739c4/)
+```cpp
+int Solution::solve(vector<int> &A) {
+    int max_ele = A[0] , min_ele = A[0] ;
+    
+    for(int i = 1 ; i < A.size() ; i++){
+        max_ele = max(max_ele , A[i]);
+        min_ele = min(min_ele , A[i]);
+    }
+    return max_ele + min_ele ;
+}
+```
+
+2. [merge-intervals](https://www.interviewbit.com/problems/merge-intervals/)
+```cpp
+vector<Interval> Solution::insert(vector<Interval> &intervals, Interval newInterval) {
+    vector<Interval> res ;
+    intervals.push_back(newInterval);
+    
+    sort(intervals.begin() , intervals.end() , [](const Interval &a , const Interval &b){
+        return a.start <= b.start ; 
+    });
+    
+    res.push_back(intervals[0]);
+    int ptr = 0 ;
+    
+    for(int i = 1 ; i < intervals.size() ; i++){
+        if(res[ptr].end >= intervals[i].start){
+            if(res[ptr].end < intervals[i].end){
+                res[ptr].end = intervals[i].end ;
+            }
+        }   
+        else{
+            res.push_back(intervals[i]);
+            ptr++ ;
+        } 
+    }
+    
+    return res ;
+}
+```
+
+3. [sort-array](https://www.interviewbit.com/problems/sort-array-with-squares/)
+```cpp
+vector<int> Solution::solve(vector<int> &A) {
+    int N = A.size();
+    vector<int> res(N);
+    int left = 0 , right = N-1 ;
+    
+    int res_ptr1 = N-1 ; 
+    
+    while(left <= right){
+        if(abs(A[left]) > abs(A[right])){
+            res[res_ptr1] = A[left]*A[left] ;
+            left++ ;
+        }
+        else{
+            res[res_ptr1] = A[right]*A[right] ;
+            right-- ;
+        }
+        res_ptr1-- ;
+    }
+    
+    return res ;
+}
+```
+
+4. [largest-number](https://www.interviewbit.com/problems/largest-number/)
+```cpp
+string Solution::largestNumber(const vector<int> &A) {
+    vector<string> temp ;
+    bool flag = true ;
+    for(int ele : A){
+        if(ele != 0){
+            flag = false ;
+        }
+        temp.push_back(to_string(ele));
+    }
+    if(flag){
+        return "0" ;
+    }
+    sort(temp.begin(), temp.end(), [](const string &a , const string &b){
+        string t = a + b ;
+        string tt = b + a ;
+
+        return t > tt ;
+    });
+    
+    string res = "";
+    for(string &st : temp){
+        res += st ;
+    }
+    return res ;
+}
+```
+
+5. [rotate-clockwise](https://www.interviewbit.com/problems/rotate-matrix/)
+```cpp
+void Solution::rotate(vector<vector<int> > &A) {
+    reverse(A.begin() , A.end());
+    
+    int N = A.size() ;
+    
+    for(int i = 0 ; i < N ; i++){
+        for(int j = i+1 ; j < N ; j++){
+            swap(A[i][j] , A[j][i]);
+        }
+    }
+    
+}
+```
+
+6. [next-permutation](https://www.interviewbit.com/problems/next-permutation/)
+```cpp
+vector<int> Solution::nextPermutation(vector<int> &A) {
+    int before_peak = 0 ;
+    int N = A.size() ;
+    for(int i = N-2 ; i >= 0 ; i--){
+        if(A[i] < A[i+1]){
+            // i+1 is peak
+            before_peak = i;
+            break ;
+        }
+    }
+    
+    for(int i = N-1 ; i > before_peak ; i--){
+        if(A[before_peak] < A[i]){
+            swap(A[before_peak] , A[i]);
+            before_peak++ ;
+            break ;
+        }   
+    }
+    
+    reverse(A.begin()+before_peak , A.end());
+    return A ;
+}
+```
+
+7. [find-permutation](https://www.interviewbit.com/problems/find-permutation/)
+```cpp
+vector<int> Solution::findPerm(const string A, int B) {
+    vector<int> arr(B);
+    int l = 1 , r = B ;
+    
+    for(int i = 0 ; i < A.size() ; i++){
+        if(A[i] == 'I'){
+            arr[i] = l ;
+            l++ ;
+        }    
+        else{
+            arr[i] = r ;
+            r-- ;
+        }
+    }
+    arr[B-1] = l ;
+    
+    return arr ;
+}
+```
+
+### Sorting
+
+1. [Noble integer](https://www.interviewbit.com/problems/noble-integer/)
+```cpp
+int Solution::solve(vector<int> &A) {
+    sort(A.begin() , A.end());
+    int N = A.size() ;
+    for(int i = 0 ; i < N ; i++){
+        while(i < N-1 and A[i] == A[i+1]){
+            i++ ;
+        }
+        
+        if(A[i] == N-i-1){
+            return 1 ;
+        }
+    }
+    return -1 ;
+}
+```
+
+2. [wave-array](https://www.interviewbit.com/problems/wave-array/)
+```cpp
+vector<int> Solution::wave(vector<int> &A) {
+    sort(A.begin() , A.end());
+    int l = 0 , r = 1;
+    vector<int> res(A.size());
+    int idx = 0 ;
+    int N = A.size() ;
+    
+    while(l < N){
+        if(r < N and idx%2 == 0){
+            res[idx] = A[r];
+            r += 2 ;
+        }   
+        else{
+            res[idx] = A[l];
+            l += 2 ;
+        } 
+        idx++ ;
+    }
+    
+    return res ;
+}
+```
+
+3. [hotel-booking-available](https://www.interviewbit.com/problems/hotel-bookings-possible/)
+```cpp
+bool Solution::hotel(vector<int> &arrive, vector<int> &depart, int K) {
+    sort(arrive.begin() , arrive.end());
+    sort(depart.begin() , depart.end());
+    
+    int N = arrive.size() ;
+    int ptr1 = 0 , ptr2 = 0 ;
+    int req_rooms = 0;
+    
+    
+    while(ptr1 < N and ptr2 < N){
+        if(arrive[ptr1] <= depart[ptr2]){
+            req_rooms++ ;
+            ptr1++ ;
+            
+            if(req_rooms > K){
+                return false ;
+            }
+        }
+        else{
+            ptr2++ ;
+            req_rooms-- ;
+        }
+    }
+    return true ;
+}
+```
+
+4. [max-dist](https://www.interviewbit.com/problems/max-distance/)
+```cpp
+int Solution::maximumGap(const vector<int> &A) {
+    int N = A.size() ;
+    vector<pair<int,int>> memo(N) ;
+    
+    for(int i = 0 ; i < N ; i++){
+        memo[i] = {A[i] , i}; 
+    }
+    sort(memo.begin() , memo.end());
+    
+    vector<int> precalc(N);
+    precalc[N-1] = memo[N-1].second ;
+    
+    for(int i = N-2 ; i >= 0 ; i--){
+        precalc[i] = max(memo[i].second , precalc[i+1]);
+    }
+    
+    int maxdist = 0 ;
+    for(int i = 0 ; i < N-1 ; i++){
+        maxdist = max(maxdist ,precalc[i+1] - memo[i].second) ;
+    }
+    
+    return maxdist ;
+}
+```
+
+5. [maxx-unsorted-subarray](https://www.interviewbit.com/problems/maximum-unsorted-subarray/)
+```cpp
+
+vector<int> Solution::subUnsort(vector<int> &A) {
+    
+    vector<int> arr = A ;
+    
+    sort(arr.begin() , arr.end());
+        
+    int N = A.size() ;
+    int left_ptr = 0 , right_ptr = N-1 ;
+    
+    int idx ;
+    
+    while(left_ptr < N and A[left_ptr] == arr[left_ptr]){
+        left_ptr++ ;
+    }
+    if(left_ptr == N){
+        return {-1} ;
+    }
+    while(A[right_ptr] == arr[right_ptr]){
+        right_ptr-- ;
+    }
+    
+    return {left_ptr , right_ptr};
+}
+```
+
+6.  
