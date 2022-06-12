@@ -1,3 +1,38 @@
+### Practise 
+
+1. [max-non-neg-subarray](https://www.interviewbit.com/problems/max-non-negative-subarray/)
+```cpp
+vector<int> Solution::maxset(vector<int> &A) {
+    vector<int> ans ;
+    vector<int> temp ;
+    
+    long long maxsum = 0 ;
+    long long cursum = 0 ;
+    
+    for(int i = 0 ; i < A.size() ; i++){
+        if(A[i] < 0){
+            cursum = 0 ;
+            temp = {} ;
+        }     
+        else if(A[i] >= 0){
+            temp.push_back(A[i]);
+            cursum += A[i] ;
+            
+            if(cursum > maxsum){
+                ans = temp ;
+                maxsum = cursum ;
+            }
+            else if(cursum == maxsum and temp.size() > ans.size()){
+                ans = temp ;
+                maxsum = cursum ;
+            }
+        }
+    }
+    
+    return ans ;
+}
+```
+
 ### Array math
 
 1. [pick from both sides](https://www.interviewbit.com/problems/pick-from-both-sides/)
@@ -665,7 +700,82 @@ int Solution::solve(vector<string> &A) {
 }
 ```
 
-2. 
+2. [balance-array](https://www.interviewbit.com/problems/balance-array/)
+```cpp
+int Solution::solve(vector<int> &A) {
+    int N = A.size() ;
+    vector<int> even_sum(N , 0);
+    vector<int> odd_sum(N,0);
+    
+    even_sum[0] = A[0] ;
+    
+    for(int i = 1 ; i < N ; i++){
+        if(i%2 == 0){
+            even_sum[i] = A[i] + even_sum[i-1];
+            odd_sum[i] = odd_sum[i-1];
+        }
+        else{
+            odd_sum[i] = A[i] + odd_sum[i-1] ;
+            even_sum[i] = even_sum[i-1] ;
+        }
+    }
+    
+    int count = 0 , e_sum , o_sum ;
+    for(int i = 0 ; i < N ; i++){
+        int prev_odd_sum = 0 , prev_even_sum = 0 ;
+        if(i%2 == 0){
+            
+            if(i-1 >= 0){
+                prev_odd_sum = odd_sum[i-1];
+            }
+            if(i-2 >= 0){
+                prev_even_sum = even_sum[i-2] ;
+            }
+            // adding the next even sum 
+            e_sum = prev_even_sum + odd_sum[N-1] - odd_sum[i] ;
+            o_sum = prev_odd_sum + even_sum[N-1] - even_sum[i] ;
+
+        }
+        else{
+            if(i-1 >= 0){
+                prev_even_sum = even_sum[i-1];
+            }
+            if(i-2 >= 0){
+                prev_odd_sum = odd_sum[i-2] ;
+            }
+            
+            e_sum = prev_even_sum + odd_sum[N-1] - odd_sum[i];
+            o_sum = prev_odd_sum + even_sum[N-1] - even_sum[i] ;    
+        }
+        if(e_sum == o_sum){
+                count++ ;
+        }
+    }
+    return count ;
+}
+``` 
+
+3. [duplicate-in-arr](https://www.interviewbit.com/problems/find-duplicate-in-array/)
+```cpp
+int Solution::repeatedNumber(const vector<int> &A) {
+    //* floyd cycle detection
+    
+    int slow = A[0] , fast = A[0] ; 
+    
+    do{
+        slow = A[slow] ;
+        fast = A[A[fast]];
+    }while(slow != fast);
+    
+    fast = A[0] ;
+    // set the fast to the begining
+    while(slow != fast){
+        slow = A[slow] ;
+        fast = A[fast] ;
+    }
+    return slow ;
+}
+```
 
 
 ### Space Recycle
@@ -776,3 +886,54 @@ int Solution::solve(vector<vector<int> > &A, int B) {
 }
 ```
 
+### Missing / repeated number
+
+3. [N/3 repeated](https://www.interviewbit.com/problems/n3-repeat-number/)
+```cpp
+int Solution::repeatedNumber(const vector<int> &A) {
+    // Boyer Moore Voting algorithm
+    
+    int candidate1 = 0 , candidate2 = 0 , count1 = 0 , count2 = 0;
+    int N = A.size() ;
+    
+    for(int i = 0 ; i < N ; i++){
+        if(A[i] == candidate1){
+            count1++ ;
+        }
+        else if(A[i] == candidate2){
+            count2++ ;
+        }
+        else if(count1 == 0){
+            candidate1 = A[i] ;
+            count1 = 1 ;
+        }
+        else if(count2 == 0){
+            candidate2 = A[i] ;
+            count2 = 1 ;
+        }
+        else{
+            count1-- ;
+            count2-- ;
+        }
+    }
+    
+    count1 = 0 ; count2 = 0 ;
+    
+    for(int i = 0 ; i < N ; i++){
+        if(A[i] == candidate1){
+            count1++ ;
+            if(count1 > N/3){
+                return candidate1 ;
+            }
+        }
+        else if(A[i] == candidate2){
+            count2++ ;
+            if(count2 > N/3){
+                return candidate2 ;
+            }
+        }
+        
+    }
+    return -1 ;
+}
+```
