@@ -641,3 +641,138 @@ vector<vector<int> > Solution::diagonal(vector<vector<int> > &A) {
 }
 ```
 
+### Arrays bucketing
+
+1. [triplets-range](https://www.interviewbit.com/problems/triplets-with-sum-between-given-range/)
+```cpp
+int Solution::solve(vector<string> &A) {
+    int left = 0 , right = A.size()-1 , mid ;
+    sort(A.begin() , A.end());
+    while(right-left >= 2){
+        mid = left + (right-left)/2 ;
+        double sum = stof(A[left]) + stof(A[mid]) + stof(A[right]) ;
+        if(sum >= 2){
+            right-- ;
+        }
+        else if(sum <= 1){
+            left++ ;
+        }
+        else{
+            return 1 ;
+        }
+    }
+    return 0 ; 
+}
+```
+
+2. 
+
+
+### Space Recycle
+
+1. [set matrix zero](https://www.interviewbit.com/problems/set-matrix-zeros/)
+```cpp
+void Solution::setZeroes(vector<vector<int> > &A) {
+    bool isCol0 = false ;
+    int M = A.size() , N = A[0].size() ;
+    
+    for(int i = 0 ; i < M ; i++){
+        if(A[i][0] == 0){
+            isCol0 = true ;
+        }
+        for(int j = 0 ; j < N ; j++){
+            if(A[i][j] == 0){
+                A[i][0] = 0 ;
+                if(j != 0)
+                    A[0][j] = 0 ;
+            }
+        }
+    }
+    
+    for(int i = M-1 ; i >= 0 ; i--){
+        for(int j = N-1 ; j > 0 ; j--){
+            if(A[i][0] == 0 or A[0][j] == 0){
+                A[i][j] = 0 ;
+            }
+        }
+        if(isCol0){
+            A[i][0] = 0 ;
+        }
+    }
+}
+```
+
+2. [first-missing-positve](https://www.interviewbit.com/problems/first-missing-integer/)
+```cpp
+
+int Solution::firstMissingPositive(vector<int> &A) {
+    N = A.size() ;
+    /*
+        The answer must be in the rangle og 1..N+1
+        
+        1. Make all negatives 0
+        2. take abs(A[i]) and then map it to A[A[i]-1] , mark that place negative
+    */
+    
+    // make all negatives zero
+    for(int i = 0 ; i < N ; i++){
+        if(A[i] < 0){
+            A[i] = 0 ;
+        }
+    }
+    
+    for(int i = 0 ; i < N ; i++){
+        int cur_idx = abs(A[i])-1 ;
+        if(isInvalid(cur_idx)){
+            continue ;
+        }
+        if(A[cur_idx] == 0){
+            A[cur_idx] = -(cur_idx+1) ;
+        }        
+        else if(A[cur_idx] != -(cur_idx+1)){
+            A[cur_idx] = A[cur_idx]*-1 ;
+        }
+    }
+}
+```
+
+3. [matrix-sum-square-sub](https://www.interviewbit.com/problems/maximum-sum-square-submatrix/)
+```cpp
+
+int Solution::solve(vector<vector<int> > &A, int B) {
+    // initiate 0 th row and 0th col
+    N = A.size() ;
+    for(int i = 1 ; i < N ; i++){
+        A[i][0] += A[i-1][0] ;
+        A[0][i] += A[0][i-1] ;
+    }
+    
+    for(int row = 1 ; row < N ; row++){
+        for(int col = 1 ; col < N ; col++){
+            A[row][col] = A[row][col] + A[row-1][col] + A[row][col-1] - A[row-1][col-1] ;
+        }
+    }
+    int maxsum = INT_MIN ;
+    for(int row = B-1 ; row < N ; row++){
+        for(int col = B-1 ; col < N ; col++){
+            bool flag1 = isValid(row-B);
+            bool flag2 = isValid(col-B);
+            int suber = 0 ;
+            if(flag1 and flag2){
+                suber += A[row-B][col-B]; 
+            }        
+            if(flag1){
+                suber -= A[row-B][col] ;
+            }
+            if(flag2){
+                suber -= A[row][col-B] ;
+            }
+            
+            maxsum = max(maxsum , A[row][col] + suber) ;
+        }
+    }
+    
+    return maxsum ;
+}
+```
+
