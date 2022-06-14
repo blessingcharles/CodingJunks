@@ -315,3 +315,245 @@ int Solution::searchInsert(vector<int> &nums, int target) {
 }
 ```
 
+### Search answer
+
+1. [Matrix median](https://www.interviewbit.com/problems/matrix-median/)
+```cpp
+int M , N ;
+
+int findLesserElements(vector<int> &arr , int target){
+    if(arr[0] > target){
+        return 0 ;
+    }
+    if(arr[N-1] <= target){
+        return N ;
+    }
+    int left = 0 , right = N-1 , mid;
+    
+    while(left < right){
+        mid = left + (right - left)/2 ;
+        
+        if(arr[mid] <= target){
+            left = mid+1 ;
+        }
+        else{
+            right = mid ;
+        }
+    }
+    
+    return right ;
+}
+
+int Solution::findMedian(vector<vector<int> > &A){
+    M = A.size() ;
+    N = A[0].size() ;
+    
+    int lesser = (M*N)/2 ;
+    
+    int left = 1 , right = A[0][N-1] ;
+    
+    for(int row = 1 ; row < M ; row++){
+        right = max(right , A[row][N-1] ) ;
+    }
+    int mid ;
+    
+    while(left < right){
+        mid = left + (right - left)/2 ;
+        
+        int cnt = 0 ;
+        
+        // find the lesser elements than mid
+        for(int i = 0 ; i < M ; i++){
+            cnt += findLesserElements(A[i] , mid);    
+        }    
+        if(cnt <= lesser){
+            left = mid+1 ;
+        }
+        else{
+            right = mid ;
+        }
+    }
+    
+    return right ;
+}
+```
+
+2. [Allocate-books](https://www.interviewbit.com/problems/allocate-books/)
+```cpp
+#include<numeric>
+
+bool CanIAllocate(vector<int> &arr , int students , int min_pages){
+    int cur_sum = 0 , required_students = 1 ;
+    
+    for(int i = 0 ; i < arr.size() ; i++){
+        if(arr[i] > min_pages){
+            return false ;
+        }
+        if(arr[i] + cur_sum > min_pages){
+            required_students++ ;
+            if(required_students > students){
+                return false ;
+            }
+            cur_sum = arr[i] ;
+        }
+        else{
+            cur_sum += arr[i] ;
+        }
+    }
+    
+    return true ;
+}
+
+int Solution::books(vector<int> &A, int B) {
+    if(A.size() < B){
+        return -1 ;
+    }
+    
+    int left = *min_element(A.begin() , A.end()) ;
+    int right = accumulate(A.begin() ,A.end() , 0);
+    int mid ;
+        
+    while(left < right){
+        mid = left + (right - left)/2 ;
+        
+        if(not CanIAllocate(A , B , mid)){
+            left = mid+1 ;
+        }
+        else{
+            right = mid ;
+        }
+    }
+    
+    return left ;
+}
+```
+
+3. [painters-problem](https://www.interviewbit.com/problems/painters-partition-problem/)
+```cpp
+#include<bits/stdc++.h>
+
+bool isPossible(vector<int> &heights , int painters ,long min_time){
+    int required_painter = 1 ;
+    long cur_sum = 0 ;
+    
+    for(int i = 0 ; i < heights.size() ; i++){
+        if(heights[i] + cur_sum > min_time){
+            required_painter++ ;
+            if(required_painter > painters){
+                return false ;
+            }
+            cur_sum = heights[i] ;
+        }
+        else{
+            cur_sum += heights[i] ;
+        }
+    }
+    
+    return true ;
+}
+int Solution::paint(int A, int B, vector<int> &C) {
+    
+    long left = *max_element(C.begin() , C.end()) , right = accumulate(C.begin() , C.end() , 0) ;
+    
+    long mid ;
+    
+    while(left < right){
+        mid = left + (right - left)/2 ;
+        
+        if(not isPossible(C , A , mid )){
+            left = mid+1 ;
+        }
+        else{
+            right = mid ;
+        }
+    }
+    long long res = (right*B)%10000003 ;
+    return res ; 
+}
+```
+
+### Sort modification
+
+2. [search in rotated array](https://www.interviewbit.com/problems/rotated-sorted-array-search/)
+```cpp
+int binSearch(const vector<int> &arr , int target , int left , int right){
+    int mid ;
+    while(left <= right){
+        mid = left + (right-left)/2 ;
+        if(arr[mid] == target){
+            return mid ;
+        }
+        else if(arr[mid] > target){
+            right = mid-1 ;
+        }
+        else{
+            left = mid+1 ;
+        }
+    }
+    return -1 ;
+}
+int Solution::search(const vector<int> &A, int B) {
+    // find the minimum element 
+    int N = A.size() ;
+    int left = 0 , right = N-1 , mid ;
+    
+    while(left < right){
+        mid = left + (right-left)/2 ;
+        if(A[mid] > A[right]){
+            left = mid+1 ;
+        }
+        else{
+            right = mid ;
+        }
+    } 
+    int idx = binSearch(A , B , 0 ,right-1);
+    
+    if(idx == -1){
+        idx = binSearch(A,B,right , N-1);
+    }
+    
+    return idx ;
+}
+```
+
+### Additional
+
+1. [packages-ships](https://www.interviewbit.com/problems/capacity-to-ship-packages-within-b-days/)
+
+```cpp
+#include<bits/stdc++.h>
+bool isPossible(vector<int>& packages,  int days , int weight){
+    int required_days = 1 , cur_sum = 0 ;
+    
+    for(int i = 0 ; i < packages.size() ; i++){
+        if(cur_sum + packages[i] > weight){
+            required_days++ ;
+            if(required_days > days){
+                return false ;
+            }
+            cur_sum = packages[i] ;
+        }
+        else{
+            cur_sum += packages[i] ;
+        }
+    }
+    return true ;
+}
+
+int Solution::solve(vector<int> &A, int B) {
+    int left = *max_element(A.begin() , A.end());
+    int right = accumulate(A.begin() , A.end() , 0);
+    int mid ;
+    
+    while(left < right){
+        mid = left + (right - left)/2 ;
+        if(not isPossible(A , B , mid)){
+            left = mid+1 ;
+        }
+        else{
+            right = mid ;
+        }
+    }
+    return right ;
+}
+```
