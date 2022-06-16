@@ -3,40 +3,80 @@
 
 using namespace std;
 
-string countAndSay(int A) {
-    string prev = "1" ;
-    int ptr = 0 ;
-    char cur_char ;
-    int count = 0 ;
-    
-    A-- ;
-    
-    while(A--){
-        string temp ;
-        ptr = 0 ;
-        while(ptr < prev.size()){
-            cur_char = prev[ptr] ;
-            ptr++ ;
+vector<int> table ;
 
-            count = 1 ;
-            while(ptr < prev.size() and prev[ptr] == cur_char){
-                ptr++ ;
-                count++ ;
-            }    
-            
-            temp.push_back(count+'0');
-            temp.push_back(cur_char);
-        }
-        prev = temp ;
-    }
+void lps(const string &pattern){
+    // a a b a a b a a a 
+    int ptr = 0 , i = 1 ;
     
-    return prev ;
+    while(i < pattern.size()){
+        if(pattern[i] == pattern[ptr]){
+            ptr++ ;
+            table[i] = ptr ;
+            i++ ;
+        }
+        else{
+            if(ptr != 0){
+                ptr = table[ptr-1];
+            }
+            else{
+                // table[i] = 0 ;
+                i++ ;
+            }
+        }
+    }
+}
+
+int kmp(const string &haystack, const string &pattern){
+    int ptr1 = 0 , ptr2 = 0 ;
+    
+    while(ptr1 < haystack.size()){
+        if(haystack[ptr1] == pattern[ptr2]){
+            ptr1++ ;
+            ptr2++ ;
+        }
+        else{
+            if(ptr2 != 0){
+                ptr2 = table[ptr2-1];
+            }
+            else{
+                ptr1++ ;
+            }
+        }
+            if(ptr2 == pattern.size()){
+                return ptr1-ptr2 ;
+            }
+    }
+    return -1 ;
+}
+
+int strStr(const string A, const string B) {
+    if(B.size() == 0 || A.size() == 0){
+        return -1 ;
+    }
+    table.resize(B.size() , 0) ;
+    lps(B);
+
+    for(int ele : table){
+        cout << ele << " " ;
+    }
+
+    return kmp(A , B);
 }
 
 
 int main()
 {
-    string str = "inttnikjmjbemrberk" ;
+    string A = "hello world" ;
+    
+    int N = A.size()-1 ;
+    int slen = 0 ;
+    
+    while(N >= 0 and A[N] != ' '){
+        N-- ; slen++ ;
+    }
 
-    cout << countAndSay(4) ;
+    cout << slen << endl ;
+
+	return 0;
 }

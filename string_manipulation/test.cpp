@@ -45,15 +45,16 @@ public:
 
 int main()
 {
-	string st = "aaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaabbbbbbbbbbbbcccccccccccccccccccbbbbbbbbaaaaaaaaaaabbbbbbbbbbbbbbbcbcbcbcbaaaaaaaaaaaaaaaaaaaaabcbcbcbcbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbddddaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbddddddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbcbcbbcbcbcbcaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcbcbcbcbcbcbbcbcbcbcbcbcbcbbaaaaaaaaaaaaaaa" ;
-    string st1 = "aaaaaaaaaaaaaaaaaaabbbbbbbbbbbbcccccccccccccccccccbbbbbbbbaaaaaaaaaaabbbbbbbbbbbbbbbcbcbcbcbaaaaaaaaaaaaaaaaaaaaabcbcbcbcbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbddddddddddddddddddddddddddddddddaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbbbbbbbcbcbbcbcbcbcbcbcbcbcbcbcbbcbcbcbcbcbcbcbbaaaaaaaaaaaaaaa" ;
+    string A = "hello world" ;
+    
+    int N = A.size()-1 ;
+    int slen = 0 ;
+    
+    while(N >= 0 and A[N] != ' '){
+        N-- ; slen++ ;
+    }
 
-    string small = "ab" ;
-
-	Solution s;
-
-	cout << s.minCut(small) << endl ;
-	// cout << s.minCut("ab") << endl ;
+    cout << slen << endl ;
 
 	return 0;
 }
