@@ -243,3 +243,20 @@ int Solution::strStr(const string A, const string B) {
     return kmp(A , B);
 }
 ```
+
+### Words
+
+1. [length-of-last-word](https://www.interviewbit.com/problems/length-of-last-word/)
+```cpp
+int Solution::lengthOfLastWord(const string A) {
+    int N = A.size()-1 ;
+    int slen = 0 ;
+    while(N >= 0 and A[N] == ' ') N-- ;
+    
+    while(N >= 0 and A[N] != ' '){
+        N-- ; slen++ ;
+    }
+    
+    return slen ;
+}
+```
