@@ -260,3 +260,158 @@ int Solution::lengthOfLastWord(const string A) {
     return slen ;
 }
 ```
+
+### string tricks
+
+1. [min-char-insert-to-make-pal](https://www.interviewbit.com/problems/minimum-characters-required-to-make-a-string-palindromic/)
+
+```cpp
+void computeLPS(vector<int> &lps , string &str){
+    int ptr = 0 , right = 1 ;
+    
+    while(right < str.size()){
+        if(str[ptr] == str[right]){
+            ptr++ ;
+            lps[right] = ptr ;
+            right++ ; 
+        }
+        else{
+            if(ptr != 0){
+                ptr = lps[ptr-1] ;
+            }
+            else{
+                right++ ;
+            }
+        }
+    }
+}
+
+int Solution::solve(string A) {
+    string str = A ;
+    reverse(str.begin() , str.end()) ;
+    str = A + "$" + str ;
+    
+    vector<int> lps(str.size() , 0);    
+    computeLPS(lps , str);
+    return A.size()-lps[str.size()-1] ;
+    
+}
+```
+
+2. [convert-to-pal](https://www.interviewbit.com/problems/convert-to-palindrome/)
+```cpp
+
+int helper(string &str ,int left , int right , int choice){
+    if(left >= right){
+        return 1 ;
+    }
+
+    if(str[left] != str[right]){
+        if(choice == 0)
+            return 0 ;
+        else{
+            return (helper(str ,left+1 , right , 0) || helper(str ,left, right-1 , 0) ) ;
+        }
+    }
+    
+    return helper(str , left+1 , right-1 , choice) ;
+}
+
+int Solution::solve(string A) {
+    
+    return helper(A , 0 , A.size()-1 , 1);
+}
+```
+
+3. [minimum-appends-pal](https://www.interviewbit.com/problems/minimum-appends-for-palindrome/)
+```cpp
+void computeLPS(string &str , vector<int> &lps){
+    int ptr = 0 , right = 1;
+    
+    while(right < str.size()){
+        if(str[right] == str[ptr]){
+            ptr++ ;
+            lps[right] = ptr ;
+            right++ ;
+        }
+        else{
+            if(ptr != 0 ){
+                ptr = lps[ptr-1] ;
+            }
+            else{
+                right++ ;
+            }
+        }
+    }
+}
+
+int Solution::solve(string A) {
+    string str = A ;
+    reverse(str.begin() , str.end());
+    
+    str = str + "$" + A ;
+    vector<int> lps(str.size() , 0);
+    computeLPS(str , lps);    
+    
+    return A.size() - lps[str.size()-1] ;
+}
+```
+
+4. [min-paranthesis](https://www.interviewbit.com/problems/minimum-parantheses/)
+
+```cpp
+int Solution::solve(string A) {
+    int count = 0 ;
+    stack<char> st ;
+    
+    for(char ch : A){
+        if(ch == '('){
+            st.push(ch) ;
+        }
+        else{
+            if(st.empty()){
+                count++ ;
+            }
+            else{
+                st.pop() ;
+            }
+        }
+    }
+    
+    return count + st.size() ;
+}
+```
+
+5. [Longest-pal-substr](https://www.interviewbit.com/problems/longest-palindromic-substring/)
+
+```cpp
+bool isPalindrome(string &A ,  int left , int right){
+    if(left >= right){
+        return true ;
+    }
+    if(A[left] != A[right]){
+        return false ;
+    }
+    
+    return isPalindrome(A , left+1 , right-1);
+}
+
+string Solution::longestPalindrome(string A) {
+    int left = 0 , maxlen = 1 ;
+    int N = A.size() ;
+    
+    for(int i = 0 ;  i < A.size()-1 ; i++){
+        if(N-i <= maxlen) break ;
+        
+        for(int j = A.size()-1 ; j > i ; j--){
+            if(isPalindrome(A , i , j) and j-i+1 > maxlen){
+                maxlen = j-i+1 ;
+                left = i ;
+                break ;
+            }
+        }
+    }    
+    
+    return A.substr(left , maxlen) ;
+}
+```
