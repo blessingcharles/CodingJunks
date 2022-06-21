@@ -261,6 +261,32 @@ int Solution::lengthOfLastWord(const string A) {
 }
 ```
 
+2. [reverse-words](https://www.interviewbit.com/problems/reverse-the-string/)
+```cpp
+string Solution::solve(string A) {
+    stringstream ss(A);
+    vector<string> arr ;
+    string res ;
+    
+    while(getline(ss ,res , ' ')){
+        if(res == "") continue ;
+        arr.push_back(res);
+    }
+    res = "" ;
+    if(arr.size() == 0){
+        return res ;
+    }
+    
+    for(int i = arr.size()-1 ; i > 0 ; i--){
+        res += arr[i] ; 
+        res += " " ;
+    }
+    res += arr[0] ;
+    return res ;
+}
+
+```
+
 ### string tricks
 
 1. [min-char-insert-to-make-pal](https://www.interviewbit.com/problems/minimum-characters-required-to-make-a-string-palindromic/)
@@ -415,3 +441,229 @@ string Solution::longestPalindrome(string A) {
     return A.substr(left , maxlen) ;
 }
 ```
+
+### String Parsing
+
+2. [compare-version](https://www.interviewbit.com/problems/compare-version-numbers/)
+```cpp
+int find_first_nonzero(string &str){
+    int idx = 0 ;
+    while(idx < str.size() and str[idx] == '0'){
+        idx++ ;
+    }
+    return idx ;
+}
+int comparator(string &str1 , string &str2){
+    // remove trailing zeros ;    
+    int idx1 = find_first_nonzero(str1) ;
+    str1 = str1.substr(idx1 , str1.size()-idx1);
+        
+    idx1 = find_first_nonzero(str2) ;
+    str2 = str2.substr(idx1 , str2.size()-idx1);
+    
+    if(str1.size() > str2.size()){
+        return 1 ;
+    }
+    if(str2.size() > str1.size()){
+        return -1 ;
+    }
+    
+    if(str1 > str2){
+        return 1 ;
+    }
+    if(str1 < str2){
+        return -1; 
+    }
+    return 0 ;
+}
+int Solution::compareVersion(string A, string B) {
+    stringstream s1(A) ;
+    stringstream s2(B) ;
+    string t1 , t2 ;    
+    while(getline(s1 , t1 , '.') and getline(s2 , t2 , '.')){
+       int res = comparator(t1, t2);
+       if(res != 0 ){
+           return res ;
+       }
+    }
+    if(getline(s1 , t1 , '.')){
+        return 1 ;
+    }
+    if(getline(s2 , t2 , '.')){
+        return -1 ;
+    }    
+    return 0 ;
+}
+```
+
+3. [atoi](https://www.interviewbit.com/problems/atoi/)
+```cpp
+int Solution::atoi(const string A) {
+    long long ans = 0 ;
+    int temp = 0 ;
+    int i = 0 ;
+    bool isnegative = false ;
+    if(A[0] == '-'){
+        isnegative = true ;
+        i = 1 ;
+    }
+    if(A[0] == '+'){
+        i = 1 ;
+    }
+    for( ; i < A.size() ; i++ ){
+        if(not isdigit(A[i])) break ;
+            
+        temp = A[i] - '0' ;
+        ans = ans*10 + temp ;
+        
+        if(ans > INT_MAX){
+            return (isnegative)?INT_MIN:INT_MAX ;
+        }
+        
+    }
+    return (isnegative)?ans*-1:ans ;
+}
+```
+
+4. [valid-ip](https://www.interviewbit.com/problems/valid-ip-addresses/)
+```cpp
+
+void helper(string &A , int pos , int dots_left , string &cur , vector<string> &res){
+    if(pos == A.size() and dots_left == 0){
+        res.push_back(cur);
+        return ;
+    }
+    if(dots_left == 0){
+        return ;
+    }
+    
+    if(pos != 0){
+        cur.push_back('.');
+    }    
+    if(A[pos] == '0'){
+        // only one chance 
+        cur.push_back('0');
+        helper(A,pos+1 , dots_left-1 , cur,res);
+        cur.pop_back();
+        if(pos != 0){
+            cur.pop_back();
+        }
+        return ;
+    }
+    
+    int temp = 0 ;
+    int counter = 0 ;
+    
+    for(int i = pos ; i < A.size() and i < pos+3 ;i++){
+        temp = temp*10 + A[i]-'0' ;
+        if(temp > 255) continue ; 
+        
+        cur.push_back(A[i]);
+        helper(A , i+1 , dots_left-1 , cur,res);
+        counter++ ;
+    }
+    
+    while(counter--){
+        cur.pop_back();
+    }
+    
+    if(pos != 0){
+        cur.pop_back() ;
+    }
+}
+vector<string> Solution::restoreIpAddresses(string A) {
+    vector<string> res ;
+    string curr = "" ;
+    helper(A , 0 , 4 , curr,res);
+    return res ;    
+}
+```
+
+### pretty print
+
+1. [zigzag-string](https://www.interviewbit.com/problems/zigzag-string/)
+```cpp
+string Solution::convert(string s, int numRows) {
+        if(numRows == 1) return s ;
+        // read row by row
+        vector<string> memo(min(numRows , int(s.size()))) ;
+        
+        string res ;
+        bool isgoingdown = false ;
+        
+        int row =  0 ;
+        
+        for(char c : s){
+            
+            if(row == 0 or row == numRows-1) 
+                isgoingdown = !isgoingdown ;
+            memo[row] += c ;
+            row +=(isgoingdown)?1:-1 ;
+        }
+        for(string &n : memo){
+            res += n ;
+        }
+        return res ;
+}
+```
+3. [pretty-json](https://www.interviewbit.com/problems/pretty-json/)
+```cpp
+string generate_indents(int count){
+    int indent = 0 ;
+    string temp = "" ;
+    while(indent < count){
+        temp.push_back('\t');
+        indent++ ;
+    }
+    return temp ;
+}
+
+bool canStopToken(char ch){
+    return ch == '{' or ch == '}' or ch == '[' or ch == ']' or ch == ',' ;
+}
+
+vector<string> Solution::prettyJSON(string A) {
+    int current_indent = 0 ;
+    vector<string> res ;
+    
+    int ptr = 0 ;
+    int N = A.size() ;
+    
+    while(ptr < N){
+        string temp = "" ;
+        
+        if(A[ptr] == '{' or A[ptr] == '['){
+            temp += generate_indents(current_indent);
+            temp.push_back(A[ptr]);
+            ptr++ ;
+            current_indent++ ;    
+        }
+        else if(A[ptr] == '}' or A[ptr] == ']'){
+            current_indent-- ;
+            temp += generate_indents(current_indent);
+            temp.push_back(A[ptr]);
+            ptr++ ;
+            if(ptr < N and A[ptr] == ','){
+                temp.push_back(',');
+                ptr++ ;
+            }
+        }
+        else{
+            temp += generate_indents(current_indent);
+            // delimiters  , and [ and {
+            while(not canStopToken(A[ptr])){
+                temp.push_back(A[ptr]);
+                ptr++ ;
+            } 
+            if(A[ptr] == ','){
+                temp.push_back(',');
+                ptr++ ;
+            }
+        }
+        res.push_back(temp) ;
+    }
+    return res ;
+}
+```
+
+### String math

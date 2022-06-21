@@ -3,44 +3,71 @@
 
 using namespace std;
 
-
-vector<vector<int>> memo ;
-
-
-int helper(string &str , vector<vector<vector<int>>> memo , int left , int right , int choice){
-    if(left >= right){
-        cout << " hi " ;
-        return 1 ;
+string generate_indents(int count){
+    int indent = 0 ;
+    string temp = "" ;
+    while(indent < count){
+        temp.push_back('\t');
+        indent++ ;
     }
+    return temp ;
+}
+
+bool canStopToken(char ch){
+    return ch == '{' or ch == '}' or ch == '[' or ch == ']' or ch == ',' ;
+}
+
+vector<string> prettyJSON(string A) {
+    int current_indent = 0 ;
+    vector<string> res ;
     
-    if(memo[left][right][choice] != -1){
-        return memo[left][right][choice] ;
-    }
-    if(str[left] != str[right]){
-        if(choice == 0)
-            return 0 ;
-        else{
-            cout << left << " " << right << " " << choice << endl ;
-            return memo[left][right][choice] = (helper(str , memo , left+1 , right , 0) || helper(str , memo , left, right-1 , 0) ) ;
+    int ptr = 0 ;
+    int N = A.size() ;
+    
+    while(ptr < N){
+        string temp = "" ;
+        cout << ptr << endl ;
+
+        if(A[ptr] == '{' or A[ptr] == '['){
+            temp += generate_indents(current_indent);
+            temp.push_back(A[ptr]);
+            ptr++ ;
+            current_indent++ ;    
         }
+        else if(A[ptr] == '}' or A[ptr] == ']'){
+            current_indent-- ;
+            temp += generate_indents(current_indent);
+            temp.push_back(A[ptr]);
+            ptr++ ;
+            if(ptr < N and A[ptr] == ','){
+                temp.push_back(',');
+                ptr++ ;
+            }
+        }
+        else{
+            temp += generate_indents(current_indent);
+            // delimiters  , and [ and {
+            while(not canStopToken(A[ptr])){
+                temp.push_back(A[ptr]);
+                ptr++ ;
+            } 
+            if(A[ptr] == ','){
+                temp.push_back(',');
+                ptr++ ;
+            }
+        }
+        res.push_back(temp) ;
     }
-    return memo[left][right][choice] = helper(str , memo , left+1 , right-1 , choice) ;
+    return res ;
 }
-
-int solve(string A) {
-    vector<vector<vector<int>>> memo ;
-    memo.resize(A.size() , vector<vector<int>>(A.size() , vector<int>(2,-1)));
-    
-    return helper(A , memo , 0 , A.size()-1 , 1);
-}
-
-
 
 
 int main()
 {
-    string A = "jubgxwdiiidwxgbbj" ;
-    
-    cout << solve(A);
+    string jj = "{\"attributes\":[{\"nm\":\"ACCOUNT\",\"lv\":[{\"v\":{\"Id\":null,\"State\":null},\"vt\":\"java.util.Map\",\"cn\":1}],\"vt\":\"java.util.Map\",\"status\":\"SUCCESS\",\"lmd\":13585},{\"nm\":\"PROFILE\",\"lv\":[{\"v\":{\"Party\":null,\"Ads\":null},\"vt\":\"java.util.Map\",\"cn\":2}],\"vt\":\"java.util.Map\",\"status\":\"SUCCESS\",\"lmd\":41962}]}" ;
+
+    for(string ss : prettyJSON(jj)){
+        cout << ss << endl ;
+    }
 	return 0;
 }
