@@ -3,71 +3,62 @@
 
 using namespace std;
 
-string generate_indents(int count){
-    int indent = 0 ;
-    string temp = "" ;
-    while(indent < count){
-        temp.push_back('\t');
-        indent++ ;
-    }
-    return temp ;
-}
-
-bool canStopToken(char ch){
-    return ch == '{' or ch == '}' or ch == '[' or ch == ']' or ch == ',' ;
-}
-
-vector<string> prettyJSON(string A) {
-    int current_indent = 0 ;
-    vector<string> res ;
+int romanToInt(string A) {
+    vector<int> nums = {1000 , 900 , 500 , 400 , 100 , 90,50 , 40 , 10 ,9 , 5 , 4 , 1};
+    vector<string> nums_map = {
+        "M" ,
+        "CM" ,
+        "D" ,
+        "CD" ,
+        "C" ,
+        "XC" ,
+        "L" ,
+        "XL" ,
+        "X" ,
+        "IX" ,
+        "V" ,
+        "IV" ,
+        "I"
+    };
     
     int ptr = 0 ;
     int N = A.size() ;
+    int idx = 0 ;
     
-    while(ptr < N){
-        string temp = "" ;
-        cout << ptr << endl ;
-
-        if(A[ptr] == '{' or A[ptr] == '['){
-            temp += generate_indents(current_indent);
-            temp.push_back(A[ptr]);
-            ptr++ ;
-            current_indent++ ;    
-        }
-        else if(A[ptr] == '}' or A[ptr] == ']'){
-            current_indent-- ;
-            temp += generate_indents(current_indent);
-            temp.push_back(A[ptr]);
-            ptr++ ;
-            if(ptr < N and A[ptr] == ','){
-                temp.push_back(',');
-                ptr++ ;
+    int res = 0 ;
+    
+    while(idx < N){
+        int sz = nums_map[ptr].size() ;
+        int count = 0 ;
+        
+        if(sz == 1){
+            char ch = nums_map[ptr][0] ;
+            
+            while(idx < N and ch == A[idx]){
+                count++ ;
+                idx++   ;      
             }
         }
         else{
-            temp += generate_indents(current_indent);
-            // delimiters  , and [ and {
-            while(not canStopToken(A[ptr])){
-                temp.push_back(A[ptr]);
-                ptr++ ;
-            } 
-            if(A[ptr] == ','){
-                temp.push_back(',');
-                ptr++ ;
+            if(idx < N-1 and nums_map[ptr] == A.substr(idx , 2)){
+                count++ ;
+                idx += 2 ;
             }
         }
-        res.push_back(temp) ;
+
+        cout << nums[ptr] << " " << count << endl ; 
+        res = res + nums[ptr]*count ;
+        ptr++ ;
+        
     }
+    
     return res ;
 }
 
 
 int main()
 {
-    string jj = "{\"attributes\":[{\"nm\":\"ACCOUNT\",\"lv\":[{\"v\":{\"Id\":null,\"State\":null},\"vt\":\"java.util.Map\",\"cn\":1}],\"vt\":\"java.util.Map\",\"status\":\"SUCCESS\",\"lmd\":13585},{\"nm\":\"PROFILE\",\"lv\":[{\"v\":{\"Party\":null,\"Ads\":null},\"vt\":\"java.util.Map\",\"cn\":2}],\"vt\":\"java.util.Map\",\"status\":\"SUCCESS\",\"lmd\":41962}]}" ;
-
-    for(string ss : prettyJSON(jj)){
-        cout << ss << endl ;
-    }
+    string A = "MDCCCIV" ;
+    cout << romanToInt(A) << endl ;
 	return 0;
 }
