@@ -542,3 +542,160 @@ ListNode* Solution::removeNthFromEnd(ListNode* A, int B) {
     return A ;
 }
 ```
+
+### pointer move
+
+1. [k-reverse](https://www.interviewbit.com/problems/k-reverse-linked-list/)
+```cpp
+pair<ListNode* , ListNode* > reverse(ListNode *head , int count){
+    ListNode* prev = NULL , *nxt = NULL ;
+    
+    while(head and count--){
+        nxt = head->next ;
+        head->next = prev ; 
+        prev = head ; 
+        head = nxt ;
+        if(nxt){
+            nxt = head->next ;
+        }    
+    }
+    
+    return {prev , head};
+}
+
+ListNode* Solution::reverseList(ListNode* A, int B) {
+    ListNode* head = new ListNode(0);
+    ListNode* prev = head , *ptr = A ;
+    
+    while(ptr){
+        pair<ListNode* , ListNode* >pt = reverse(ptr , B);
+        prev->next = pt.first ;
+        ptr->next = pt.second ;
+        prev = ptr ;
+        ptr = pt.second ;
+    }
+    
+    return head->next ;
+}
+```
+
+2. [even-reverse](https://www.interviewbit.com/problems/even-reverse/)
+```cpp
+ListNode* reverse(ListNode *head ){
+    ListNode* prev = NULL , *nxt = NULL ;
+    
+    while(head ){
+        nxt = head->next ;
+        head->next = prev ; 
+        prev = head ; 
+        head = nxt ;
+        if(nxt){
+            nxt = head->next ;
+        }    
+    }
+    
+    return prev ;
+}
+ListNode* Solution::solve(ListNode* A) {
+    if(not A or not A->next){
+        return A ;
+    }
+    
+    ListNode* even_head = A->next , *even_ptr = A->next ;
+    ListNode* odd_head = A , *odd_ptr = A , *ptr = A->next->next ;
+    
+    bool is_odd = true ;
+    while(ptr){
+        if(is_odd){
+            odd_ptr->next = ptr ;
+            odd_ptr = ptr ;
+        }
+        else{
+            even_ptr->next = ptr ;
+            even_ptr = ptr ;
+        }
+        is_odd = !is_odd ;
+        ptr = ptr->next ;
+    }
+    odd_ptr->next = NULL ; even_ptr->next = NULL ;
+    even_head = reverse(even_head);
+    
+    ListNode* temp = new ListNode(0);
+    ListNode* head = temp ;
+    
+    while(even_head or odd_head){
+        
+        // attaching odd_head 
+        head->next = odd_head ;
+        odd_head = odd_head->next ;
+        head = head->next ;
+            
+        // attaching even_head
+        head->next = even_head ;
+        if(even_head){
+            even_head = even_head->next ;
+            head = head->next ;
+        }
+    }
+    
+    return temp->next ;    
+}
+```
+
+3. [swap-nodes](https://www.interviewbit.com/problems/swap-list-nodes-in-pairs/)
+```cpp
+ListNode* Solution::swapPairs(ListNode* A) {
+    if(not A or not A->next){
+        return A ;
+    }
+    
+    ListNode* head = new ListNode(0);
+    ListNode* ptr = A , *prev = head ;
+    ListNode* nxt ;
+    
+    while(ptr){
+        nxt = ptr->next ;
+        if(nxt){
+            prev->next = nxt ;
+            ptr->next = nxt->next ;
+            nxt->next = ptr ;
+            
+            prev = ptr ;
+        }
+        ptr = ptr->next ;
+    }
+    
+    return head->next ;
+}
+```
+
+4. [rotete-right](https://www.interviewbit.com/problems/rotate-list/)
+```cpp
+ListNode* Solution::rotateRight(ListNode* A, int B) {
+    int maxlen = 0 ;
+    ListNode* ptr = A ;
+    ListNode* lastnode = A ;
+    
+    while(ptr){
+        lastnode = ptr ;
+        ptr = ptr->next ; maxlen++ ;
+    }
+    
+    B = B%maxlen ;
+    if(B == 0){
+        return A ;
+    }
+    int len = maxlen - B ;
+    ptr = A ;
+    ListNode* prev ;
+    while(len--){
+        prev = ptr ;
+        ptr = ptr->next ;    
+    }
+    prev->next = NULL ;
+    lastnode->next = A ;
+    
+    return ptr ;
+}
+```
+
