@@ -397,3 +397,91 @@ vector<int> Solution::intersect(const vector<int> &A, const vector<int> &B) {
     return res ;
 }
 ```
+
+### Inplace Update
+
+1. [remove-duplicates](https://www.interviewbit.com/problems/remove-duplicates-from-sorted-array/)
+```cpp
+int Solution::removeDuplicates(vector<int> &A) {
+    int ptr1 = 0 , ptr2 = 1 ;
+    int N = A.size() ;
+    
+    while(ptr2 < N){
+        while(ptr2 < N and A[ptr2] == A[ptr2-1]){
+            ptr2++ ;
+        }
+        if(ptr2 < N){
+            ptr1++ ;
+            A[ptr1] = A[ptr2] ;
+        } 
+        ptr2++ ;
+    }
+    
+    return ptr1+1 ;
+}
+```
+
+2. [remove-dup-ii](https://www.interviewbit.com/problems/remove-duplicates-from-sorted-array-ii/)
+```cpp
+int Solution::removeDuplicates(vector<int> &A) {
+   int ptr1 = 2 , ptr2 = 2 ;
+   int N = A.size() ;
+   if(N <= 2){
+       return N ;
+   }
+   
+   while(ptr2 < N){
+      if(A[ptr1-2] == A[ptr2]){
+          // repeating
+          ptr2++ ;
+      }
+      else{
+          A[ptr1] = A[ptr2] ;
+          ptr1++ ; 
+          ptr2++ ;
+      }
+   }
+   
+   return ptr1 ;
+}
+```
+
+3. [remove-ele](https://www.interviewbit.com/problems/remove-element-from-array/)
+```cpp
+int Solution::removeElement(vector<int> &A, int B) {
+    int ptr1 = 0 , ptr2 = 0 ;
+    int N = A.size() ;
+    
+    while(ptr2 < N){
+        if(A[ptr2] != B){
+            A[ptr1] = A[ptr2] ;
+            ptr1++ ;
+        }
+        ptr2++ ;
+    }
+    return ptr1 ;
+}
+```
+
+4. [sort-by-color](https://www.interviewbit.com/problems/sort-by-color/)
+```cpp
+void Solution::sortColors(vector<int> &A) {
+     int ptr1 = 0 , ptr2 =  0 , ptr3 = A.size()-1 ;
+     
+     while(ptr2 <= ptr3){
+         if(A[ptr2] == 1){
+             ptr2++ ;
+         }
+         else if(A[ptr2] == 0){
+             swap(A[ptr2] , A[ptr1]);
+             ptr1++ ;
+             ptr2++ ;
+         }
+         else{
+             // 2 
+             swap(A[ptr2] , A[ptr3]);
+             ptr3-- ;
+         }
+     }
+}
+```
