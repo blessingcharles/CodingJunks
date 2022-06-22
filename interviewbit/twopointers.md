@@ -339,3 +339,61 @@ int Solution::maxArea(vector<int> &A) {
     return maxarea ;
 }
 ```
+
+### Multiple arrays
+
+1. [merge sorted array](https://www.interviewbit.com/problems/merge-two-sorted-lists-ii/)
+```cpp
+void Solution::merge(vector<int> &A, vector<int> &B) {
+    int N = A.size() , M = B.size() ;
+    A.resize(N+M);
+    
+    vector<int> arr ;
+    int ptr1 = 0 , ptr2 = 0 ;
+    
+    while(ptr1 < N and ptr2 < M){
+        if(A[ptr1] <= B[ptr2]){
+            arr.push_back(A[ptr1]);
+            ptr1++ ;
+        }
+        else{
+            arr.push_back(B[ptr2]);
+            ptr2++ ;
+        }
+    }
+    
+    while(ptr1 < N){
+        arr.push_back(A[ptr1++]);
+    }
+    while(ptr2 < M){
+        arr.push_back(B[ptr2++]);
+    }
+    
+    for(int i = 0 ; i < N+M ; i++){
+        A[i] = arr[i] ;
+    }
+}
+```
+
+2. [intersection](https://www.interviewbit.com/problems/intersection-of-sorted-arrays/)
+```cpp
+vector<int> Solution::intersect(const vector<int> &A, const vector<int> &B) {
+    int ptr1 = 0 , ptr2 = 0 ;
+    int M = A.size() , N = B.size() ;
+    vector<int> res ;
+    
+    while(ptr1 < M and ptr2 < N){
+        if(A[ptr1] == B[ptr2]){
+            res.push_back(A[ptr1]);
+            ptr1++ ; ptr2++ ;
+        }
+        else if(A[ptr1] > B[ptr2]){
+            ptr2++ ;
+        }
+        else{
+            ptr1++ ;
+        }
+    }
+    return res ;
+}
+```
