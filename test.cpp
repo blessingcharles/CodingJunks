@@ -3,49 +3,47 @@
 
 using namespace std;
 
-int threeSumClosest(vector<int> &A, int B) {
+int solve(vector<int> &nums, int B)
+{
+    // atmost b distincts 
     
-    sort(A.begin() , A.end());
+    int left = 0 , right = 1 ;
+    int N = nums.size() ;
+    unordered_map<int,int> memo ;
+    memo[nums[left]]++ ;
+    int current_distincts = 1 ;
+    int ans = 1 ;
     
-    long mindiff = INT_MAX ;
-    long maxdiff = INT_MIN ;
-    
-    int N = A.size()-1 ;
-    long temp ;
-    
-    for(int i = 0 ; i < N-2 ; i++){
-        int left = i+1 , right = N-1 ;
-        
-        while(left < right){
-            temp = A[i] + A[left] + A[right] ;
-                cout << B - temp << endl ;
-            if(temp == B) return B ;
-            if(temp < B){
-                mindiff = min(mindiff , (long )B-temp);
-                left++ ;
-            }        
-            else{
-                maxdiff = max(maxdiff , (long )B-temp);
-                right-- ;
+    while(right < N){
+        if(memo.find(nums[right]) == memo.end()){
+            current_distincts++ ;
+        }    
+        memo[nums[right]]++ ;
+        while(left < right and current_distincts > B){
+            if(memo[nums[left]] == 1){
+                memo.erase(nums[left]);
+                current_distincts-- ;
+                break ;
             }
+            else{
+                memo[nums[left]]-- ;
+            }
+            left++ ;
         }
+        cout << left << " " << right << endl ;
+        ans += (right - left+1);
+        right++ ;
     }
     
-    if(maxdiff == INT_MIN){
-        return B-mindiff ;
-    }
-    if(mindiff == INT_MAX){
-        return B-maxdiff ;
-     }
-    return (abs(maxdiff) > mindiff)?B - mindiff:B-maxdiff ;
+    return ans ;
 }
-
-
 
 int main()
 {
-    vector<int> arr = {-10,-10,-10};
+    vector<int> arr = { 5, 3, 5, 1, 3};
 
-    cout << threeSumClosest(arr, -5) << endl ;
-	return 0;
+    cout << solve(arr, 3) << endl;
+    cout << solve(arr, 2) << endl;
+
+    return 0;
 }
