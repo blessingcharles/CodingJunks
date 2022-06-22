@@ -3,62 +3,49 @@
 
 using namespace std;
 
-int romanToInt(string A) {
-    vector<int> nums = {1000 , 900 , 500 , 400 , 100 , 90,50 , 40 , 10 ,9 , 5 , 4 , 1};
-    vector<string> nums_map = {
-        "M" ,
-        "CM" ,
-        "D" ,
-        "CD" ,
-        "C" ,
-        "XC" ,
-        "L" ,
-        "XL" ,
-        "X" ,
-        "IX" ,
-        "V" ,
-        "IV" ,
-        "I"
-    };
+int threeSumClosest(vector<int> &A, int B) {
     
-    int ptr = 0 ;
-    int N = A.size() ;
-    int idx = 0 ;
+    sort(A.begin() , A.end());
     
-    int res = 0 ;
+    long mindiff = INT_MAX ;
+    long maxdiff = INT_MIN ;
     
-    while(idx < N){
-        int sz = nums_map[ptr].size() ;
-        int count = 0 ;
+    int N = A.size()-1 ;
+    long temp ;
+    
+    for(int i = 0 ; i < N-2 ; i++){
+        int left = i+1 , right = N-1 ;
         
-        if(sz == 1){
-            char ch = nums_map[ptr][0] ;
-            
-            while(idx < N and ch == A[idx]){
-                count++ ;
-                idx++   ;      
+        while(left < right){
+            temp = A[i] + A[left] + A[right] ;
+                cout << B - temp << endl ;
+            if(temp == B) return B ;
+            if(temp < B){
+                mindiff = min(mindiff , (long )B-temp);
+                left++ ;
+            }        
+            else{
+                maxdiff = max(maxdiff , (long )B-temp);
+                right-- ;
             }
         }
-        else{
-            if(idx < N-1 and nums_map[ptr] == A.substr(idx , 2)){
-                count++ ;
-                idx += 2 ;
-            }
-        }
-
-        cout << nums[ptr] << " " << count << endl ; 
-        res = res + nums[ptr]*count ;
-        ptr++ ;
-        
     }
     
-    return res ;
+    if(maxdiff == INT_MIN){
+        return B-mindiff ;
+    }
+    if(mindiff == INT_MAX){
+        return B-maxdiff ;
+     }
+    return (abs(maxdiff) > mindiff)?B - mindiff:B-maxdiff ;
 }
+
 
 
 int main()
 {
-    string A = "MDCCCIV" ;
-    cout << romanToInt(A) << endl ;
+    vector<int> arr = {-10,-10,-10};
+
+    cout << threeSumClosest(arr, -5) << endl ;
 	return 0;
 }
