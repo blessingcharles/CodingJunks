@@ -192,3 +192,80 @@ ListNode* Solution::sortList(ListNode* head) {
 }
 ```
 
+### List math
+
+1. [add-two-numbers](https://www.interviewbit.com/problems/add-two-numbers-as-lists/)
+```cpp
+ListNode* Solution::addTwoNumbers(ListNode* A, ListNode* B) {
+    if(not A){
+        return B ;
+    }
+    
+    ListNode* ptr1 = A , *ptr2 = B ;
+    int carry = 0 ;
+    int cursum ;
+    
+    ListNode* prev = A ;
+    
+    while(ptr1 and ptr2){
+        cursum = ptr1->val + ptr2->val + carry ;
+        
+        carry = cursum/10 ;
+        ptr1->val = cursum%10 ;
+        
+        prev = ptr1 ;    
+        ptr1 = ptr1->next ;
+        ptr2 = ptr2->next ;    
+    
+    }
+    while(ptr1){
+        cursum = ptr1->val + carry ;
+       
+        carry = cursum/10 ;
+        ptr1->val = cursum%10 ;
+        prev = ptr1 ;
+        ptr1 = ptr1->next ;
+    }
+    
+    while(ptr2){
+        cursum = ptr2->val + carry ;
+        carry = cursum/10 ;
+        prev->next = new ListNode(cursum%10);
+        prev = prev->next ;
+        
+        ptr2 = ptr2->next ;    
+    }
+    if(carry){
+        prev->next = new ListNode(carry);
+    }
+    
+    return A ;
+}
+```
+
+2. [detect-cycle](https://www.interviewbit.com/problems/list-cycle/)
+```cpp
+ListNode* Solution::detectCycle(ListNode* A) {
+    if(not A or not A->next){
+        return NULL ;
+    }
+    
+    ListNode* slow = A , *fast = A;
+    
+    do{
+        slow = slow->next ;
+        fast = fast->next->next ;
+    }while(fast and fast->next and fast != slow);
+    
+    if(not fast or not fast->next){
+        return NULL ;
+    }
+    fast = A ;
+    while(fast != slow){
+        fast = fast->next ;
+        slow = slow->next ;
+    }
+
+    return fast ;
+}
+```
