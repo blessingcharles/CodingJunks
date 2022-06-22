@@ -269,3 +269,135 @@ ListNode* Solution::detectCycle(ListNode* A) {
     return fast ;
 }
 ```
+
+### List trick
+
+1. [kth-node-from-middle](https://www.interviewbit.com/problems/kth-node-from-middle/)
+```cpp
+ListNode* getMid(ListNode *head , vector<ListNode *> &arr){
+    ListNode* fast = head ;
+    arr.push_back(head);
+    
+    while(fast and fast->next){
+        head = head->next;
+        arr.push_back(head) ;
+        fast = fast->next->next ;
+    }
+    return head ;
+}
+
+int Solution::solve(ListNode* head, int B) {
+    vector<ListNode* > arr ;
+
+    ListNode* mid = getMid(head , arr);
+    
+    if(arr.size() < B+1){
+        return -1 ;
+    }
+    return arr[arr.size()-B-1]->val ;
+}
+```
+
+2. [Reverse-alternative-k-nodes](https://www.interviewbit.com/problems/reverse-alternate-k-nodes/)
+```cpp
+pair<ListNode* ,ListNode*> reverseNode(ListNode* head , int count){
+    ListNode* prev = NULL , *nxt = head->next;
+    while(head and count--){
+        head->next = prev ;
+        prev = head ;
+        head = nxt ;
+        if(nxt){
+            nxt = head->next ;
+        }
+    }
+    return {prev , head} ;
+}
+
+ListNode* Solution::solve(ListNode* A, int B) {
+    ListNode* head = new ListNode(0);
+    head->next = A ;
+    ListNode* ptr = A ;
+    ListNode* prev = head ;
+    
+    while(ptr){
+        pair<ListNode* , ListNode*> t = reverseNode(ptr , B);
+        prev->next = t.first ; ptr->next = t.second ;
+         
+        ptr = ptr->next ;
+        int count = B ;
+        
+        while(ptr and count--){
+            prev = ptr ;
+            ptr = ptr->next ;
+        }
+    }
+    return head->next ;
+}
+```
+
+3. [reverse-ll-2](https://www.interviewbit.com/problems/reverse-link-list-ii/)
+```cpp
+pair<ListNode* , ListNode* > reverse(ListNode *head , int count){
+    ListNode* prev = NULL , *nxt = NULL ;
+    while(head and count--){
+        nxt = head->next ;
+        head->next = prev ;
+        prev = head ;
+        head = nxt ;
+        if(nxt){
+            nxt = nxt->next ;
+        }
+    }
+    return {prev , head}; 
+}
+ListNode* Solution::reverseBetween(ListNode* A, int B, int C) {
+    int count = 1 ;
+    ListNode* head = new ListNode(0); head->next = A ;
+    
+    ListNode* prev = head , *ptr = A ;
+    
+    while(count < B){
+        count++ ;
+        prev = ptr ;
+        ptr = ptr->next ;
+    }
+    
+    // reverse the part 
+    pair<ListNode* , ListNode*> t = reverse(ptr , C-B+1);
+    prev->next = t.first ;
+    ptr->next = t.second ;
+    return head->next ;
+}
+```
+
+4. [reorder-list](https://www.interviewbit.com/problems/reorder-list/)
+```cpp
+ListNode* Solution::reorderList(ListNode* A) {
+    vector<ListNode *> arr ;
+    ListNode* temp = A ;
+    while(temp){
+        arr.push_back(temp);
+        temp = temp->next ;
+    }
+    int left = 0 , right = arr.size()-1 ;
+    ListNode* head = new ListNode(0);
+    ListNode* ptr = head ;
+    
+    while(left <= right){
+        if(left == right){
+            ptr->next = arr[left];
+            left++ ;
+            ptr->next->next = NULL ;
+        }    
+        else{
+            ptr->next = arr[left++] ;
+            ptr = ptr->next ;
+            ptr->next = arr[right--] ;
+            ptr = ptr->next ;
+            ptr->next = NULL ;
+        }
+    } 
+    return head->next ;
+}
+```
+
