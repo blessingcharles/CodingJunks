@@ -401,3 +401,144 @@ ListNode* Solution::reorderList(ListNode* A) {
 }
 ```
 
+### List 2 pointer
+
+1. [palindrome-list](https://www.interviewbit.com/problems/palindrome-list/)
+```cpp
+ListNode* Solution::reorderList(ListNode* A) {
+    vector<ListNode *> arr ;
+    ListNode* temp = A ;
+    while(temp){
+        arr.push_back(temp);
+        temp = temp->next ;
+    }
+    int left = 0 , right = arr.size()-1 ;
+    ListNode* head = new ListNode(0);
+    ListNode* ptr = head ;
+    
+    while(left <= right){
+        if(left == right){
+            ptr->next = arr[left];
+            left++ ;
+            ptr->next->next = NULL ;
+        }    
+        else{
+            ptr->next = arr[left++] ;
+            ptr = ptr->next ;
+            ptr->next = arr[right--] ;
+            ptr = ptr->next ;
+            ptr->next = NULL ;
+        }
+    } 
+    return head->next ;
+}
+```
+
+2. [remove-dup-2](https://www.interviewbit.com/problems/remove-duplicates-from-sorted-list-ii/)
+```cpp
+ListNode* Solution::deleteDuplicates(ListNode* A) {
+    ListNode* head = new ListNode(0);
+    
+    ListNode* ptr1 = A , *prev = head ;
+    ListNode* mover = A ;
+    int prev_val = INT_MIN ;
+    
+    while(mover){
+        if(mover->val != prev_val){
+           if(not mover->next or (mover->next->val != mover->val)){
+               prev->next = mover ;
+               prev = mover ;
+           }
+        }
+        prev_val = mover->val ;
+        mover = mover->next ;
+    }
+    if(prev)
+        prev->next = NULL ;
+    
+    return head->next ;
+}
+```
+
+3. [merge-list](https://www.interviewbit.com/problems/merge-two-sorted-lists/)
+```cpp
+ListNode* Solution::mergeTwoLists(ListNode* A, ListNode* B) {
+    ListNode* head = new ListNode(0);
+    ListNode* prev = head ;
+    while(A and B){
+        if(A->val <= B->val){
+            prev->next = A ;
+            prev = A ;
+            A = A->next ;
+        }
+        else{
+            prev->next = B ;
+            prev = B ;
+            B = B->next ;
+        }
+    }
+    while(A){
+        prev->next = A ;
+        prev = A ;
+        A = A->next ;
+    }
+    while(B){
+        prev->next = B ;
+        prev = B ;
+        B = B->next ;
+    }
+    
+    prev->next = NULL ;
+    return head->next ;
+}
+```
+
+4. [remove-dup](https://www.interviewbit.com/problems/remove-duplicates-from-sorted-list/)
+```cpp
+ListNode* Solution::deleteDuplicates(ListNode* A) {
+    ListNode* ptr = A , *mover = A->next ;
+    int prev_val = A->val ;
+    
+    while(mover){
+        if(mover->val != prev_val){
+            ptr->next = mover ;
+            ptr = mover ;
+            prev_val = mover->val ;
+        }
+        mover = mover->next ;
+    } 
+    
+    ptr->next = NULL ;
+    return A ;
+}
+```
+
+5. [remove-nth-node](https://www.interviewbit.com/problems/remove-nth-node-from-list-end/)
+```cpp
+ListNode* Solution::removeNthFromEnd(ListNode* A, int B) {
+    if(B <= 0){
+        return A ;
+    }
+    
+    int len = 0 ;
+    ListNode* temp = A ;
+    while(temp){
+        temp = temp->next ;
+        len++ ;
+    }
+    len = len-B ;
+    temp = A ;
+    if(len <= 0){
+        return A->next ;
+    }
+    ListNode* prev = A ;
+    
+    while(temp and len--){
+        prev = temp ;
+        temp = temp->next ;    
+    }
+    
+    prev->next = temp->next ;
+    return A ;
+}
+```
