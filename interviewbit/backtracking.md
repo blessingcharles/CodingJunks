@@ -87,3 +87,138 @@ vector<int> Solution::grayCode(int A) {
 }
 ```
 
+### Subsets
+
+1. [subset-generation](https://www.interviewbit.com/problems/subset/)
+```cpp
+
+void helper(vector<int> &A , vector<int> &storage , int pos , vector<vector<int>> &res){
+    if(pos == A.size()){
+        res.push_back(storage);
+        return  ;
+    }
+    
+    //include the element
+    storage.push_back(A[pos]);
+    helper(A , storage , pos+1 , res);
+    storage.pop_back();
+    helper(A , storage , pos+1 , res);
+        
+
+}
+vector<vector<int> > Solution::subsets(vector<int> &A) {
+    vector<vector<int>> res ;
+    sort(A.begin(),A.end());
+    vector<int> storage ;
+    helper(A , storage , 0 , res);    
+    
+    sort(res.begin(),res.end());
+    return res ;
+}
+```
+
+2. [combination-sum](https://www.interviewbit.com/problems/combination-sum/)
+```cpp
+void helper(vector<int> &arr , int pos,int cur, int req , vector<int> &storage , set<vector<int>> &res){
+    if(req == cur){
+        res.insert(storage);
+        return ;
+    }
+    if(req < cur or pos == arr.size()){
+        return ;
+    }
+    
+    storage.push_back(arr[pos]);
+    
+    helper(arr , pos , cur+arr[pos] , req , storage , res);
+    storage.pop_back();
+    helper(arr , pos+1 , cur,req , storage , res);
+}
+
+vector<vector<int> > Solution::combinationSum(vector<int> &A, int B) {
+    set<vector<int>> res ;
+    vector<int> storage ;
+    sort(A.begin() ,A.end());
+    helper(A , 0 , 0 ,B, storage , res);
+    return vector<vector<int>>(res.begin() , res.end()) ;
+}
+```
+
+3. [combination-sum-2](https://www.interviewbit.com/problems/combination-sum-ii/)
+```cpp
+void helper(int pos , int curr , int req , vector<int> &arr , vector<int> &storage , set<vector<int>> &res){
+    if(curr == req){
+        res.insert(storage);
+        return ;
+    }
+    if(curr > req or pos == arr.size()){
+        return ;
+    } 
+    storage.push_back(arr[pos]);
+    helper(pos+1 , curr+arr[pos] , req , arr , storage , res);
+    storage.pop_back();
+    
+    helper(pos+1 , curr , req , arr , storage , res);
+    
+}
+vector<vector<int> > Solution::combinationSum(vector<int> &A, int B) {
+    set<vector<int>> res ;
+    vector<int> storage ;
+    sort(A.begin(),A.end());
+    helper(0 , 0 , B , A , storage , res);
+    
+    return vector<vector<int>>(res.begin() , res.end());
+}
+```
+
+4. [combinations](https://www.interviewbit.com/problems/combinations/)
+```cpp
+void helper(int ele ,int target, int count , vector<int> &storage , vector<vector<int>> &res){
+    if(count == 0){
+        res.push_back(storage);
+        return ;
+    }
+    if(count < 0 or ele > target){
+        return  ;
+    }
+    
+    storage.push_back(ele);
+    helper(ele+1,target , count-1 ,storage , res);
+    storage.pop_back();
+    
+    helper(ele+1,target, count , storage , res);
+    
+}
+
+vector<vector<int> > Solution::combine(int A, int B) {
+    vector<vector<int>> res ;
+    vector<int> storage ;
+    
+    helper(1,A, B , storage , res);    
+    return res ;    
+}
+```
+
+5. [subsets-2](https://www.interviewbit.com/problems/subsets-ii/)
+```cpp
+void helper(int pos , vector<int> &arr , vector<int> &storage , set<vector<int>> &res){
+    if(pos == arr.size()){
+        res.insert(storage);
+        return ;
+    }
+    helper(pos+1 , arr , storage , res);
+    storage.push_back(arr[pos]);
+    helper(pos+1 , arr,storage,res);
+    storage.pop_back();
+    
+}
+vector<vector<int> > Solution::subsetsWithDup(vector<int> &A) {
+    set<vector<int>> res ;
+    sort(A.begin() , A.end());
+    vector<int> storage;
+    
+    helper(0 , A , storage , res);
+    return vector<vector<int>>(res.begin() , res.end()) ;
+}
+```
+
