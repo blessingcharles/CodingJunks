@@ -222,3 +222,108 @@ vector<vector<int> > Solution::subsetsWithDup(vector<int> &A) {
 }
 ```
 
+### Bruteforce Builder
+
+1. [letter-phone](https://www.interviewbit.com/problems/letter-phone/)
+```cpp
+unordered_map<char , string> phone = {
+    {'0'  , "0"},
+    {'1'  , "1"},
+    {'2' ,  "abc"} ,
+    {'3' , "def"} ,
+    {'4' , "ghi" },
+    {'5' , "jkl" },
+    {'6' , "mno" },
+    {'7' , "pqrs" },
+    {'8' , "tuv" },
+    {'9' , "wxyz"}
+};
+void helper(int pos , string &str , string &container , vector<string> &res){
+    if(pos == str.size()){
+        res.push_back(container);
+        return  ;
+    }
+    
+    for(char ch : phone[str[pos]]){
+        container.push_back(ch);
+        helper(pos+1 , str, container,res);
+        container.pop_back();
+    }        
+}
+
+vector<string> Solution::letterCombinations(string A) {
+    vector<string> res ;
+    string storage = "";
+    helper(0,A,storage,res);
+    return res ;
+}
+```
+
+2. [palindrome-partitioning](https://www.interviewbit.com/problems/palindrome-partitioning/)
+```cpp
+bool isPalindrome(string &st){
+    int left = 0 , right = st.size()-1 ;
+    
+    while(left < right){
+        if(st[left] != st[right]){
+            return false ;
+        }
+        left++ ; right-- ;
+    }
+    return true ;
+}
+vector<vector<string>> helper(string &str , int pos){
+    if(pos == str.size()){
+        return vector<vector<string>>(1) ;
+    }
+    vector<vector<string>> res ;
+    string temp = "" ;
+    
+    for(int i = pos ; i < str.size() ; i++){
+        temp.push_back(str[i]);
+        if(isPalindrome(temp)){
+            vector<vector<string>> tt = helper(str , i+1);
+            
+            for(vector<string> &v : tt){
+                v.insert(v.begin() , temp);
+                res.insert(res.end() , v);
+            }
+            
+        }
+    }
+    
+    return res ;
+}
+vector<vector<string> > Solution::partition(string A) {
+    return helper(A , 0);
+}
+```
+
+3. [generate-parenthesis](https://www.interviewbit.com/problems/generate-all-parentheses-ii/)
+```cpp
+void helper(int open_paren , int closed_paren , int total,int cur ,string &container , vector<string> &res){
+    if(2*total == cur){
+        res.push_back(container);
+        return ;
+    }    
+    
+    if(open_paren < total){
+        container.push_back('(');
+        helper(open_paren+1 , closed_paren , total , cur+1 , container , res);
+        container.pop_back();
+    }
+    
+    if(closed_paren < open_paren){
+        container.push_back(')');
+        helper(open_paren , closed_paren+1 , total , cur+1 , container , res);
+        container.pop_back();
+    }
+}
+vector<string> Solution::generateParenthesis(int A) {
+    vector<string> res ;
+    string container = "" ;
+    helper(0 , 0 , A , 0 , container , res);
+    return res ;
+}
+```
+
