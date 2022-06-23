@@ -3,62 +3,41 @@
 
 using namespace std;
 
-template<typename T> class Node{
-public:
-    T val ;
-    Node* nxt ;
-    Node(){
-        this->nxt = NULL ;
-    };
-    Node(T value){
-        this->val = value ;
-        this->nxt = NULL ;
+void permute(string &res){
+    int idx = 0 ;
+    for(int i = res.size()-2 ; i >= 0 ; i++){
+        if(res[i] < res[i+1]){
+            idx = i ;
+            break ;
+        }
     }
-};
+    for(int i = res.size()-1 ; i > idx ; i++){
+        if(res[idx] < res[i]){
+            swap(res[idx] , res[i]);
+            idx++ ;
+            break ;
+        }
+    }
+    reverse(res.begin()+idx , res.end());
+}
 
-template<typename T> class MyStack{
+string getPermutation(int A, int B) {
+    string res = "" ;
+    
+    for(int i = 1 ; i <= A ; i++){
+        res.push_back(i+'0');
+    }
+    while(B--){
+        permute(res);
+    }
 
-public:
-    Node<T> *head ;
-    MyStack(){
-        head = NULL ;
-    }    
-    void push(T val){
-        if(not head){
-            head = new Node<T>(val);
-        }else{
-            Node<T>* temp = new Node<T>(val);
-            temp->nxt = head ;
-            head = temp ;
-        }
-    }    
-    void pop(){
-        if(not head){
-            return ;
-        }
-        Node<T> *temp = head ; 
-        head = head->nxt ;
-        delete temp ; 
-    }
-    int top(){
-        if(not head){
-            return -1 ;
-        }
-        return head->val ;
-    }
-    bool isEmpty(){
-        return head == NULL ;
-    }
-};
+    return res ;
+}
 
 
 int main()
 {
-    MyStack<int> *st = new MyStack<int>(); 
-
-    st->push(5);
-    st->push(10);
-    cout << st->top() ;
+    cout << getPermutation(3,4) ;
 
     return 0;
 }
