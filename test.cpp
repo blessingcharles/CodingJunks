@@ -3,47 +3,62 @@
 
 using namespace std;
 
-int solve(vector<int> &nums, int B)
-{
-    // atmost b distincts 
-    
-    int left = 0 , right = 1 ;
-    int N = nums.size() ;
-    unordered_map<int,int> memo ;
-    memo[nums[left]]++ ;
-    int current_distincts = 1 ;
-    int ans = 1 ;
-    
-    while(right < N){
-        if(memo.find(nums[right]) == memo.end()){
-            current_distincts++ ;
-        }    
-        memo[nums[right]]++ ;
-        while(left < right and current_distincts > B){
-            if(memo[nums[left]] == 1){
-                memo.erase(nums[left]);
-                current_distincts-- ;
-                break ;
-            }
-            else{
-                memo[nums[left]]-- ;
-            }
-            left++ ;
-        }
-        cout << left << " " << right << endl ;
-        ans += (right - left+1);
-        right++ ;
+template<typename T> class Node{
+public:
+    T val ;
+    Node* nxt ;
+    Node(){
+        this->nxt = NULL ;
+    };
+    Node(T value){
+        this->val = value ;
+        this->nxt = NULL ;
     }
-    
-    return ans ;
-}
+};
+
+template<typename T> class MyStack{
+
+public:
+    Node<T> *head ;
+    MyStack(){
+        head = NULL ;
+    }    
+    void push(T val){
+        if(not head){
+            head = new Node<T>(val);
+        }else{
+            Node<T>* temp = new Node<T>(val);
+            temp->nxt = head ;
+            head = temp ;
+        }
+    }    
+    void pop(){
+        if(not head){
+            return ;
+        }
+        Node<T> *temp = head ; 
+        head = head->nxt ;
+        delete temp ; 
+    }
+    int top(){
+        if(not head){
+            return -1 ;
+        }
+        return head->val ;
+    }
+    bool isEmpty(){
+        return head == NULL ;
+    }
+};
+
 
 int main()
 {
-    vector<int> arr = { 5, 3, 5, 1, 3};
+    MyStack<int> *st = new MyStack<int>(); 
 
-    cout << solve(arr, 3) << endl;
-    cout << solve(arr, 2) << endl;
+    st->push(5);
+    st->push(10);
+    cout << st->top() ;
 
     return 0;
 }
