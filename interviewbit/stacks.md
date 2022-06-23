@@ -278,3 +278,75 @@ int Solution::largestRectangleArea(vector<int> &A) {
 }
 ```
 
+### Stack Math
+
+1. [Evaluate exp](https://www.interviewbit.com/problems/evaluate-expression/)
+```cpp
+int calc(int op1 , int op2 , string &op){
+
+    if(op == "+")
+        return op1+op2 ;
+    if(op == "-")
+        return op1-op2 ;
+    if(op == "*" or op == "" or op == " ")
+        return op1*op2 ;
+    if(op == "/")
+        return op1/op2 ;
+
+    return 0 ;
+}
+
+bool isSymbol(string &s){
+    return s == "+" or s == "-" or s == "*" or s == "" or s == " " or s == "/" ;
+}
+
+int Solution::evalRPN(vector<string> &A) {
+    stack<string> st ;
+    
+    for(string &symbol : A){
+        if(isSymbol(symbol)){
+            int op2 = stoi(st.top()) ; st.pop();
+            int op1 = stoi(st.top()) ; st.pop() ;
+            
+            int res = calc(op1 , op2 , symbol);
+            st.push(to_string(res));   
+        }
+        else{
+            st.push(symbol);
+        }
+    }
+    if(st.empty()){
+        return 0 ;
+    }
+    
+    return stoi(st.top()) ;
+}
+```
+
+2. [trap-rain-water](https://www.interviewbit.com/problems/rain-water-trapped/)
+```cpp
+int Solution::trap(const vector<int> &A) {
+    int N = A.size() ;
+    
+    vector<int> fromleft(N);
+    vector<int> fromright(N);
+    fromleft[0] = 0 ;
+    fromright[N-1] = 0 ;
+    
+    for(int i = 1, j = N-2 ; i < N ; i++ , j--){
+        fromleft[i] = max(fromleft[i-1] , A[i-1]);
+        fromright[j] = max(fromright[j+1] , A[j+1]);
+    }
+    
+    int water = 0 ;
+    
+    for(int i = 1 ; i < N-1 ; i++){
+        int height = min(fromleft[i] , fromright[i]) - A[i] ;
+        if(height > 0){
+            water += height ;
+        }
+    }
+    
+    return water ;
+}
+```

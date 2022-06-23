@@ -68,3 +68,54 @@ vector<int> Solution::slidingMaximum(const vector<int> &A, int B) {
     return ans ;
 }
 ```
+
+### Multisource bfs
+
+1. [hotel-service](https://www.interviewbit.com/problems/hotel-service/)
+```cpp
+bool isInValid(int row , int col, int M , int N){
+    return row < 0 or col < 0 or row >= M or col >= N ;
+}
+
+vector<int> Solution::nearestHotel(vector<vector<int> > &A, vector<vector<int> > &B) {
+    int dx[4] = {1 , -1 , 0 , 0} ;
+    int dy[4] = {0 , 0 , 1 , -1} ;
+    queue<vector<int>> q ;
+    int M = A.size() , N = A[0].size() ;
+    
+    // Multisource bfs
+    for(int i = 0 ; i < M ; i++){
+        for(int j = 0 ; j < N ; j++){
+            if(A[i][j] == 1){
+                q.push({0,i,j});
+                A[i][j] = 0 ;
+            }
+            else{
+                A[i][j] = -1 ;
+            }
+        }
+    }
+    vector<int> cur_node ;
+    
+    while(not q.empty()){
+        int sz = q.size() ;
+        while(sz--){
+            cur_node = q.front() ;
+            for(int i = 0 ; i < 4 ; i++){
+                int neigh_row = dx[i] + cur_node[1] , neigh_col = dy[i] + cur_node[2] ;
+                if(not isInValid(neigh_row , neigh_col , M , N) and A[neigh_row][neigh_col] == -1){
+                    A[neigh_row][neigh_col] = 1+cur_node[0] ;
+                    q.push({A[neigh_row][neigh_col] , neigh_row , neigh_col });
+                }
+            }        
+            q.pop();
+        }
+    }
+    vector<int> res(B.size());
+    for(int i = 0 ; i < B.size() ; i++){
+        res[i] = A[B[i][0]-1][B[i][1]-1] ;    
+    }
+    
+    return res ;
+}
+```
