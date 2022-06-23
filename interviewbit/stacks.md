@@ -230,3 +230,51 @@ int MinStack::getMin() {
     return minst->top();
 }
 ```
+
+### Clever Stack
+
+1. [nearest-smaller-ele](https://www.interviewbit.com/problems/nearest-smaller-element/)
+```cpp
+vector<int> Solution::prevSmaller(vector<int> &A) {
+    stack<int> st ; // monotonic increasing stactk 
+    vector<int> ans(A.size()) ;
+    
+    for(int i = 0 ; i < A.size() ; i++){
+        while(not st.empty() and st.top() >= A[i]){
+            st.pop();
+        }
+        if(st.empty()){
+            ans[i] = -1 ;
+        }
+        else{
+            ans[i] = st.top() ;
+        }
+        st.push(A[i]);
+    }
+
+    return ans ;
+}
+```
+
+2. [largest-rectangle-histogram](https://www.interviewbit.com/problems/largest-rectangle-in-histogram/)
+```cpp
+int Solution::largestRectangleArea(vector<int> &A) {
+    stack<pair<int,int>> st ;
+    A.push_back(0);
+    st.push({0,A[0]});
+    int maxarea = A[0] ;
+    
+    for(int i = 0 ; i < A.size() ; i++){
+        int left_expandable = i ;
+        
+        while(not st.empty() and st.top().second >= A[i]){
+            left_expandable = st.top().first ;
+            maxarea = max(maxarea , st.top().second * (i-left_expandable));
+            st.pop();
+        }
+        st.push({left_expandable , A[i]});
+    }
+    return maxarea ;
+}
+```
+
