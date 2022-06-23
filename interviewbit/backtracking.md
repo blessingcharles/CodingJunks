@@ -327,3 +327,181 @@ vector<string> Solution::generateParenthesis(int A) {
 }
 ```
 
+### permutation
+
+1. [permute](https://www.interviewbit.com/problems/permutations/)
+```cpp
+void permute(vector<int> &arr){
+     if(arr.size() < 2) return ;
+
+    int pos = 0 ;
+    for(int i = arr.size()-2 ; i >= 0 ; i--){
+        if(arr[i] < arr[i+1]){
+            //find a peak element
+            pos = i ;
+            break ;
+        }
+    }
+
+    for(int i = arr.size()-1 ; i > pos ; i--){
+        if(arr[pos] < arr[i]){
+            swap(arr[pos] , arr[i]);
+            pos++ ;
+            break ;
+        }
+    }
+    reverse(arr.begin()+pos , arr.end());
+}
+
+vector<vector<int> > Solution::permute(vector<int> &A) {
+    vector<int> init = A ;
+    vector<vector<int>> res ;
+    
+    do{
+        res.push_back(A);
+        permute(A);
+    }while(init != A);
+    
+    return res ;
+}
+```
+
+### game solving
+
+1. [nqueen](https://www.interviewbit.com/problems/nqueens/)
+```cpp
+bool canIPlace(int row , int col , vector<string> &board){
+    //check the rows 
+    int N = board.size() ;
+    
+    for(int r = 0 ; r < N ; r++){
+        if(board[r][col] == 'Q'){
+            return false ;
+        }
+    }
+    // check for cross cut
+    bool flag = true ;
+    int move = 1 ;
+    
+    while(flag){
+        flag = false ;
+        
+        if(row+move < N and col+move < N){
+            flag = true ;
+            if(board[row+move][col+move] == 'Q'){
+                return false ;
+            }
+        }
+        if(row+move < N and col-move >= 0){
+            flag = true ;
+            if(board[row+move][col-move] == 'Q'){
+                return false ;
+            }
+        }
+        if(row-move >= 0 and col+move < N){
+            flag = true ;
+            if(board[row-move][col+move] == 'Q'){
+                return false ;
+            }
+        }
+        if(row-move >= 0 and col-move >= 0){
+            flag = true ;
+            if(board[row-move][col-move] == 'Q'){
+                return false ;
+            }
+        }
+        move++ ;
+    }
+    
+    return true ;
+}
+void solver(int row , vector<string> &board , vector<vector<string>> &res){
+    if(row == board.size()){
+        res.push_back(board);
+        return ;
+    }
+    
+    for(int col = 0 ; col < board.size() ; col++){
+        if(canIPlace(row , col , board)){
+            board[row][col] = 'Q';
+            solver(row+1 , board , res);
+            board[row][col] = '.';
+        }
+    }
+    
+}
+vector<vector<string> > Solution::solveNQueens(int A) {
+    vector<vector<string>> res ;
+    vector<string> board(A , string(A , '.')) ;
+
+    solver(0 , board , res);
+    
+    return res ;
+}
+```
+
+2. [sudoku](https://www.interviewbit.com/problems/sudoku/)
+```cpp
+string possible = "123456789" ;
+bool canIPlace(char ch , int row , int col , vector<vector<char>> &board){
+    // check the row and col
+    for(int i = 0 ; i < board.size() ; i++){
+        if(board[row][i] == ch) return false ;
+        if(board[i][col] == ch) return false ;
+    }
+    
+    // check 3*3 matrix ;
+    int i_row = floor(row/3)*3 ;
+    int i_col = floor(col/3)*3 ;
+    
+    for(int i = 0 ; i < 3 ; i++){
+        for(int j = 0 ; j < 3 ; j++){
+            if(board[i+i_row][j+i_col] == ch){
+                return false ;
+            }
+        }
+    }
+    return true ;
+}
+
+bool helper(int row , int col , vector<vector<char>> &A){
+    if(row == A.size()){
+        return true;
+    }
+    if(A[row][col] != '.'){
+        col++ ;
+        if(col == A.size()){
+            col = 0 ;
+            row++ ;
+        }
+        return helper(row , col , A);
+    }
+    
+    int cur_col = col ;
+    int cur_row = row ;
+    
+    for(char ch : possible){
+        if(canIPlace(ch , row , col , A)){
+            
+            
+            A[row][col] = ch ;
+            col++ ;
+            if(col == A.size()){
+                col = 0 ; row++ ;
+            }
+            if(helper(row , col , A)){
+                return true ;
+            }
+            
+            row = cur_row ; 
+            col = cur_col ;
+            A[row][col] = '.' ;
+        }
+    }    
+    
+    return false ;
+}
+void Solution::solveSudoku(vector<vector<char> > &A) {
+    helper(0,0,A);
+}
+```
