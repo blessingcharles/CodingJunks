@@ -559,7 +559,7 @@ vector<int> Solution::equal(vector<int> &A) {
 }
 ```
 
-4. [copy-list]()
+4. [copy-list](https://www.interviewbit.com/problems/copy-list/)
 ```cpp
 RandomListNode* Solution::copyRandomList(RandomListNode* A) {
     RandomListNode* head = new RandomListNode(0);
@@ -586,5 +586,120 @@ RandomListNode* Solution::copyRandomList(RandomListNode* A) {
         cur = cur->next ;
     }
     return head->next ;
+}
+```
+
+### Maths and Hashing
+
+1. [is-pal](https://www.interviewbit.com/problems/check-palindrome/)
+```cpp
+int Solution::solve(string A) {
+    unordered_map<char , int> memo ;
+    
+    for(char ch : A){
+        memo[ch]++ ;
+    }
+    int odds_count = 0 ;
+    
+    for(unordered_map<char,int>::iterator it = memo.begin() ; it != memo.end() ; it++){
+        if(it->second%2 == 1){
+            if(odds_count == 1){
+                return 0 ;
+            }
+            odds_count++ ;
+        }    
+    }
+    return 1 ;
+}
+```
+
+2. [fraction](https://www.interviewbit.com/problems/fraction/)
+```cpp
+string Solution::fractionToDecimal(int c, int d) {
+    long a = c , b = d ;
+    string res = "" ;
+    if(a == 0){
+        return "0" ;
+    }
+    
+    long sign = ((a < 0) ^ (b < 0))?-1:1 ;
+    
+    a = abs(a);
+    b = abs(b);
+    long initital = a/b ;
+    if(sign == -1){
+        res += "-" ;
+    }
+    res += to_string(initital);
+    
+    long rem = a%b ;
+    if(rem == 0){
+        return res ;
+    }
+    
+    bool isrepeated = false ; 
+    long idx ;
+    unordered_map<long,long> memo ;
+    res += "." ;
+    while(rem > 0){
+        if(memo.find(rem) != memo.end()){
+            isrepeated = true ;
+            idx =memo[rem];
+            break ;
+        }
+        else
+            memo[rem] = res.size();
+        
+        rem = rem*10 ;
+        res += to_string(rem/b) ;
+        
+        rem = rem%b ;
+    }
+    if(isrepeated){
+        res += ")";
+        res.insert(idx , "(");
+    }
+    
+    return res ;
+}
+
+```
+
+3. [points-on-stline](  https://www.interviewbit.com/problems/points-on-the-straight-line/)
+```cpp
+int Solution::maxPoints(vector<int> &A, vector<int> &B) {
+    if(A.size() == 0){
+        return 0 ;
+    }
+    if(A.size() == 1){
+        return 1 ;
+    }
+    
+    int maxpoints = 0 ;
+    double curslope = 0 ;
+    
+    for(int i = 0 ; i < A.size() ; i++){
+        int i_max = 0 , samePoint = 1 ;
+        
+        unordered_map<double,int> slopes ;
+        for(int j = i+1 ; j < A.size() ; j++){
+            
+            if(A[j] == A[i] and B[j] == B[i]){
+                samePoint++      ;
+            }
+            else if(A[j]-A[i] == 0){
+                slopes[INT_MAX]++;
+                i_max = max(slopes[INT_MAX] ,i_max);        
+            }
+            else{
+                curslope = (double )(B[j] - B[i])/(double )(A[j] - A[i]) ;
+                slopes[curslope]++ ;
+                i_max = max(slopes[curslope] ,i_max);        
+            }
+        }
+        maxpoints = max(maxpoints ,i_max+samePoint);        
+    }
+    
+    return maxpoints ;
 }
 ```
