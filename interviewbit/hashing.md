@@ -234,3 +234,130 @@ int Solution::diffPossible(const vector<int> &A, int B) {
     return 0 ;
 }
 ```
+
+## Incremental Hash
+
+1. [Incremental-problem](https://www.interviewbit.com/problems/an-increment-problem/)
+```cpp
+vector<int> Solution::solve(vector<int> &A) {
+    unordered_map<int,int> memo ;
+    
+    for(int i = 0 ; i < A.size() ; i++){
+        if(memo.find(A[i]) != memo.end()){
+            int idx = memo[A[i]] ;
+            memo[A[i]] = i ;
+            A[idx]++ ;
+            memo[A[idx]] = idx ;
+        }
+        else{
+            memo[A[i]] = i ;
+        }
+    }
+    return A ;
+}
+```
+
+2. [subarray-with-given-xor](https://www.interviewbit.com/problems/subarray-with-given-xor/)
+```cpp
+int Solution::solve(vector<int> &A, int k) {
+    int count = 0 ;
+    unordered_map<int,int> memo ;
+    memo[0] = 1 ;
+    int curxor = 0 ;
+    
+    for(int i = 0 ; i < A.size() ; i++){
+        curxor = curxor ^ A[i] ;
+        if(memo.find(curxor ^ k) != memo.end()){
+            count += memo[curxor ^ k];
+        }          
+        memo[curxor]++ ;
+    }
+    
+    return count ;
+}
+```
+
+3. [two-out-of-three](https://www.interviewbit.com/problems/two-out-of-three/)
+```cpp
+vector<int> Solution::solve(vector<int> &A, vector<int> &B, vector<int> &C) {
+    unordered_map<int,int> memo1 , memo2 , memo3 ;
+    for(int ele : A){
+        memo1[ele]++ ;
+    }
+    for(int ele : B){
+        memo2[ele]++ ;
+    }
+    for(int ele : C){
+        memo3[ele]++ ;
+    }
+    set<int> st ;
+        
+    for(int ele : A){
+        if(memo2.find(ele) != memo2.end()){
+            st.insert(ele);        
+        }
+        else if(memo3.find(ele) != memo3.end()){
+            st.insert(ele);        
+        }
+    }
+    for(int ele : B){
+        if(memo1.find(ele) != memo1.end()){
+            st.insert(ele);        
+            memo1[ele]-- ;
+            if(memo1[ele] == 0){
+                memo1.erase(ele) ;
+            }
+        }
+        else if(memo3.find(ele) != memo3.end()){
+            st.insert(ele);        
+            memo3[ele]-- ;
+            if(memo3[ele] == 0){
+                memo3.erase(ele) ;
+            }
+        }
+    }
+    return vector<int>(st.begin() , st.end());    
+}
+```
+
+4. [substring-concatenation](https://www.interviewbit.com/problems/substring-concatenation/)
+```cpp
+bool helper(string &A , int pos , unordered_map<string,int> memo , int wordLen){
+    string temp ;
+    while(memo.size() and pos < A.size()){
+        temp = A.substr(pos , wordLen);
+        if(memo.find(temp) == memo.end()) return false ;
+        memo[temp]-- ;
+        if(memo[temp] == 0){
+            memo.erase(temp);
+        }
+        pos = pos + wordLen ;
+    }
+    
+    return (memo.size() == 0)?true:false ;
+}
+vector<int> Solution::findSubstring(string A, const vector<string> &B) {
+    int wordLen = B[0].size() ;
+    unordered_map<string , int> memo ;
+    
+    for(const string &s : B){
+        memo[s]++ ;    
+    }
+    string temp ;
+    vector<int> res ;
+    
+        
+    for(int i = 0 ; i < A.size() ; i++){
+        temp = A.substr(i,wordLen);
+        if(memo.find(temp) != memo.end()){
+            //try to match it 
+            if(helper(A , i , memo , wordLen)){
+                res.push_back(i);
+            }
+        }
+    }  
+    return res ;
+}
+
+```
+
