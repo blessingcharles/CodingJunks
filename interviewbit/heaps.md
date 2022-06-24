@@ -136,3 +136,81 @@ ListNode* Solution::mergeKLists(vector<ListNode*> &A) {
     return head->next ;
 }
 ```
+
+## MAPS
+
+1. [distinct-number-in-window](https://www.interviewbit.com/problems/distinct-numbers-in-window/)
+```cpp
+vector<int> Solution::dNums(vector<int> &A, int B) {
+    int N = A.size() ;
+    
+    if(B > N){
+        return {} ;
+    }
+    
+    int left = 0 , right = 0 ;
+    unordered_map<int,int> memo ; // to hold the counts
+    vector<int> ans ;
+    
+    // fix the first window
+    for(right = 0; right < B ; right++){
+        memo[A[right]]++ ;
+    } 
+    
+    ans.push_back(memo.size());
+    
+    while(right < N){
+        // shrink the window
+        memo[A[left]]-- ;
+        if(memo[A[left]] == 0){
+            memo.erase(A[left]);
+        }
+        left++ ;
+        
+        memo[A[right]]++ ;
+        right++ ;
+        ans.push_back(memo.size());
+    }
+    
+    return ans ;
+}
+```
+
+2. [LRU-Cache](https://www.interviewbit.com/problems/lru-cache/)
+```cpp
+#include<bits/stdc++.h>
+
+int capacity ;
+unordered_map<int , list<pair<int,int>>::iterator> memo ;
+list<pair<int,int>> dl ;
+
+LRUCache::LRUCache(int cap) {
+    capacity = cap ;
+    memo.clear() ;
+    dl.clear() ;    
+}
+
+int LRUCache::get(int key) {
+    if(memo.find(key) == memo.end()){
+        return -1 ;
+    }
+    list<pair<int,int>>::iterator it = memo[key];
+    dl.splice(dl.begin() , dl , it);
+    return it->second ;
+}
+
+void LRUCache::set(int key, int value) {
+    auto it = memo.find(key);
+    if(it != memo.end()){
+        it->second->second = value ;
+        dl.splice(dl.begin() , dl , it->second);
+        return ;
+    }
+    if(memo.size() == capacity){
+        memo.erase(dl.back().first);
+        dl.pop_back() ;
+    }
+    dl.push_front({key,value});
+    memo[key] = dl.begin();
+}
+```
