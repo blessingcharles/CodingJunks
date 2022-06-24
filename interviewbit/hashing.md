@@ -361,3 +361,105 @@ vector<int> Solution::findSubstring(string A, const vector<string> &B) {
 
 ```
 
+### Hashing two ptr
+
+1. [exact-odd](https://www.interviewbit.com/problems/subarray-with-b-odd-numbers/)
+```cpp
+int Solution::solve(vector<int> &A, int B) {
+    queue<int> q ;
+    int count = 0;
+    int left = 0 , right = 0 ;
+    while(right < A.size()){
+        if(A[right] % 2 == 1){
+            q.push(right);
+        }
+        
+        while(q.size() > B){
+            left = q.front()+1 ;
+            q.pop();
+        }
+        
+        if(q.size() == B){
+            // how many subarray i can generate
+            if(B == 0){
+                count += (right-left+1);
+            }
+            else{
+                count += (q.front() - left + 1);
+            }
+        }
+        right++ ;
+    }
+    
+    return count ;
+}
+```
+
+2. [window-string](https://www.interviewbit.com/problems/window-string/)
+```cpp
+string Solution::minWindow(string A, string B) {
+    int N = A.size() , M = B.size() ;
+    
+    if(N == M){
+        return (A == B)?A:"" ;
+    }
+    if(N < M){
+        return "" ;
+    }
+    int minlen = INT_MAX ;
+    int left = 0 , right = 0 , minleft = -1 ;
+    
+    unordered_map<char,int> memo;
+    unordered_map<char , int> window ;
+    
+    for(char ch : B){
+        memo[ch]++ ;
+    }
+    int have = 0 , need = memo.size() ;
+    
+    while(right < N){
+        window[A[right]]++ ;
+        if(memo.find(A[right]) != memo.end() and memo[A[right]] == window[A[right]]){
+            have++ ;
+        }
+        
+        while(have == need){
+            if(minlen > right-left+1){
+                minlen = right-left+1 ;
+                minleft = left ;
+            }
+
+            window[A[left]]-- ;
+            if(memo.find(A[left]) != memo.end() and memo[A[left]] > window[A[left]]){
+                have-- ;
+            }
+            left++ ;
+        }
+        right++ ;
+    }
+    return (minlen == INT_MAX)?"":A.substr(minleft , minlen) ;   
+}
+```
+
+3. [longest-substr-without-repeat](https://www.interviewbit.com/problems/longest-substring-without-repeat/)
+```cpp
+int Solution::lengthOfLongestSubstring(string A) {
+    int maxlen = 0 ;
+    int left = 0 , right = 0 ;
+    unordered_map<char , int > memo ;
+    int N = A.size() ;
+    
+    while(right < N){
+        while(memo.find(A[right]) != memo.end()){
+            memo.erase(A[left]);
+            left++ ;
+        }    
+        memo[A[right]]++ ;
+        maxlen = max(maxlen , right-left+1);
+        right++ ;
+    }
+    return maxlen ;
+}
+```
+
+4. 
