@@ -462,4 +462,129 @@ int Solution::lengthOfLongestSubstring(string A) {
 }
 ```
 
-4. 
+
+## Key information
+
+1. [pair-xor](https://www.interviewbit.com/problems/pairs-with-given-xor/)
+```cpp
+int Solution::solve(vector<int> &A, int B) {
+    int count = 0 ;
+    unordered_set<int> memo(A.begin() , A.end());
+    
+    for(int ele : A){
+        if(memo.find(ele ^ B) != memo.end()){
+            count++ ;
+            memo.erase(ele);
+        }
+        
+    }
+    return count ;
+}
+```
+
+2. [Anagrams](https://www.interviewbit.com/problems/anagrams/)
+```cpp
+vector<vector<int> > Solution::anagrams(const vector<string> &arr) {
+    unordered_map<string , vector<int>> memo ;
+    vector<string> A = arr ;
+    
+    for(int i = 0 ; i < A.size() ; i++){
+        sort(A[i].begin() , A[i].end());
+        memo[A[i]].push_back(i+1) ;
+    }
+    
+    vector<vector<int>> res ;
+    for(int i = 0 ; i < A.size() ; i++){
+        if(memo.find(A[i]) != memo.end()){
+            res.push_back(memo[A[i]]);
+            memo.erase(A[i]);
+        }
+    }
+    return res ;
+}
+```
+
+3. [equal](https://www.interviewbit.com/problems/equal/)
+```cpp
+bool isLexSmaller(int e1 , int e2 , int e3 , int e4 , int x1 , int x2 , int x3 , int x4){
+    if(x1 != e1){
+        return x1 < e1 ;
+    }
+
+    if(x2 != e2){
+        return x2 < e2 ;
+    }
+
+
+    if(x3 != e3){
+        return x3 < e3 ;
+    }
+
+    if(x4 != e4){
+        return x4 < e4 ;
+    }
+
+    return false ;
+}
+
+vector<int> Solution::equal(vector<int> &A) {
+    unordered_map<int , pair<int,int>> memo ;
+    int first = INT_MAX , second = INT_MAX , third = INT_MAX, fourth = INT_MAX ;
+    pair<int,int> temp ;
+    
+    for(int i = 0 ; i < A.size()-1 ; i++){
+        for(int j = i+1 ; j < A.size() ; j++){
+            int cursum = A[i] + A[j] ;
+                    
+            if(memo.find(cursum) != memo.end()){
+                    temp = memo[cursum] ;
+                    if(temp.first == i or temp.first == j or temp.second == i  or temp.second == j){
+                        continue ;
+                    }
+                    if(isLexSmaller(first , second , third , fourth , temp.first , temp.second , i , j)){
+                        first = temp.first ;
+                        second = temp.second ;
+                        third = i ;
+                        fourth = j ;
+                    }
+            }
+            else{
+                memo[cursum] = {i,j};
+            }
+        }
+    }
+    if(first == INT_MAX) return  {} ;
+    
+    return {first, second,third,fourth} ;
+}
+```
+
+4. [copy-list]()
+```cpp
+RandomListNode* Solution::copyRandomList(RandomListNode* A) {
+    RandomListNode* head = new RandomListNode(0);
+    RandomListNode* prev = head ;
+    unordered_map<RandomListNode* , RandomListNode* > memo ;
+    RandomListNode* cur = A ;
+    while(cur){
+        prev->next = new RandomListNode(cur->label);
+        memo[cur] = prev->next ;
+        
+        prev = prev->next ;
+        cur = cur->next ;
+    }
+    
+    prev = head->next ;
+    cur = A ;
+    
+    while(cur){
+        
+        if(cur->random){
+            prev->random = memo[cur->random];
+        }
+        prev = prev->next ;
+        cur = cur->next ;
+    }
+    return head->next ;
+}
+```
