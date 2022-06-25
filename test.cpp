@@ -3,67 +3,95 @@
 
 using namespace std;
 
-bool isLexSmaller(int e1 , int e2 , int e3 , int e4 , int x1 , int x2 , int x3 , int x4){
-    if(x1 != e1){
-        return x1 < e1 ;
+
+#include<bits/stdc++.h>
+
+struct TrieNode{
+    TrieNode* children[26] = {NULL};
+    bool isEOF = false ;
+};
+
+class Trie{
+public :
+    TrieNode* root ;
+    Trie(){
+        root = new TrieNode();
     }
-
-    if(x2 != e2){
-        return x2 < e2 ;
-    }
-
-
-    if(x3 != e3){
-        return x3 < e3 ;
-    }
-
-    if(x4 != e4){
-        return x4 < e4 ;
-    }
-
-    return false ;
-}
-vector<int> equal(vector<int> &A) {
-    unordered_map<int , pair<int,int>> memo ;
-    int first = INT_MAX , second = INT_MAX, third = INT_MAX, fourth = INT_MAX;
-    pair<int,int> temp ;
     
-    for(int i = 0 ; i < A.size()-1 ; i++){
-        for(int j = i+1 ; j < A.size() ; j++){
-            int cursum = A[i] + A[j] ;
-                    
-            if(memo.find(cursum) != memo.end()){
-                    temp = memo[cursum] ;
-                    if(temp.first == i or temp.first == j or temp.second == i  or temp.second == j){
-                        continue ;
-                    }
-
-                    cout << temp.first << " " << temp.second << " " << i << " " << j << endl ;
-                    if(isLexSmaller(first , second , third , fourth , temp.first , temp.second , i , j)){
-                        first = temp.first ;
-                        second = temp.second ;
-                        third = i ;
-                        fourth = j ;
-                    }
+    void insert(string &str){
+        TrieNode* crawler = root ;
+        for(char ch : str){
+            int val = ch - 'a' ;
+            if(crawler->children[val] == NULL){
+                crawler->children[val] = new TrieNode();
             }
-            else{
-                memo[cursum] = {i,j};
+            crawler = crawler->children[val];
+        }
+        crawler->isEOF = true ;
+    }
+    
+    bool search(string &str){
+        TrieNode* crawler = root ;
+        
+        for(char ch : str){
+            int val = ch - 'a' ;
+            if(crawler->children[val] == NULL){
+                return false ;
+            }
+            crawler = crawler->children[val];
+        }
+        
+        return crawler->isEOF ;
+    }
+};
+
+vector<int> solve(string A, vector<string> &B) {
+    
+    stringstream ss(A);
+    string temp ;
+    Trie *tt = new Trie();
+    
+    while(getline(ss ,temp , '_')){
+        tt->insert(temp) ;    
+    }
+    
+    int N = B.size() ;
+    vector<pair<int,int>> arr(N) ;
+    
+    for(int i = 0 ; i < N ; i++){
+        stringstream ss(B[i]);
+        int count  = 0 ;
+        while(getline(ss , temp , '_')){
+            if(tt->search(temp)){
+                count++ ;
             }
         }
+        cout << count << " " << i << endl ;
+        arr[i] = {count , i};
     }
-    if(first == INT_MAX) return  {} ;
     
-    return {first, second,third,fourth} ;
+    sort(arr.begin() , arr.end() , [](pair<int,int>& a , pair<int,int>& b){
+        if(a.first == b.first){
+            return a.second < b.second ;
+        }
+        return a.first > b.first ;
+    });
+    vector<int> ans(N) ;
+    for(int i = 0 ; i < N ; i++){
+        ans[i] = arr[i].second ;
+    }
+    return ans ;
 }
 
 
 int main()
 {
-    vector<int> arr = {3, 4, 7, 1, 2, 9, 8};
-    for(int ele :equal(arr)){
-    cout << "----------" ;
+    string str = "cool_ice_wifi" ;
+    vector<string> arr = { "water_is_cool", "cold_ice_drink", "cool_wifi_speed"};
+    for(int ele : solve(str , arr)){
         cout << ele << " " ;
-    }
+    } 
+    cout << endl ;
 
     return 0;
 }
