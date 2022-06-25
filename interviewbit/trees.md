@@ -896,3 +896,92 @@ int Solution::lca(TreeNode* A, int B, int C) {
 
 }
 ```
+
+### 2 trees
+
+1. [merge-tree](https://www.interviewbit.com/problems/merge-two-binary-tree/)
+```cpp
+TreeNode* Solution::solve(TreeNode* root1, TreeNode* root2) {
+    if(not root1 and not root2){
+        return NULL ;
+    }
+    if(not root1){
+        return root2 ;
+    }
+    if(not root2){
+        return root1 ;
+    }
+    
+    TreeNode* newroot = new TreeNode(root1->val + root2->val);
+    
+    newroot->left = solve(root1->left , root2->left);
+    newroot->right = solve(root1->right , root2->right);
+    return newroot ;  
+}
+```
+
+2. [symmetric-bt](https://www.interviewbit.com/problems/symmetric-binary-tree/)
+```cpp
+bool isMirror(TreeNode* root1 , TreeNode* root2){
+    if(not root1 and not root2){
+        return true ;
+    }
+    if(not root1 or not root2 or root1->val != root2->val){
+        return false ;
+    }
+    
+    return isMirror(root1->left , root2->right) and isMirror(root1->right , root2->left);
+}
+
+int Solution::isSymmetric(TreeNode* A) {
+    if(not A) return true ;
+    
+    return isMirror(A->left , A->right);
+}
+```
+
+3. [same-tree](https://www.interviewbit.com/problems/identical-binary-trees/)
+```cpp
+int Solution::isSameTree(TreeNode* root1, TreeNode* root2) {
+    if(not root1 and not root2){
+        return true ;
+    }
+    if(not root1 or not root2 or root1->val != root2->val){
+        return false ;
+    }
+    
+    return isSameTree(root1->left , root2->left) and isSameTree(root1->right , root2->right);
+}
+```
+
+### LinkedList Tree
+
+1. [flatten-bt](https://leetcode.com/problems/flatten-binary-tree-to-linked-list/)
+```cpp
+void solve(TreeNode* root){
+    if(not root){
+        return ;
+    }
+    solve(root->left);
+    solve(root->right);
+    
+    if(root->left){
+        TreeNode* temp = root->right ;
+        root->right = root->left ;
+        TreeNode* node = root ;
+        
+        while(root->right){
+            root = root->right ;
+        }
+        root->right = temp ;
+        node->left = NULL ;  
+    } 
+}
+
+TreeNode* Solution::flatten(TreeNode* A) {
+    solve(A);
+    return A ;
+}
+```
+
+2. 
