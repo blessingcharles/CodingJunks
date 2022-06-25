@@ -824,3 +824,75 @@ TreeNode* Solution::buildTree(vector<int> &inorder, vector<int> &postorder) {
 }
 ```
 
+### Inplace
+
+1. [invert-tree](https://www.interviewbit.com/problems/invert-the-binary-tree/)
+```cpp
+TreeNode* Solution::invertTree(TreeNode* root) {
+    if(not root){
+        return root ;
+    }    
+    TreeNode* temp = root->left ;
+    root->left = invertTree(root->right);
+    root->right = invertTree(temp);
+    return root ;
+}
+```
+
+### Tree search
+1. [lca](https://www.interviewbit.com/problems/least-common-ancestor/)
+```cpp
+TreeNode* findLCA(TreeNode* root , int b , int c , bool &b_found , bool &c_found){
+    if(not root){
+        return NULL ;
+    }
+    if(root->val == b){
+        b_found = true ;
+       return root ; 
+    } 
+    if(root->val == c){
+        c_found = true ;
+        return root ;
+    }
+    
+    TreeNode* left = findLCA(root->left , b , c , b_found , c_found);
+    TreeNode* right = findLCA(root->right , b , c , b_found , c_found);
+    
+    if(left and right){
+        return root ;
+    }
+    if(not left and not right){
+        return NULL ;
+    }
+    
+    return (left != NULL)?left:right ;
+}
+bool find(TreeNode* root , int target){
+    if(not root){
+        return false ;
+    }
+    if(root->val == target){
+        return true ;
+    }
+    
+    return find(root->left , target) or find(root->right , target);
+     
+}
+int Solution::lca(TreeNode* A, int B, int C) {
+    bool b_found = false , c_found = false ;
+    
+    TreeNode* ll = findLCA(A , B , C , b_found , c_found);
+    
+    if(not ll) return -1 ;
+    if(b_found and c_found) return ll->val ;
+    
+    if(not b_found){
+        b_found = find(ll , B);
+        return (b_found)?ll->val:-1 ;
+    }
+    c_found = find(ll , C);
+    
+    return (c_found)?ll->val:-1 ;
+
+}
+```
