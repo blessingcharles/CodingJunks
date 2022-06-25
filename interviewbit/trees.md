@@ -331,4 +331,177 @@ vector<string> Solution::prefix(vector<string> &A) {
 }
 ```
 
-4. 
+### Simple tree ops
+
+1. [path-to-node](https://www.interviewbit.com/problems/path-to-given-node/)
+```cpp
+bool helper(TreeNode* root , int target , vector<int> &ans){
+    if(root == NULL){
+        return false ;    
+    }
+    ans.push_back(root->val);
+    if(root->val == target){
+        // we found it 
+        return true ;
+    }
+    
+    if(helper(root->left , target , ans)){
+        return true ;
+    }
+    if(helper(root->right , target , ans)){
+        return true ;
+    }
+    ans.pop_back() ;
+    return false ;
+}
+vector<int> Solution::solve(TreeNode* A, int B) {
+    vector<int> ans ;
+    helper(A , B , ans);
+    
+    return ans ;
+}
+```
+
+2. [Remove-half-nodes](https://www.interviewbit.com/problems/remove-half-nodes/)
+```cpp
+TreeNode* Solution::solve(TreeNode* root) {
+    if(not root){
+        return NULL ;
+    }
+    root->left = solve(root->left);
+    root->right = solve(root->right);
+    
+    if(not root->left and not root->right){
+        return root ;
+    }
+    if(not root->left){
+        // I am having only one children
+        return root->right ;
+    }
+    if(not root->right){
+        return root->left ;
+    }
+    return root ;
+}
+```
+
+3. [Node-at-k-distance](https://www.interviewbit.com/problems/nodes-at-distance-k/)
+```cpp
+bool findAncestors(TreeNode* root , int target , vector<TreeNode* > &ancestors ){
+    if(not root){
+        return false;
+    }
+    ancestors.push_back(root);
+    if(root->val == target){
+        return true ;
+    }
+    if(findAncestors(root->left , target , ancestors)){
+        return true ;
+    }
+    if(findAncestors(root->right , target , ancestors)){
+        return true ;
+    }
+    ancestors.pop_back();
+    return false ;
+}
+
+void helper(TreeNode* root , int count ,TreeNode* stopper , vector<int> &ans){
+    if(not root){
+        return ;
+    }
+    if(root == stopper or count < 0){
+        return ;
+    }
+    
+    if(count == 0){
+        ans.push_back(root->val);
+        return ;
+    }
+    helper(root->left , count-1 ,stopper , ans);
+    helper(root->right , count-1 ,stopper , ans);
+}
+
+vector<int> Solution::distanceK(TreeNode* root, int B, int C) {
+    vector<TreeNode* > ancestors ;
+    vector<int> ans ;
+    findAncestors(root , B , ancestors);
+    int idx = ancestors.size()-1 ;
+    
+    // for(TreeNode* rt : ancestors){
+    //     ans.push_back(rt->val);
+    // }
+    reverse(ancestors.begin() , ancestors.end());
+    
+    for(int i = 0 ; i < ancestors.size() ; i++){
+        helper(ancestors[i] , C-i , (i == 0)?NULL:ancestors[i-1] , ans);
+    }
+    
+    return ans ;
+}
+```
+
+4. [balances-bt](https://www.interviewbit.com/problems/balanced-binary-tree/)
+```cpp
+pair<bool,int> helper(TreeNode* root){
+    if(not root){
+        return {true , 0};
+    }
+    pair<int,int> leftSide = helper(root->left);
+    if(leftSide.first == false){
+        return {false , 0};
+    }
+    
+    pair<int,int> rightSide = helper(root->right);
+    if(rightSide.first == false){
+        return {false , 0};
+    }
+    int diff = abs(leftSide.second - rightSide.second) ;
+    if(diff > 1){
+        return {false , 0};
+    }
+    
+    return {true , 1 + max(leftSide.second , rightSide.second)};
+}
+
+int Solution::isBalanced(TreeNode* A) {
+    return helper(A).first ;
+}
+```
+
+5. [maximum-edge-removal](https://www.interviewbit.com/problems/maximum-edge-removal/)
+```cpp
+int removeEdges(int cur_node , int &count , vector<bool> &visited , vector<vector<int>> &graph){
+    visited[cur_node] = true ;
+    int nodes_count = 0 ;
+    
+    for(int neigh : graph[cur_node]){
+        if(not visited[neigh]){
+            int subcomponent = removeEdges(neigh , count , visited , graph);
+            if(subcomponent%2 == 0){
+                // even number of nodes in the subcomponent so we can remove  the edge
+                count++ ;
+            }
+            else{
+                nodes_count += subcomponent ;
+            }
+        }
+    }
+    return 1+nodes_count ;
+}
+
+int Solution::solve(int A, vector<vector<int> > &B) {
+    int count = 0 ;
+    vector<vector<int>> graph(A+1) ;
+    
+    for(vector<int>& edge : B){
+        graph[edge[0]].push_back(edge[1]);
+        graph[edge[1]].push_back(edge[0]);
+    }
+    vector<bool> visited(A+1 , false);
+    removeEdges(1 , count , visited , graph);
+    
+    return count ;
+}
+```
+
+6. 
