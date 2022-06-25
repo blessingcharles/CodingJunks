@@ -110,15 +110,19 @@ public:
         dist[src] = 0;
 
         for(int n = 0 ; n < this->V-1 ; n++){
+           // relax all the edges
            for(int i = 0 ; i < this->V ; i++){
-               for(auto neighbours : this->l[i]){
+               
+                if(dist[i] == INT_MAX) continue;
+
+                for(auto neighbours : this->l[i]){
                     int weight = neighbours.first ;
                     int y = neighbours.second ;
 
-                    if(dist[y] == INT_MAX || dist[y] > dist[i] + weight ){
+                    if(dist[y] > dist[i] + weight ){
                         dist[y] = dist[i] + weight ;
                     }
-               }
+                }
            }
         }
 
