@@ -718,3 +718,109 @@ vector<vector<int> > Solution::pathSum(TreeNode* A, int B) {
 }
 ```
 
+### Tree Construction
+
+1. [inorder-cartesian-tree](https://www.interviewbit.com/problems/inorder-traversal-of-cartesian-tree/)
+```cpp
+int findGreater(vector<int> &arr , int left , int right){
+    int max_idx= left ;
+    
+    for(int i = left+1 ; i <= right ; i++){
+        if(arr[i] > arr[max_idx]){
+            max_idx = i ;
+        }
+    }
+    return max_idx ;
+}
+
+TreeNode* BuildCartesian(vector<int> &arr , int left , int right){
+    if(left > right){
+        return NULL ;
+    }    
+    
+    int idx = findGreater(arr , left , right);
+    TreeNode* root = new TreeNode(arr[idx]);
+    root->left = BuildCartesian(arr , left , idx-1);
+    root->right = BuildCartesian(arr , idx+1 , right);
+    return root ;
+}
+
+TreeNode* Solution::buildTree(vector<int> &A) {
+    return BuildCartesian(A , 0 , A.size()-1);
+        
+}
+```
+
+2. [sorted-arr-to-bst](https://www.interviewbit.com/problems/sorted-array-to-balanced-bst/)
+```cpp
+TreeNode* buildBST(const vector<int> &arr , int left , int right){
+    if(left > right){
+        return NULL ;
+    }
+    int mid = left + (right-left)/2 ;
+    
+    TreeNode* root = new TreeNode(arr[mid]);
+    
+    root->left = buildBST(arr , left , mid-1);
+    root->right = buildBST(arr , mid+1 , right);
+    
+    return root ; 
+}
+
+TreeNode* Solution::sortedArrayToBST(const vector<int> &A) {
+    return buildBST(A , 0 , A.size()-1);    
+}
+```
+
+3. [construct-bt-from-inorder-pre](https://www.interviewbit.com/problems/construct-binary-tree-from-inorder-and-preorder/)
+```cpp
+TreeNode* build(vector<int> &preorder , int &idx , vector<int> &inorder , int left , int right , unordered_map<int,int> &memo){
+    if(left > right){
+        return NULL ;
+    }
+    int rootVal = preorder[idx++] ;
+    
+    TreeNode* root = new TreeNode(rootVal);
+    
+    root->left = build(preorder,idx , inorder , left ,            memo[rootVal]-1 , memo);
+    root->right = build(preorder,idx, inorder,  memo[rootVal]+1 , right , memo);
+    return root ;
+}
+
+TreeNode* Solution::buildTree(vector<int> &A, vector<int> &B) {
+    unordered_map<int,int> memo ;
+    for(int i = 0 ; i < B.size() ; i++){
+        memo[B[i]] = i ;
+    }
+    int idx = 0 ;
+    return build(A ,idx, B , 0 , A.size()-1 , memo);
+}
+```
+
+4. [bt-from-inorder-postorder](https://www.interviewbit.com/problems/binary-tree-from-inorder-and-postorder/)
+```cpp
+TreeNode* build(vector<int> &postorder , int &idx , vector<int> &inorder , int left , int right , unordered_map<int,int> &memo){
+    if(left > right){
+        return NULL ;
+    }
+    int rootVal = postorder[idx--] ;
+    TreeNode* root = new TreeNode(rootVal);
+    
+    root->right = build(postorder , idx , inorder , memo[rootVal]+1 , right , memo);
+    root->left = build(postorder , idx , inorder , left , memo[rootVal]-1 , memo);
+    
+    return root ;
+    
+}
+
+TreeNode* Solution::buildTree(vector<int> &inorder, vector<int> &postorder) {
+    unordered_map<int,int> memo ;
+    for(int i = 0 ; i < inorder.size() ; i++){
+        memo[inorder[i]] = i ;
+    }
+    
+    int idx = inorder.size()-1 ;
+    return build(postorder ,idx, inorder , 0 , inorder.size()-1 , memo);
+}
+```
+
