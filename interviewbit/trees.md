@@ -1,5 +1,42 @@
 # TREES
 
+## Example
+
+1. [nxt-greater-bst](https://www.interviewbit.com/problems/next-greater-number-bst/)
+```cpp
+
+bool helper(TreeNode* root , int target ,bool &getnext , TreeNode* &greater){
+    if(not root){
+        return false ;
+    }
+    
+    if(helper(root->left , target , getnext , greater)){
+        return true ;   
+    }
+    
+    if(getnext){
+        greater = root ;
+        getnext = false ;
+        return true ;
+    }
+    if(root->val == target){
+        getnext = true ;
+    }
+    
+    if(helper(root->right , target , getnext , greater)){
+        return true ;
+    }
+    return false ;
+}
+TreeNode* Solution::getSuccessor(TreeNode* A, int B) {
+    bool getnext = false ;
+    TreeNode* greater = NULL ;
+    
+    helper(A , B , getnext , greater) ;
+    return greater ;
+}
+
+```
 ### BST TREE
 
 1. [check-valid-bst]()
@@ -504,4 +541,180 @@ int Solution::solve(int A, vector<vector<int> > &B) {
 }
 ```
 
-6. 
+### Root to Leaf
+
+1. [Burn-a-tree](https://www.interviewbit.com/problems/burn-a-tree/)
+```cpp
+void buildGraph(TreeNode* root , TreeNode* parent , unordered_map<int , vector<int>> &graph , unordered_set<int> &nodes){
+    if(not root){
+        return ;
+    }    
+    if(parent){
+        graph[root->val].push_back(parent->val);
+    }
+    
+    nodes.insert(root->val);
+    
+    if(root->left){
+        graph[root->val].push_back(root->left->val);
+        buildGraph(root->left , root , graph , nodes );
+    }
+    if(root->right){
+        graph[root->val].push_back(root->right->val);
+        buildGraph(root->right , root , graph , nodes);
+    }
+}
+
+int Solution::solve(TreeNode* A, int B) {
+    unordered_map<int , vector<int>> graph ;
+    unordered_set<int> nodes ;
+
+    buildGraph(A , NULL , graph , nodes );
+    queue<int> q ;
+    q.push(B);
+    int time = -1 ;
+
+    nodes.erase(B);
+    
+    while(not q.empty()){
+        int sz = q.size() ;
+        time++ ;
+        while(sz--){
+            int curnode = q.front() ; q.pop() ;
+            
+            // add neighbours
+            for(int neigh : graph[curnode]){
+                if(nodes.find(neigh) != nodes.end()){
+                    q.push(neigh);
+                    nodes.erase(neigh);
+                }    
+            }
+        }
+    }
+    
+    return time ;
+}
+```
+
+2. [maxdepth-of-bt](https://www.interviewbit.com/problems/max-depth-of-binary-tree/)
+```cpp
+int Solution::maxDepth(TreeNode* A) {
+    if(not A){
+        return 0 ;
+    }
+    
+    return 1 + max(maxDepth(A->left) , maxDepth(A->right));
+}
+```
+
+3. [sum-root-to-leaf](https://www.interviewbit.com/problems/sum-root-to-leaf-numbers/)
+```cpp
+int mod = 1003 ;
+
+void helper(TreeNode* root , string &container , long long &cursum){
+    if(not root){
+        return  ;
+    }
+    
+    container.push_back(root->val+'0');
+    string prev = container ;
+    
+    if(container.size() >= 7){
+        int val = stoi(container);
+        val = val%mod ;
+        container = to_string(val) ;
+    }
+    
+    // is leaf node ?
+    if(not root->left and not root->right){
+        cursum = (cursum + stoll(container)%mod)%mod ;
+        // cout << container << endl ;
+    }
+    helper(root->left , container , cursum);
+    helper(root->right , container , cursum);
+    
+    container = prev ;
+    container.pop_back() ;    
+}
+int Solution::sumNumbers(TreeNode* A) {
+    long long cursum = 0 ;
+    string container = "" ;
+    helper(A , container , cursum);
+    return cursum ;
+}
+```
+
+4. [Pathsum](https://www.interviewbit.com/problems/path-sum/)
+```cpp
+int Solution::hasPathSum(TreeNode* root, int B) {
+    if(not root){
+        return 0 ;
+    }
+    if(not root->left and not root->right){
+        if(B-root->val == 0){
+            return 1 ;
+        }
+        return 0 ;
+    }
+    if(hasPathSum(root->left , B-root->val)){
+        return 1 ;
+    }
+    
+    return hasPathSum(root->right , B - root->val) ;
+    
+}
+```
+
+5. [min-depth-of-bt](https://www.interviewbit.com/problems/min-depth-of-binary-tree/)
+```cpp
+int Solution::minDepth(TreeNode* A) {
+    if(not A){
+        return 0 ;
+    }
+    // is I'm a leaf
+    if(not A->left and not A->right){
+        return 1 ;
+    }
+    if(not A->right){
+        return 1+minDepth(A->left) ;
+    }
+    if(not A->left){
+        return 1+minDepth(A->right);
+    }
+    
+    return 1+min(minDepth(A->left) , minDepth(A->right));
+    
+}
+```
+
+6. [root-leaf-pathsum](https://www.interviewbit.com/problems/root-to-leaf-paths-with-sum/)
+```cpp
+void helper(TreeNode* root , int target , int cursum , vector<int> &container , vector<vector<int>> &res){
+    if(not root){
+        return ;
+    }    
+    container.push_back(root->val);
+    
+    if(not root->left and not root->right){
+        // leaf node 
+        if(cursum + root->val == target){
+            res.push_back(container);
+        }
+        container.pop_back();
+        return ;
+    }
+    helper(root->left , target , cursum+root->val , container , res);
+    helper(root->right , target , cursum+root->val , container , res);
+    container.pop_back();
+    return ;
+}
+
+vector<vector<int> > Solution::pathSum(TreeNode* A, int B) {
+    vector<vector<int>> res ;
+    vector<int> container ;
+    helper(A , B , 0 ,container , res);
+    
+    return res ;   
+}
+```
+
