@@ -6,92 +6,40 @@ using namespace std;
 
 #include<bits/stdc++.h>
 
-struct TrieNode{
-    TrieNode* children[26] = {NULL};
-    bool isEOF = false ;
-};
+long mod = 1e9+7;
 
-class Trie{
-public :
-    TrieNode* root ;
-    Trie(){
-        root = new TrieNode();
-    }
+int cntBits(vector<int> &A) {
+    long sum = 0 ;
     
-    void insert(string &str){
-        TrieNode* crawler = root ;
-        for(char ch : str){
-            int val = ch - 'a' ;
-            if(crawler->children[val] == NULL){
-                crawler->children[val] = new TrieNode();
-            }
-            crawler = crawler->children[val];
-        }
-        crawler->isEOF = true ;
-    }
-    
-    bool search(string &str){
-        TrieNode* crawler = root ;
         
-        for(char ch : str){
-            int val = ch - 'a' ;
-            if(crawler->children[val] == NULL){
-                return false ;
-            }
-            crawler = crawler->children[val];
-        }
+    for(int i = 0 ; i < 4 ; i++){
+        long ones_count = 0 , zeros_count = 0 ;
+        int mask = (1 << i) ;
         
-        return crawler->isEOF ;
-    }
-};
+        for(int j = 0 ; j < A.size() ; j++){
+             
+            cout << A[j] << " " << (A[j] & mask) << endl ;
 
-vector<int> solve(string A, vector<string> &B) {
-    
-    stringstream ss(A);
-    string temp ;
-    Trie *tt = new Trie();
-    
-    while(getline(ss ,temp , '_')){
-        tt->insert(temp) ;    
-    }
-    
-    int N = B.size() ;
-    vector<pair<int,int>> arr(N) ;
-    
-    for(int i = 0 ; i < N ; i++){
-        stringstream ss(B[i]);
-        int count  = 0 ;
-        while(getline(ss , temp , '_')){
-            if(tt->search(temp)){
-                count++ ;
+            if((A[j] >> i)&1 != 0){
+                 ones_count++ ;
+            }
+            else{
+                 zeros_count++ ;
             }
         }
-        cout << count << " " << i << endl ;
-        arr[i] = {count , i};
+        cout << i << " " << ones_count << " " << zeros_count << endl ;
+        sum = (sum + (ones_count*zeros_count)%mod)%mod ;
     }
     
-    sort(arr.begin() , arr.end() , [](pair<int,int>& a , pair<int,int>& b){
-        if(a.first == b.first){
-            return a.second < b.second ;
-        }
-        return a.first > b.first ;
-    });
-    vector<int> ans(N) ;
-    for(int i = 0 ; i < N ; i++){
-        ans[i] = arr[i].second ;
-    }
-    return ans ;
+    return 2*sum  ;
 }
 
 
 int main()
 {
-    string str = "cool_ice_wifi" ;
-    vector<string> arr = { "water_is_cool", "cold_ice_drink", "cool_wifi_speed"};
-    for(int ele : solve(str , arr)){
-        cout << ele << " " ;
-    } 
-    cout << endl ;
+    vector<int> arr = {1,3,5};
+
+    cout << cntBits(arr) ;
 
     return 0;
 }
