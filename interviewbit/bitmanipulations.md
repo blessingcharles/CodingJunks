@@ -126,3 +126,78 @@ int Solution::singleNumber(const vector<int> &A) {
 }
 ```
 
+### Bit tricks
+
+1. [min-xor-value]()
+```cpp
+int Solution::findMinXor(vector<int> &A) {
+    int minvalue = INT_MAX ;
+    sort(A.begin() , A.end());
+    
+    for(int i = 0 ; i < A.size()-1 ; i++){
+        minvalue = min(minvalue , A[i]^A[i+1]);
+    }
+    
+    return minvalue ;
+}
+```
+
+3. [palindromic-bin-repr](https://www.interviewbit.com/problems/palindromic-binary-representation/)
+```cpp
+#include<bits/stdc++.h>
+
+int Solution::solve(int A) {
+    if(A == 1) return 1 ;
+    
+    queue<string> q ;
+    q.push("11");
+    
+    string curr ;
+    A-- ;
+    string temp1 , temp2 ;
+    
+    while(A--){
+        curr = q.front() ; q.pop() ;
+        int mid = curr.size()/2 ;
+        if(curr.size()&1 == 1){
+            //odd size so find the middle and insert the middle character
+            string tt(1 , curr[mid]);
+            temp1 = curr ;
+            temp1.insert(mid , tt); 
+            q.push(temp1);
+        }
+        else{
+            temp1 = curr ; temp2 = curr ;
+            temp1.insert(mid , "0");
+            temp2.insert(mid , "1");
+            q.push(temp1);
+            q.push(temp2);
+        }
+    }
+    bitset<32> bt(curr);
+    
+    return (int )bt.to_ulong() ;
+}
+
+```
+
+4. [xoring-subarrays](https://www.interviewbit.com/problems/xor-ing-the-subarrays/)
+```cpp
+int Solution::solve(vector<int> &A) {
+    if(A.size() == 1) return A[0] ;
+    int N = A.size() ;
+    
+    if(N&1 == 0) return 0 ;
+    
+    int xor_val = 0 ;
+    
+    for(int i = 0 ; i < N ; i++){
+        int freq = (i+1)*(N-i);
+        if(freq&1 == 1){
+            xor_val = xor_val ^ A[i];
+        }    
+    }
+    return xor_val ;
+}
+```
+
