@@ -1117,3 +1117,181 @@ vector<int> Solution::preorderTraversal(TreeNode* A) {
 
 ### Segment trees
 
+
+
+### Views
+
+1. [Right-view-of-bt](https://www.interviewbit.com/problems/right-view-of-binary-tree/)
+```cpp
+vector<int> Solution::solve(TreeNode* A) {
+    vector<int> ans ;
+    if(not A){
+        return ans ;
+    }
+    
+    queue<TreeNode* > q ;
+    q.push(A);
+    int cur_ele ;
+    TreeNode* curnode ;
+    
+    while(not q.empty()){
+        int sz = q.size() ;
+        
+        while(sz--){
+            curnode = q.front()  ; q.pop() ;
+            
+            cur_ele = curnode->val ;
+            
+            if(curnode->left){
+                q.push(curnode->left);
+            }
+            if(curnode->right){
+                q.push(curnode->right);
+            }
+        }
+        ans.push_back(cur_ele);
+    }
+    
+    return ans ;
+}
+```
+
+2. [cousins-bt](https://www.interviewbit.com/problems/cousins-in-binary-tree/)
+```cpp
+vector<int> Solution::solve(TreeNode* A, int B) {
+    vector<int> ans ;
+    if(not A or A->val == B) return ans ;
+    
+    queue<pair<TreeNode* , TreeNode* >> q ;
+    vector<pair<TreeNode* , TreeNode* >> holder ;
+    
+    q.push({A , NULL});
+    pair<TreeNode* , TreeNode* > curnode ;
+    TreeNode* targetParent ;
+    vector<pair<TreeNode* , TreeNode*>> hh; 
+    
+    while(not q.empty()){
+        
+        int sz = q.size() ;
+        bool isthislevel = false ;
+        vector<pair<TreeNode * , TreeNode*> > holder ;
+        
+        while(sz--){
+            curnode = q.front() ; q.pop() ;
+            if(curnode.first->val == B){
+                isthislevel = true ;
+                targetParent = curnode.second ;
+            }        
+            
+            holder.push_back(curnode);
+            if(curnode.first->left){
+                q.push({curnode.first->left , curnode.first});
+            }
+            if(curnode.first->right){
+                q.push({curnode.first->right , curnode.first});
+            }
+        }
+        
+        if(isthislevel){
+            hh = holder ;
+            break ;
+        }
+    }
+    
+    for(pair<TreeNode* , TreeNode* > &pp : hh){
+        if(pp.second == targetParent) continue ;
+        ans.push_back(pp.first->val);
+    }
+    return ans ;
+}
+```
+
+3. [reverse-level-order](https://www.interviewbit.com/problems/reverse-level-order/)
+```cpp
+vector<int> Solution::solve(TreeNode* A) {
+    vector<int> res ;
+    queue<TreeNode* > q ;
+    q.push(A);
+    TreeNode* curr ;
+    
+    while(not q.empty()){
+        int sz = q.size() ;
+        vector<int> dq ;
+        
+        while(sz--){
+            curr = q.front() ; q.pop() ;
+            dq.push_back(curr->val);
+            if(curr->left){
+                q.push(curr->left);
+            }            
+            if(curr->right){
+                q.push(curr->right);
+            }
+        }
+        res.insert(res.begin() , dq.begin() , dq.end());
+    }
+    return res ;
+}
+```
+
+4. [zigzag-levelorder](https://www.interviewbit.com/problems/zigzag-level-order-traversal-bt/)
+```cpp
+vector<vector<int> > Solution::zigzagLevelOrder(TreeNode* A) {
+    vector<vector<int>> res ; 
+    
+    bool isreverse = false ;
+    queue<TreeNode* > q ;
+    q.push(A);
+    TreeNode* curr ;
+    
+    while(not q.empty()){
+        int sz = q.size() ;
+        deque<int> dq ;
+        
+        while(sz--){
+            curr = q.front() ; q.pop() ;
+            
+            if(isreverse){
+                dq.push_front(curr->val);
+            }
+            else{
+                dq.push_back(curr->val) ;
+            }
+            
+            if(curr->left){
+                q.push(curr->left);
+            }
+            
+            if(curr->right){
+                q.push(curr->right);
+            }
+        }    
+        isreverse = not isreverse ;
+        res.push_back(vector<int>(dq.begin() , dq.end()));
+    } 
+    return res ;
+}
+```
+
+5. [populate-nxt-right-ptr](https://www.interviewbit.com/problems/populate-next-right-pointers-tree/)
+```cpp
+void Solution::connect(TreeLinkNode* A) {
+    queue<TreeLinkNode* > q ;
+    q.push(A);
+    while(not q.empty()){
+        int sz = q.size() ;
+        TreeLinkNode* nxt = NULL ;
+        while(sz--){
+            TreeLinkNode* curnode = q.front() ; q.pop() ;
+            curnode->next = nxt ;
+            nxt = curnode ;
+            if(curnode->right){
+                q.push(curnode->right);
+            }
+            if(curnode->left){
+                q.push(curnode->left);
+            }
+        }
+    }
+}
+```
