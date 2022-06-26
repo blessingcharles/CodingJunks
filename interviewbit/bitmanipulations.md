@@ -89,3 +89,40 @@ int Solution::cntBits(vector<int> &A) {
     return (2*sum)%mod  ;
 }
 ```
+
+### bit array
+
+1. [single-numer-1](https://www.interviewbit.com/problems/single-number/)
+```cpp
+int Solution::singleNumber(const vector<int> &A) {
+    int xor_value = 0 ;
+    
+    for(int ele : A){
+        xor_value = xor_value ^ ele ;
+    }
+    return xor_value ;
+}
+```
+
+2. [single number 2](https://www.interviewbit.com/problems/single-number-ii/)
+```cpp
+int Solution::singleNumber(const vector<int> &A) {
+    // counting the bits ;
+    // set bit for idx should be multiple of 3 otherwise the single element bit had occured
+    int res = 0 ; 
+    for(int i=0;i<32;i++){
+        int count = 0 ;
+        int mask = (1<<i);
+        
+        for(int j=0;j<A.size();j++){
+            if(A[j]&mask) count++;
+        }
+        if(count%3 != 0){
+            res = res | mask ;
+        }
+    }
+    
+    return res ;
+}
+```
+
