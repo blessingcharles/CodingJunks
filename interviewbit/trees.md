@@ -984,4 +984,136 @@ TreeNode* Solution::flatten(TreeNode* A) {
 }
 ```
 
-2. 
+### Traversals
+
+1. [vertical-order-traversal](https://www.interviewbit.com/problems/vertical-order-traversal-of-binary-tree/)
+```cpp
+vector<vector<int> > Solution::verticalOrderTraversal(TreeNode* A) {
+    if(not A){
+        return vector<vector<int>>() ;
+    }
+    unordered_map<int , vector<int>> memo ;
+    int minval = INT_MAX , maxval = INT_MIN ;
+       
+    queue<pair<TreeNode * , int>> q ;
+    q.push({A , 0});
+    
+    pair<TreeNode* , int> curnode ;
+    
+    while(not q.empty()){
+        curnode = q.front() ; q.pop() ;
+        memo[curnode.second].push_back(curnode.first->val);
+        
+        maxval = max(maxval , curnode.second);
+        minval = min(minval , curnode.second) ;
+        
+        if(curnode.first->left){
+            q.push({curnode.first->left , curnode.second-1});
+        }
+        if(curnode.first->right){
+            q.push({curnode.first->right , curnode.second+1});
+        }
+    
+    }   
+     
+    int adder = abs(minval) ;
+    int N = adder + maxval + 1 ;
+    vector<vector<int>> ans(N) ;
+    
+    unordered_map<int , vector<int>>::iterator it = memo.begin() ;
+    
+    for( ; it != memo.end() ; it++){
+        ans[it->first+adder] = it->second ;
+    }
+    
+    return ans ;
+    
+}
+```
+
+2. [diagonal-traversal](https://www.interviewbit.com/problems/diagonal-traversal/)
+```cpp
+void solver(TreeNode* root , int &maxval ,int marker , unordered_map<int , vector<int>> &memo){
+    if(not root){
+        return ;
+    }
+    maxval = max(maxval , marker);
+    memo[marker].push_back(root->val);
+    solver(root->left , maxval , marker+1 , memo);
+    solver(root->right , maxval , marker , memo);
+}
+
+vector<int> Solution::solve(TreeNode* A) {
+    if(not A){
+        return {} ;
+    }
+    
+    unordered_map<int , vector<int>>  memo ;
+    vector<int> ans ;
+    int maxval = 0 ;
+    
+    solver(A , maxval , 0 , memo);
+
+    for(int i = 0 ; i <= maxval ; i++){
+        if(memo[i].size() > 0){
+            ans.insert(ans.end() , memo[i].begin() , memo[i].end()) ;
+        }    
+    }
+    
+    return ans ;
+}
+```
+
+3. [inorder-iterative](https://www.interviewbit.com/problems/inorder-traversal/)
+```cpp
+vector<int> Solution::inorderTraversal(TreeNode* A) {
+    TreeNode* current = A ;
+    stack<TreeNode* > st ;
+    vector<int> ans ;
+    
+    while(current or not st.empty()){
+        
+        // go to the leftmost TreeNode
+        while(current){
+            st.push(current);
+            current = current->left ;
+        }
+        
+        current = st.top() ; st.pop() ;
+        ans.push_back(current->val);
+        current = current->right ;
+    }
+    
+    return ans ;
+}
+```
+
+4. [preorder-iterative](https://www.interviewbit.com/problems/preorder-traversal/)
+```cpp
+vector<int> Solution::preorderTraversal(TreeNode* A) {
+    vector<int> res ;
+    if(not A){
+        return res ;
+    }
+    
+    stack<TreeNode* > st ;
+    st.push(A);
+    
+    while(not st.empty()){
+        TreeNode* current = st.top() ; st.pop() ;
+        
+        res.push_back(current->val);
+        
+        if(current->right){
+            st.push(current->right) ;
+        }
+        if(current->left){
+            st.push(current->left);
+        }
+    }
+    return res ;
+}
+```
+
+### Segment trees
+
