@@ -1295,3 +1295,110 @@ void Solution::connect(TreeLinkNode* A) {
     }
 }
 ```
+
+### Addition Practise
+
+1. [vertical-sum](https://www.interviewbit.com/problems/vertical-sum-of-a-binary-tree/)
+```cpp
+void helper(TreeNode* root , int marker , int &minval , int &maxval , unordered_map<int,int> &memo){
+    if(not root){
+        return ;
+    }
+    minval = min(minval , marker);
+    maxval = max(maxval , marker);
+    
+    if(memo.find(marker) == memo.end()){
+        memo[marker] = root->val ;
+    }
+    else{
+        memo[marker] += root->val ;
+    }
+    
+    helper(root->left , marker-1 , minval , maxval , memo);
+    helper(root->right , marker+1 , minval , maxval , memo);
+    
+}
+vector<int> Solution::verticalSum(TreeNode* A) {
+    if(not A){
+        return {} ;
+    }
+    
+    unordered_map<int  , int > memo ;
+    int maxval = 0 ;
+    int minval = 0 ;
+    helper(A ,0 , minval ,maxval , memo);
+    
+    int adder = abs(minval);
+    int N = adder + maxval + 1 ;
+    
+    vector<int> ans(N);
+    
+    for(auto it = memo.begin() ; it != memo.end() ; it++){
+        ans[it->first+adder] = it->second ;
+    } 
+    return ans ;
+}
+```
+
+2. [construct-bst-preorder](https://www.interviewbit.com/problems/construct-bst-from-preorder/)
+```cpp
+
+TreeNode* build(vector<int> &preorder , int &idx ,int left , int right , unordered_map<int,int> &memo){
+    if(left > right){
+        return NULL ;
+    }
+    int rootVal = preorder[idx++] ;
+    
+    TreeNode* root = new TreeNode(rootVal);
+    
+    root->left = build(preorder,idx , left ,            memo[rootVal]-1 , memo);
+    root->right = build(preorder,idx, memo[rootVal]+1 , right , memo);
+    return root ;
+}
+
+TreeNode* Solution::constructBST(vector<int> &A) {
+    vector<int> inorder = A ;
+    sort(inorder.begin() , inorder.end());
+    int idx = 0 ;
+    unordered_map<int,int> memo ;
+    
+    for(int i = 0 ; i < inorder.size() ; i++){
+        memo[inorder[i]] = i ;
+    }
+    
+    return build(A , idx ,0 , A.size()-1,memo);
+}
+
+```
+
+3. [lastnode-bt](https://www.interviewbit.com/problems/last-node-in-a-complete-binary-tree/)
+```cpp
+
+int Solution::lastNode(TreeNode* A) {
+    if(not A){
+        return -1 ;
+    }
+    
+    int lastval ;
+    queue<TreeNode* > q ; 
+    TreeNode* currnode ;
+    q.push(A);
+    
+    while(not q.empty()){
+        int sz = q.size() ;
+        while(sz--){
+            currnode = q.front() ; q.pop() ;
+            lastval = currnode->val ;
+            
+            if(currnode->left){
+                q.push(currnode->left);
+            }
+            if(currnode->right){
+                q.push(currnode->right);
+            }
+        }
+    }
+    
+    return lastval ;
+}
+```
