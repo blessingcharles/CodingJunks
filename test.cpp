@@ -3,63 +3,37 @@
 
 using namespace std;
 
-int N , M ;
-
-bool helper(const string &str , const string &pattern , int ptr1 , int ptr2 ,  vector<vector<int8_t>> &memo){
-    if(ptr1 >= M and ptr2 >= N) return true ;
-    if(ptr2 >= N) return false ;
-    if(memo[ptr1][ptr2] != -1){
-        return memo[ptr1][ptr2] ;
+int helper(int left , int right , vector<int> &A , vector<int> &prefixsum){
+    
+    if(left == right){
+        return 0 ;
+    }
+    if(left+1 == right){
+        return A[left] + A[right] ;
     }
     
-    if(ptr1 >= M){
-        // string finished can we finish this pattern somewhat ?
-        if(ptr2+1 >= N or pattern[ptr2+1] != '*') return memo[ptr1][ptr2] = false ;
-        return memo[ptr1][ptr2] = helper(str , pattern , ptr1 , ptr2+2, memo) ;
-    }
-    // check if star presents
-    bool isstar = false ;
+    int entire_merge =  (prefixsum[right+1] - prefixsum[left]) ;
     
-    if(ptr2+1 < N and pattern[ptr2+1] == '*') isstar = true ;
-    
-    if(isstar){
-        //skip the []* completely in the pattern
-        if(helper(str , pattern , ptr1 , ptr2+2 , memo)){
-            return memo[ptr1][ptr2] = true ;
-        }
-        // use the []*
-        if(pattern[ptr1] != '.' and str[ptr1] != pattern[ptr2]){
-            return memo[ptr1][ptr2] = false ;
-        }
-        else{
-            return memo[ptr1][ptr2] = helper(str , pattern , ptr1+1 , ptr2, memo);
-        }
+    int curminsum = INT_MAX ;
+    for(int i = left ; i < right ; i++){
+        //merge at left 
+        curminsum = min(curminsum , helper(left , i , A , prefixsum) + helper(i+1 , right , A , prefixsum));
     }
-    if(pattern[ptr2] == '.'){
-        return memo[ptr1][ptr2] = helper(str , pattern , ptr1+1 , ptr2+1, memo);
-    }
-    //normal characters match
-    if(str[ptr1] != pattern[ptr2]) return memo[ptr1][ptr2] = false ;    
-    return memo[ptr1][ptr2] = helper(str , pattern , ptr1+1 , ptr2+1 , memo);
+    return curminsum + entire_merge ;
 }
 
-int isMatch(const string str, const string pattern) {
-    M = str.size() ;
-    N = pattern.size() ;
-    vector<vector<int8_t>> memo(M+1 , vector<int8_t>(N+1 , -1));
+int solve(vector<int> &A) {
+    vector<int> prefixsum(A.size()+1,0);
+    partial_sum(A.begin() , A.end() , prefixsum.begin()+1);
     
-    return helper(str , pattern , 0 , 0 , memo);
+    return helper(0 , A.size()-1 , A , prefixsum);
 }
-
-
-
 
 int main()
-{                    // 0 1   2  3  4  5  6  7  8
+{ // 0 1   2  3  4  5  6  7  8
 
-    string str = "acbcd" , pattern = "a.*b.*d" ;
-
-    cout << isMatch(str , pattern) ;
+    vector<int> arr = {1,2,3,4} ;
+    cout << solve(arr);
 
     return 0;
 }

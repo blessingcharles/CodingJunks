@@ -431,3 +431,99 @@ int Solution::isInterleave(string A, string B, string C) {
     return helper(A , B , C , 0 , 0 , 0 , memo);
 }
 ```
+
+### DERIVED DP
+
+1. [chain-of-pairs](https://www.interviewbit.com/problems/chain-of-pairs/)
+```cpp
+// greedy solution
+int Solution::solve(vector<vector<int> > &A) {
+ 	sort(A.begin(), A.end(), [](const vector<int> &a, const vector<int> &b)
+         { return a[1] < b[1]; });
+    int maxlen = 1;
+    int curend = A[0][1];
+
+    for (int i = 1; i < A.size(); i++)
+    {
+        if (curend < A[i][0])
+        {
+            maxlen++;
+            curend = A[i][1];
+        }
+    }
+
+    return maxlen;
+}
+```
+
+2. [maxsum without adjacent](https://www.interviewbit.com/problems/max-sum-without-adjacent-elements/)
+```cpp
+// TOP DOWN
+int helper(int col , vector<vector<int>> &A , vector<int> &memo){
+    if(col == 0) return max(A[0][0] , A[1][0]) ;
+    if(col < 0) return 0 ;
+    if(memo[col] != -1) return memo[col] ;
+    
+    int option1 = max(A[0][col] , A[1][col]) + helper(col-2 , A , memo);
+    int option2 = helper(col-1 , A , memo );
+    
+    return memo[col] = max(option1 , option2);
+}
+
+int Solution::adjacent(vector<vector<int> > &A) {
+    vector<int> memo(A[0].size() , -1);
+    
+    return helper(A[0].size()-1 , A , memo);
+}
+
+// BOTTOM UP
+
+int Solution::adjacent(vector<vector<int> > &A) {
+    vector<int> dp(A[0].size()+1 , 0);
+    dp[1] = max(A[0][0] , A[1][0]) ;
+    
+    for(int col = 2 ; col <= A[0].size() ; col++){
+        int option1 = max(A[0][col-1] , A[1][col-1]) + dp[col-2] ;
+        int option2 = dp[col-1] ;
+        
+        dp[col] = max(option1 , option2) ; 
+    }
+    
+    return dp.back() ;
+}
+```
+
+3. [merge-elements](https://www.interviewbit.com/problems/merge-elements/)
+```cpp
+// TOP DOWN
+
+int helper(int left , int right , vector<int> &A , vector<int> &prefixsum , vector<vector<int>> &memo){
+    if(left == right){
+        return 0 ;
+    }
+    if(left+1 == right){
+        return A[left] + A[right] ;
+    }
+    if(memo[left][right] != -1){
+        return memo[left][right] ;
+    }
+    
+    int entire_merge =  (prefixsum[right+1] - prefixsum[left]) ;
+    
+    int curminsum = INT_MAX ;
+    for(int i = left ; i < right ; i++){
+        //merge at left 
+        curminsum = min(curminsum , helper(left , i , A , prefixsum , memo) + helper(i+1 , right , A , prefixsum , memo));
+    }
+    return memo[left][right] = curminsum + entire_merge ;
+}
+
+int Solution::solve(vector<int> &A) {
+    vector<int> prefixsum(A.size()+1,0);
+    vector<vector<int>> memo(A.size() , vector<int>(A.size() , -1));
+    
+    partial_sum(A.begin() , A.end() , prefixsum.begin()+1);
+    
+    return helper(0 , A.size()-1 , A , prefixsum , memo);
+}
+```

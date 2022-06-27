@@ -1,46 +1,15 @@
-string Solution::fractionToDecimal(long a, long b) {
-    string res = "" ;
-    if(a == 0){
-        return "0" ;
-    }
-    
-    long initital = a/b ;
-    long sign = ((a < 0) ^ (b < 0))?-1:1 ;
-    
-    a = abs(a);
-    b = abs(b);
-    if(sign == -1){
-        res += "-" ;
-    }
-    res += to_string(initital);
-    
-    long rem = a%b ;
-    if(rem == 0){
-        return res ;
-    }
-    
-    bool isrepeated = false ; 
-    long idx ;
-    unordered_map<long,long> memo ;
-    res += "." ;
-    while(rem > 0){
-        if(memo.find(rem) != memo.end()){
-            isrepeated = true ;
-            idx =memo[rem];
-            break ;
-        }
-        else
-            memo[rem] = res.size();
-        
-        rem = rem*10 ;
-        res += to_string(rem/b) ;
-        
-        rem = rem%b ;
-    }
-    if(isrepeated){
-        res += ")";
-        res.insert(idx , "(");
-    }
-    
-    return res ;
+{
+  {98, 894}
+  {397, 942}
+  {70, 519}
+  {258, 456}
+  {286, 449}
+  {516, 626}
+  {370, 873}
+  {214, 224}
+  {74, 629}
+  {265, 886}
+  {708, 815}
+  {394, 770}
+  {56, 252}
 }
