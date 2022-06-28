@@ -1054,3 +1054,216 @@ vector<string> Solution::wordBreak(string A, vector<string> &B) {
     return res ;    
 }
 ```
+
+### Multiply dp
+
+1. [unique BST](https://www.interviewbit.com/problems/unique-binary-search-trees-ii/)
+```cpp
+int helper(int N , vector<int> &memo){
+    if(N <= 1){
+        return 1 ;
+    }
+    if(memo[N] != -1) return memo[N] ;
+    
+    int res = 0 ;
+    
+    for(int i = 0 ; i < N ; i++){
+        res = (res+ helper(i , memo)*helper(N-i-1 , memo)) ;    
+    }
+    
+    return memo[N] = res ;
+}
+int Solution::numTrees(int A) {
+    // catalan's number
+    vector<int> memo(A+1 , -1);
+    return helper(A , memo);
+}
+```
+
+### Breaking Words
+1. [Palindrome Partioning 2](https://www.interviewbit.com/problems/palindrome-partitioning-ii/)
+```cpp
+int N ;
+
+bool isPalindrome(string &str , int start , int end){
+    while(start < end){
+        if(str[start++] != str[end--]) return false ;
+    }
+    return true ;
+}
+int helper(int start , int end , string &str ,  vector<vector<int>> &memo){
+    if(start == end) return 0 ;
+    if(start > end){
+        return N ;
+    }
+    if(memo[start][end] != -1) return memo[start][end] ;
+    
+    if(isPalindrome(str , start , end)){
+        return 0 ;
+    }
+
+    int minlen = N ;
+    for(int i = start ; i < end ; i++){
+        //put a cut in i 
+        minlen = min(minlen , 1 + helper(start , i , str,memo) + helper(i+1 , end , str , memo)) ;
+    }
+    return memo[start][end] = minlen ;
+}
+
+int Solution::minCut(string A) {
+    N = A.size() ;
+    vector<vector<int>> memo(N , vector<int>(N , -1));
+    
+    return helper(0 , N-1 , A , memo);
+}
+```
+2. [word break](https://www.interviewbit.com/problems/word-break/)
+```cpp
+int N ;
+
+bool helper(int pos , string &str , unordered_set<string> &dictionary , vector<int> &memo){
+    if(pos >= N){
+        return true ;
+    }    
+    if(memo[pos] != -1){
+        return memo[pos] ;
+    }
+    
+    string temp = "" ;
+    for(int i = pos ; i < N ; i++){
+        temp.push_back(str[i]);
+        if(dictionary.find(temp) != dictionary.end()){
+            if(helper(i+1 , str, dictionary , memo)){
+                return memo[pos] = true ;
+            }
+        }
+    }
+    return memo[pos] = false ;
+}
+
+int Solution::wordBreak(string A, vector<string> &B) {
+    unordered_set<string> dictionary(B.begin() , B.end());
+    N = A.size() ;
+    vector<int> memo(A.size() , -1);
+    return helper(0 , A , dictionary , memo);
+}
+```
+
+### GREEDY OR DP
+
+1. [Tushar's Birthday Bomb](https://www.interviewbit.com/problems/tushars-birthday-bombs/)
+```cpp
+vector<int> Solution::solve(int A, vector<int> &B) {
+    vector<pair<int,int>> maxB ;
+    int small_power = INT_MAX ;
+    
+    for(int i = 0 ; i < B.size() ; i++){
+        if(small_power > B[i]){
+            small_power = B[i] ;
+            maxB.push_back({i , B[i]});
+        }
+    }
+    int N = maxB.size() ;
+    vector<int> ans ;
+    int idx = 0 ;
+    while(idx < N){
+        //for lexicographical order this strongest person can kick without altering the maxkicks
+        pair<int,int> person = maxB[idx] ;
+        
+        while(A-person.second >= 0 and (1 + (A-person.second)/small_power) == A/small_power){
+            A = A-person.second ;
+            ans.push_back(person.first);
+        }
+        idx++ ;
+    }
+    return ans ;
+}
+```
+
+2. [jump game array](https://www.interviewbit.com/problems/jump-game-array/)
+```cpp
+int N ;
+
+bool helper(int pos , vector<int> &arr , vector<bool> &memo){
+    if(pos >= N) return true ;
+    if(memo[pos] == false) return false ;
+    
+    for(int i = 1 ; i <= arr[pos] ; i++){
+        if(helper(pos+i , arr , memo)){
+            return true ;
+        }
+    }
+    return memo[pos] = false ;
+}
+
+int Solution::canJump(vector<int> &A) {
+    vector<bool> memo(A.size() , true);
+    N = A.size() ;
+    if(N == 1) return true ;
+    
+    return helper(0 , A , memo);    
+}
+```
+
+3. [min jumps array](https://www.interviewbit.com/problems/min-jumps-array/)
+```cpp
+int N ;
+// TOP DOWN
+int helper(int pos , vector<int> &A , vector<int> &memo){
+    if(pos >= N-1) return 0 ;
+    if(memo[pos] != -1) return memo[pos] ;
+    
+    int minjumps = N+1 ;
+    
+    for(int i = 1 ; i <= A[pos] ; i++){
+        minjumps = min(minjumps ,helper(pos+i , A , memo));
+    }
+    return memo[pos] = 1 + minjumps ;
+}
+// BOTTOM UP
+int Solution::jump(vector<int> &A) {
+    N = A.size() ;
+    vector<int> dp(N , INT_MAX);
+    dp[0] = 0 ;
+    
+    for(int i = 0 ; i < N-1 ; i++){
+        // if we can reach here first
+        if(dp[i] != INT_MAX){
+            for(int pos = 1 ; pos <= A[i] ; pos++){
+                int maxreachable = min(N-1 ,pos+i);
+                if(dp[maxreachable] > 1+dp[i]){
+                    dp[maxreachable] = 1+dp[i] ;
+                }
+            }
+        }
+    }
+    
+    if(dp[N-1] == INT_MAX) return -1 ;
+    return dp[N-1] ;
+}
+
+// GREEDY
+int Solution::jump(vector<int> &A) {
+    int N = A.size() ;
+    if(N <= 1) return 0 ;
+    
+    int maxReachable = A[0] ;
+    int curMaxReachable = A[0] ;
+    int cursteps = 1 ;
+    
+    for(int i = 1 ; i <= maxReachable ; i++){
+        if(i == N-1){
+            return cursteps ;
+        }
+        curMaxReachable = max(curMaxReachable , i+A[i]);
+        if(i == maxReachable){
+            if(curMaxReachable == maxReachable) return -1 ;
+            maxReachable = curMaxReachable ;
+            cursteps++ ;
+        }
+    }
+    
+    return -1 ;
+}
+```
+
