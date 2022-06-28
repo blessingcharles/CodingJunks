@@ -3,42 +3,66 @@
 
 using namespace std;
 
-int helper(int pos ,bool canbuy, const vector<int> &arr , vector<vector<int>> &memo ){
-    if(pos < 0){
-        return 0 ;
+int N;
+
+vector<string> combine(string &temp, vector<string> arr)
+{
+
+    for (int i = 0; i < arr.size(); i++)
+    {
+        arr[i] = arr[i] + " " + temp;
     }
-    // if(memo[pos][canbuy] != -1){
-    //     return memo[pos][canbuy] ;
-    // }
-    
-    if(canbuy){
-        // buy now
-        int option1 = helper(pos-1 , false , arr , memo) - arr[pos] ;
-        // skip it    
-        int option2 = helper(pos-1 , true , arr , memo) ; 
-        return memo[pos][canbuy] = max(option1 , option2) ;
-    }
-        
-    // sell now 
-    int option1 = arr[pos] + helper(pos-1 , true , arr , memo) ;
-    int option2 = helper(pos-1 , false , arr , memo);
-    
-    return memo[pos][canbuy] = max(option1 , option2) ;
+
+    return arr;
 }
 
-int maxProfit(const vector<int> &A) {
-    int N = A.size() ;
-    vector<vector<int>> memo(N , vector<int>(2 , -1));
-    
-    return helper(N-1 , true , A , memo );
+vector<string> helper(string s, unordered_set<string> &dict, unordered_map<string, vector<string>> &memo)
+{
+    vector<string> results;
+    if (memo.find(s) != memo.end())
+        return memo[s];
+
+    if (dict.find(s) != dict.end())
+    {
+        results.push_back(s);
+    }
+
+    for (int i = 1; i < s.size(); i++)
+    {
+        string temp = s.substr(i);
+        if (dict.find(temp) != dict.end())
+        {
+            vector<string> local = combine(temp, helper(s.substr(0, i), dict, memo));
+
+            for (string &st : local)
+            {
+                cout << st << endl ;
+                results.push_back(st);
+            }
+        }
+    }
+    return memo[s] = results;
+}
+
+vector<string> wordBreak(string A, vector<string> &B)
+{
+    N = A.size();
+    unordered_set<string> dictionary(B.begin(), B.end());
+    unordered_map<string, vector<string>> memo;
+
+    vector<string> res = helper(A, dictionary, memo);
+    sort(res.begin(), res.end());
+    return res;
 }
 
 int main()
-{ 
-    vector<int> arr = { 2 , 1};
+{
+    string A = "cats";
+    vector<string> arr = {"cat", "cats", "and", "sand", "dog"};
 
-    cout << maxProfit(arr);
-
+    for(auto str : wordBreak(A, arr)){
+        cout << str << endl ;
+    }
 
     return 0;
 }
