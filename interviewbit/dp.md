@@ -527,3 +527,118 @@ int Solution::solve(vector<int> &A) {
     return helper(0 , A.size()-1 , A , prefixsum , memo);
 }
 ```
+
+### KNAPSACK DP
+
+1. [flip-arrays](https://www.interviewbit.com/problems/flip-array/)
+```cpp
+#include<bits/stdc++.h>
+
+pair<int,int> helper(int pos , const vector<int> &arr , int cursum ,vector<vector<pair<int,int>>> &memo){
+    if(pos < 0){
+        return {cursum , 0} ;  
+    }
+    if(memo[pos][cursum].first != -1){
+        return memo[pos][cursum] ;
+    }
+    
+    // can we make this negative
+    int decreaser = 2*arr[pos] ;
+    
+    if(cursum - decreaser >= 0){
+        pair<int,int> res1 = helper(pos-1 , arr , cursum-decreaser , memo ) ;
+        pair<int,int> res2 = helper(pos-1 , arr , cursum ,memo ) ;
+        
+        res1.second += 1 ;
+        if(res1.first < res2.first){
+            return memo[pos][cursum] = res1 ;
+        }
+        if(res1.first == res2.first and res1.second < res2.second){
+            return memo[pos][cursum] =  res1 ;
+        }
+        return memo[pos][cursum] =  res2 ;
+    }
+    
+    return memo[pos][cursum] =  helper(pos-1 , arr,cursum  , memo);
+}
+
+int Solution::solve(const vector<int> &A) {
+    
+    int total_sum = accumulate(A.begin() , A.end() , 0);
+    vector<vector<pair<int,int>>> memo(A.size() , vector<pair<int,int>>(total_sum+1 , {-1 , -1}));
+    
+    return helper(A.size()-1 , A , total_sum , memo).second ;
+}
+```
+
+2. [Tushar's-birthday-party](https://www.interviewbit.com/problems/tushars-birthday-party/)
+```cpp
+int helper(int pos ,int remaining,const vector<int> &capacity ,const vector<int>& cost , vector<vector<int>> &memo){
+    if(remaining == 0){
+        return 0 ;
+    }
+    if(remaining < 0 or pos < 0){
+        return 1e9 ;
+    }
+    if(memo[pos][remaining] != -1) return memo[pos][remaining] ;
+    
+    // he can eat this dish and again eat this dish or skip this dish 
+    int option1 = cost[pos] + helper(pos , remaining-capacity[pos] , capacity , cost , memo);
+    int option2 = helper(pos-1 , remaining , capacity , cost , memo);
+    
+    return memo[pos][remaining] = min(option1 , option2);
+}
+
+int Solution::solve(const vector<int> &A, const vector<int> &B, const vector<int> &C) {
+    int total_cost = 0 ;
+    int N = B.size() ;
+    int maxele = *max_element(A.begin() , A.end());
+    
+    vector<vector<int>> memo(N , vector<int>(maxele+1 , -1));
+    
+    for(int i = 0 ; i < A.size() ; i++){
+        total_cost += helper(N-1 , A[i] , B , C , memo );
+    }
+    return total_cost ;
+}
+```
+
+3. [0/1 knapsack]()
+```cpp
+// TOP DOWN
+int helper(int pos , int capacity , vector<int> &weight , vector<int> &profit , vector<vector<int>> &memo){
+    if(pos < 0) return 0 ;
+    if(capacity == 0) return 0 ;
+    if(memo[pos][capacity] != -1) return memo[pos][capacity] ;
+    
+    // add this item or skip item
+    int option1 = INT_MIN ;
+    
+    if(capacity - weight[pos] >= 0 ){
+        option1 = profit[pos] + helper(pos-1 , capacity - weight[pos] , weight , profit , memo);
+    }
+    
+    int option2 = helper(pos-1 , capacity , weight , profit, memo);
+    
+    return memo[pos][capacity] = max(option1 , option2);
+}
+// BOTTOM UP
+int Solution::solve(vector<int> &profit, vector<int> &weight, int C) {
+    int N = profit.size() ;
+    vector<vector<int>> dp(N+1 , vector<int>(C+1 , 0));
+    
+    for(int pos = 1 ; pos <= N ; pos++){
+        for(int capacity = 1 ; capacity <= C ; capacity++){
+            if(capacity - weight[pos-1] >= 0){
+                 dp[pos][capacity] = max(profit[pos-1] + dp[pos-1][capacity-weight[pos-1]] , dp[pos-1][capacity]);
+            }
+            else{
+                dp[pos][capacity] = dp[pos-1][capacity];
+            }
+        }
+    }
+    return dp[N][C] ;
+}
+
+
+```

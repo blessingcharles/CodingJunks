@@ -3,37 +3,65 @@
 
 using namespace std;
 
-int helper(int left , int right , vector<int> &A , vector<int> &prefixsum){
+
+vector<vector<int> > avgset(vector<int> &A) {
+    int totalsum = accumulate(A.begin() , A.end() , 0);
+    int N = A.size() ;
+    vector<int> list1 , list2 ;
+    uint64_t seq = 0 ;
+    sort(A.begin() , A.end());
     
-    if(left == right){
-        return 0 ;
-    }
-    if(left+1 == right){
-        return A[left] + A[right] ;
+    uint64_t M = pow(2 , N);
+    for(uint64_t i = 1 ; i < M ; i++){
+        vector<int> temp1 ;
+        int cursum = 0 ;
+        
+        for(int j = 0 ; j < N ; j++){
+            if(i & (1 << j)){
+                temp1.push_back(A[j]);
+                cursum += A[j] ;        
+            }
+        }
+        
+        if(cursum/temp1.size() == (totalsum-cursum)/(N-temp1.size())){
+            // got it 
+            seq = i ;
+            list1 = temp1  ;
+            break ;       
+        }
     }
     
-    int entire_merge =  (prefixsum[right+1] - prefixsum[left]) ;
+    if(seq == 0) return vector<vector<int>>() ;
     
-    int curminsum = INT_MAX ;
-    for(int i = left ; i < right ; i++){
-        //merge at left 
-        curminsum = min(curminsum , helper(left , i , A , prefixsum) + helper(i+1 , right , A , prefixsum));
+    for(int j = 0 ; j < N ; j++){
+        if((seq& (1 << j)) == 0){
+            list2.push_back(A[j]) ;
+        }
     }
-    return curminsum + entire_merge ;
+    if(list1.size() < list2.size()) return {list1 , list2};
+    if(list2.size() < list1.size()) return {list2 , list1} ;
+    
+    // checl for lexi order
+    for(int i = 0 ; i < list1.size() ; i++){
+        if(list1[i] < list2[i]) return {list1 , list2};
+        if(list2[i] < list1[i]) return {list2 , list1} ;
+    }
+    return {list1 , list2} ;
 }
 
-int solve(vector<int> &A) {
-    vector<int> prefixsum(A.size()+1,0);
-    partial_sum(A.begin() , A.end() , prefixsum.begin()+1);
-    
-    return helper(0 , A.size()-1 , A , prefixsum);
-}
 
 int main()
-{ // 0 1   2  3  4  5  6  7  8
+{ 
+    vector<int> arr = { 22, 12, 32, 19};
 
-    vector<int> arr = {1,2,3,4} ;
-    cout << solve(arr);
+    // cout << solve(arr , b ,c);
 
+    for(auto vec : avgset(arr)){
+        for(int ele : vec){
+            cout << ele << " " ;
+        }
+        cout << endl ;
+    }
+    
     return 0;
 }
