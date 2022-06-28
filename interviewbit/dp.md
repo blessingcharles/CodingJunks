@@ -970,3 +970,37 @@ int Solution::chordCnt(int A) {
 }
 ```
 
+### ADHOC
+
+1. [buy-sell stock2](https://www.interviewbit.com/problems/best-time-to-buy-and-sell-stocks-ii/)
+```cpp
+int helper(int pos ,bool canbuy, const vector<int> &arr , vector<vector<int>> &memo ){
+    if(pos == arr.size()){
+        return 0 ;
+    }
+    if(memo[pos][canbuy] != -1){
+        return memo[pos][canbuy] ;
+    }
+    
+    if(canbuy){
+        // buy now
+        int option1 = helper(pos+1 , false , arr , memo) - arr[pos] ;
+        // skip it    
+        int option2 = helper(pos+1 , true , arr , memo) ; 
+        return memo[pos][canbuy] = max(option1 , option2) ;
+    }
+        
+    // sell now 
+    int option1 = arr[pos] + helper(pos+1 , true , arr , memo) ;
+    int option2 = helper(pos+1 , false , arr , memo);
+    
+    return memo[pos][canbuy] = max(option1 , option2) ;
+}
+
+int Solution::maxProfit(const vector<int> &A) {
+    int N = A.size() ;
+    vector<vector<int>> memo(N , vector<int>(2 , -1));
+    
+    return helper(0 , true , A , memo );
+}
+```
