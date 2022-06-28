@@ -603,7 +603,7 @@ int Solution::solve(const vector<int> &A, const vector<int> &B, const vector<int
 }
 ```
 
-3. [0/1 knapsack]()
+3. [0/1 knapsack](https://www.interviewbit.com/problems/0-1-knapsack/)
 ```cpp
 // TOP DOWN
 int helper(int pos , int capacity , vector<int> &weight , vector<int> &profit , vector<vector<int>> &memo){
@@ -642,3 +642,331 @@ int Solution::solve(vector<int> &profit, vector<int> &weight, int C) {
 
 
 ```
+
+### Simple Array dp
+
+1. [Longest Increasing subsequence Bitonic](https://www.interviewbit.com/problems/length-of-longest-subsequence/)
+```cpp
+int Solution::longestSubsequenceLength(const vector<int> &arr) {
+    int N = arr.size() ;
+    
+    vector<int> dp1(N , 1);
+    vector<int> dp2(N , 1);
+    
+    // lis
+    
+    for(int i = 1 ; i < N ; i++){
+        for(int j = 0 ; j < i ; j++){
+            if(arr[j] < arr[i] and dp1[i] < dp1[j]+1){
+                dp1[i] = 1+dp1[j] ;
+            }
+        }
+    }
+    
+    // decreasing lis 
+    for(int i = N-2 ; i >= 0 ; i--){
+        for(int j = N-1 ; j > i ; j--){
+            if(arr[j] < arr[i] and dp2[i] < dp2[j]+1){
+                dp2[i] = dp2[j]+1 ;
+            }
+        }
+    }
+    
+    int max_bitonic = 0 ;
+    
+    for(int i = 0 ; i < N ; i++){
+        max_bitonic = max(max_bitonic ,dp1[i]+dp2[i]-1) ;
+    }
+    
+    return max_bitonic ;
+}
+```
+
+2. [smallest sequence with given primes](https://www.interviewbit.com/problems/smallest-sequence-with-given-primes/)
+```cpp
+vector<int> Solution::solve(int A, int B, int C, int count) {
+    vector<int> arr(1,1);
+    int idx1 = 0 , idx2 = 0 , idx3 = 0 ;
+    
+    while(count--){
+        int ele1 = arr[idx1]*A ;
+        int ele2 = arr[idx2]*B ;
+        int ele3 = arr[idx3]*C ;
+        
+        if(ele1 < ele2 and ele1 < ele3){
+            // ele1 is the smallest
+            arr.push_back(ele1);
+            idx1++ ; 
+        }    
+        else if(ele2 < ele3 and ele2 < ele1){
+            // ele2 is the smallest 
+            arr.push_back(ele2);
+            idx2++ ;
+        }
+        else if(ele3 < ele1  and ele3 < ele2){
+            //ele3 is the smallest
+            arr.push_back(ele3); idx3++ ;
+        }
+        else if(ele1 == ele2 and ele2 == ele3){
+            // all are same 
+            idx1++ ; idx2++ ; idx3++ ;
+            arr.push_back(ele1);
+        }
+        else if(ele1 == ele2){
+            arr.push_back(ele1);
+            idx1++ ; idx2++ ;
+        }
+        else if(ele2 == ele3){
+            arr.push_back(ele2);
+            idx2++ ; idx3++ ;
+        }
+        else{
+            // ele3 == ele1 
+            arr.push_back(ele1);
+            idx1++ ; idx3++ ;
+        }
+    }
+    
+    return vector<int>(arr.begin()+1 , arr.end()) ;
+}
+
+```
+
+3. [largest area of rectangle with permutation](https://www.interviewbit.com/problems/largest-area-of-rectangle-with-permutations/)
+```cpp
+int Solution::solve(vector<vector<int> > &A) {
+    int M = A.size() ;int  N = A[0].size() ;
+    if(M == 0 and N == 0) return 0 ;
+    
+    for(int i = 1 ; i < M ; i++){
+        for(int j = 0 ; j < N ; j++){
+            if(A[i][j] != 0)
+                A[i][j] = A[i][j] + A[i-1][j] ;
+        }
+    }
+    
+    for(vector<int> &x : A){
+        sort(x.begin() , x.end());
+    }
+    int maxarea = 0 ;
+    for(int i = 0 ; i < M ; i++){
+        int width = 1 , curarea = 0  ;
+        for(int j = N-1 ; j >= 0 ;j--){
+            curarea = width*A[i][j] ;
+            maxarea = max(maxarea , curarea);
+            width++ ;
+        }
+    }
+    return maxarea ;
+}
+
+```
+
+4. [Tiling with dominos](https://www.interviewbit.com/problems/tiling-with-dominoes/)
+```cpp
+int Solution::solve(int N) {
+    // For 3 X N board , for each col there are 8 states are possible 
+    long mod = 1e9+7 ;
+    
+    vector<vector<long>> dp(N+1 , vector<long>(8 , 0));
+    dp[0][7] = 1 ;
+    for(int i = 1 ; i <= N ; i++){
+        dp[i][0] = dp[i-1][7]%mod ;
+        
+        dp[i][1] = dp[i-1][6]%mod ;
+        dp[i][2] = dp[i-1][5]%mod ;
+        
+        dp[i][3] += dp[i-1][7]%mod ;
+        dp[i][3] += dp[i-1][4]%mod ;
+        
+        dp[i][4] = dp[i-1][3]%mod ;
+        dp[i][5] = dp[i-1][2]%mod ;
+        
+        dp[i][6] = dp[i-1][7]%mod ;
+        dp[i][6] += dp[i-1][1]%mod ;
+        
+        dp[i][7] = dp[i-1][3]%mod ;
+        dp[i][7] += dp[i-1][6]%mod ;
+        dp[i][7] += dp[i-1][0]%mod ;
+    }
+    return dp[N][7]%mod ;
+}
+```
+
+4. a) [Domino tromino tiling](https://leetcode.com/problems/domino-and-tromino-tiling/) 
+```cpp
+class Solution {
+public:
+    int numTilings(int n) {
+        long mod = 1e9+7 ;
+        
+        vector<vector<long>> dp(n+1 , vector<long>(4 , 0));
+        dp[0][3] = 1 ;
+        for(int i = 1 ; i <= n ; i++){
+            dp[i][0] = dp[i-1][3]%mod ;
+            
+            dp[i][1] = (dp[i-1][0] + dp[i-1][2])%mod ;
+            dp[i][2] = (dp[i-1][0] + dp[i-1][1])%mod ;
+            
+            dp[i][3] = (dp[i-1][0] + dp[i-1][2] + dp[i-1][1] + dp[i-1][3])%mod;
+        }
+        
+        return dp[n][3]%mod ;
+    }
+};
+```
+
+5. [Paint house](https://www.interviewbit.com/problems/paint-house/)
+```cpp
+int helper(int pos , int prev_color , vector<vector<int>> &A , vector<vector<int>> &memo){
+    if(pos < 0){
+        return 0 ;
+    }
+    if(memo[pos][prev_color] != -1) return memo[pos][prev_color] ;
+    
+    int mincost = INT_MAX ;
+    
+    for(int i = 0 ; i < 3 ; i++){
+        if(i != prev_color){
+            mincost = min(mincost ,A[pos][i] + helper(pos-1 , i , A , memo));
+        }
+    }
+    
+    return memo[pos][prev_color] = mincost ;
+}
+
+int Solution::solve(vector<vector<int> > &A) {
+    vector<vector<int>> memo(A.size() , vector<int>(4 , -1));
+    
+    return helper(A.size()-1 , 3 , A , memo) ;    
+}
+
+// BOTTOM UP
+
+int Solution::solve(vector<vector<int> > &A) {
+    vector<vector<int>> dp(A.size()+1 , vector<int>(4 , INT_MAX));
+    dp[0][0] = 0 ; dp[0][1] = 0 ; dp[0][2] = 0 ;
+    
+    for(int i = 1 ; i <= A.size() ; i++){
+        for(int prev_color = 0 ; prev_color < 3 ; prev_color++){
+            for(int color = 0 ; color < 3 ; color++){
+                if(color != prev_color){
+                    dp[i][prev_color] = min(dp[i][prev_color] , dp[i-1][color] + A[i-1][color]) ;                            
+                }
+            }
+        }
+    }
+    int N = dp.size() ;
+    
+    return *min_element(dp[N-1].begin() , dp[N-1].end());
+}
+```
+
+6. [ways to decode](https://www.interviewbit.com/problems/ways-to-decode/)
+```cpp
+
+int N ;
+int mod = 1e9+7 ;
+
+int helper(string &encoded , int pos , vector<int> &memo){
+    if(pos == N) return 1 ;
+    
+    if(memo[pos] != -1) return memo[pos] ;
+    
+    if(encoded[pos] == '0'){
+        return 0 ;
+    }
+    if(pos+1 < N and encoded[pos] == '1'){
+        return memo[pos] = (helper(encoded , pos+1 , memo) + helper(encoded , pos+2 , memo))%mod;
+    }
+    if(pos+1 < N and encoded[pos] == '2' and encoded[pos+1] < '7'){
+        return  memo[pos] = (helper(encoded , pos+1 , memo) + helper(encoded , pos+2 , memo))%mod;
+    }
+    
+    return memo[pos] = helper(encoded , pos+1 , memo)%mod ;
+    
+}
+int Solution::numDecodings(string A) {
+    N =A.size() ;
+    vector<int> memo(A.size() , -1);
+    return helper(A , 0, memo) ; 
+}
+```
+
+7. [stairs](https://www.interviewbit.com/problems/stairs/)
+```cpp
+
+// TOP DOWN
+
+int helper(int A , vector<int> &memo){
+     if(A == 0){
+        return 1 ;
+    }
+    if(A < 0) return 0 ;
+    if(memo[A] != -1) return memo[A] ;
+    
+    return memo[A] = helper(A-1 , memo) + helper(A-2 , memo) ;
+}
+
+int Solution::climbStairs(int A) {
+    vector<int> memo(A+1 , -1);
+    return helper(A , memo) ;
+}
+
+// BOTTOM UP
+
+int Solution::climbStairs(int A) {
+    vector<int> dp(A+1 , 1);
+    dp[1] = 1 ;
+
+    for(int i = 2 ; i <= A ; i++){
+        dp[i] = dp[i-1] + dp[i-2] ;
+    }    
+    return dp[A] ;
+}
+
+```
+
+8. [Longest Increasing subsequence](https://www.interviewbit.com/problems/longest-increasing-subsequence/)
+```cpp
+int Solution::lis(const vector<int> &A) {
+    int N = A.size() ;
+    vector<int> dp(N , 1);
+    int maxlen = 1 ;
+    
+    for(int i = 1 ; i < N ; i++){
+        for(int j = 0 ; j < i ; j++){
+            if(A[i] > A[j] and dp[i] < dp[j]+1){
+                dp[i] = dp[j] + 1 ;   
+            }
+        }
+        maxlen = max(maxlen , dp[i]);
+    }
+    return maxlen ;
+}
+```
+
+9. [Intersecting chords](https://www.interviewbit.com/problems/intersecting-chords-in-a-circle/)
+```cpp
+int mod = 1e9+7 ;
+
+long helper(int n , vector<int> &memo){
+    
+    if(n <= 1) return 1 ;
+    long res = 0 ;
+    if(memo[n] != -1) return memo[n] ;
+    
+    for(int i = 0 ; i < n ; i++){
+        res = (res + (helper(i ,memo)%mod*helper(n-i-1 , memo )%mod)%mod)%mod ;
+    }
+    
+    return memo[n] = res%mod ;
+}
+
+int Solution::chordCnt(int A) {
+    // finding the catalan number 1 1 2 5 14
+    vector<int> memo(A+1 , -1);
+    return helper(A , memo)%mod ;    
+}
+```
+
