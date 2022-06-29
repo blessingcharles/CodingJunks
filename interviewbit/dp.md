@@ -1267,3 +1267,359 @@ int Solution::jump(vector<int> &A) {
 }
 ```
 
+### DP TRICKY
+
+1. [Longest Arithmetic sequence]()
+```cpp
+// BRUTE FORCE
+int N ;
+
+int helper(int prev_idx , int pos , int diff , const vector<int> &arr){
+    if(pos >= N) return 0 ;
+    
+    int curdiff = abs(arr[prev_idx] - arr[pos]) ;
+    if(curdiff == diff){
+        // we can incluede it 
+        return 1 + helper(pos , pos+1 , diff , arr);
+    }
+    
+    return helper(prev_idx , pos+1 , diff , arr);
+}
+
+int Solution::solve(const vector<int> &A) {
+    N = A.size() ;
+    if(N == 0) return 0 ;
+    if(N == 1) return 1 ;
+    
+    int maxlen = 2 ;
+    for(int i = 0 ; i < N-1 ; i++){
+        for(int j = i+1 ; j < N ; j++){
+            int curdiff = abs(A[i]-A[j]);
+            maxlen = max(maxlen , 2+helper(j , j+1 , curdiff , A));        
+        }
+    }
+    
+    return maxlen ;
+}
+
+
+int Solution::solve(const vector<int> &A) {
+    int N = A.size() ;
+    if(N == 0) return 0 ;
+    if(N == 1) return 1 ;    
+    int maxlen = 1 ;
+    vector<unordered_map<long,int>> dictionary(N);
+    
+    for(int i = 1 ; i < N ; i++){
+        for(int j = 0 ; j < i ; j++){
+            int curdiff = A[i] - A[j] ;
+            // if the same curdiff occured in j's map then 1 + prev_occ
+            if(dictionary[j].find(curdiff) != dictionary[j].end()){
+                dictionary[i][curdiff] = 1 + dictionary[j][curdiff] ;
+                maxlen = max(maxlen , dictionary[i][curdiff] ) ;
+            }
+            else{
+                dictionary[i][curdiff] = 1 ;
+            }
+        }
+    }
+    
+    return 1+maxlen ;
+}
+
+```
+
+2. [N digit number with sum s](https://www.interviewbit.com/problems/n-digit-numbers-with-digit-sum-s-/)
+```cpp
+string producer = "0123456789" ;
+long mod = 1000000007 ;
+
+long helper(int req_sum , int reqlen , vector<vector<int>> &memo){
+    if(req_sum == 0 and reqlen == 0) return 1 ;
+    if(req_sum < 0 or reqlen <= 0) return 0 ;
+    if(memo[req_sum][reqlen] != -1) return memo[req_sum][reqlen] ;
+    
+    long ways = 0 ;
+    for(char ele : producer){
+        ways = (ways + helper(req_sum-(ele-'0') , reqlen-1 , memo))%mod;
+    }
+    return memo[req_sum][reqlen] = ways%mod ;
+}
+
+int Solution::solve(int A, int B) {
+    long ways = 0 ;
+    vector<vector<int>> memo(B+1 , vector<int>(A+1 , -1));
+    
+    for(int i = 1 ; i < 10 ; i++){
+        ways = (ways + helper(B-(producer[i]-'0') , A-1 , memo))%mod ;    
+    }
+    
+    return ways ;
+}
+
+```
+
+3. [ways to color 3*N](https://www.interviewbit.com/problems/ways-to-color-a-3xn-board/)
+```cpp
+int dp[5][5][5][100005] = {-1} ; 
+int mod = 1e9+7 ;
+
+int helper(int col , int x , int y , int z){
+    if(col == 0) return 1 ; 
+    if(dp[x][y][z][col] != -1) return dp[x][y][z][col] ;
+         
+    long ways = 0 ;
+    
+    for(int i = 0 ; i < 4 ; i++){
+        if(i == x) continue ;
+        
+        for(int j = 0 ; j < 4 ; j++){
+        
+            if(i == j or j == y) continue ;
+            for(int k = 0 ; k < 4 ; k++){
+                
+                if(j == k  or k == z) continue ;
+                ways = (ways + helper(col-1 ,i , j , k))%mod; 
+            }
+        }
+    }
+    
+    return dp[x][y][z][col] = ways%mod ;
+}
+int Solution::solve(int A) {
+    memset(dp , -1 , sizeof(dp));
+    return helper(A , 4 ,4,4);
+}
+```
+
+4. [kth manhatten neighbourhood](https://www.interviewbit.com/problems/kth-manhattan-distance-neighbourhood/)
+```cpp
+int M , N ;
+
+int dx[8] = {-1,-1,-1,0,0,1,1,1};
+int dy[8] = {-1,0,1,1,-1,-1,0,1} ;
+
+
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0  or row >= M or col >= N ;
+}
+
+int findManhettan(int row , int col , int dist , vector<vector<int>> &matrix ,  vector<vector<vector<int>>> &memo){
+    if(dist < 0) return INT_MIN ;
+    if(dist == 0) return matrix[row][col] ;
+    if(memo[row][col][dist] != -1) return memo[row][col][dist] ;
+    
+    // 8 possible neighbours
+    int max_ele = matrix[row][col] ;
+    
+    for(int i = 0 ; i < 8 ; i++){
+        if(isInvalid(row+dx[i] , col+dy[i])) continue ;
+        
+        int moving_dist = abs(dx[i]) + abs(dy[i]);
+        
+        max_ele = max(max_ele , findManhettan(row+dx[i] , col + dy[i] , dist-moving_dist , matrix , memo));
+    }    
+    return memo[row][col][dist] = max_ele ;
+}
+
+vector<vector<int> > Solution::solve(int A, vector<vector<int> > &B) {
+    M = B.size() ; N = B[0].size() ;
+    
+    vector<vector<int>> res = B ;
+    vector<vector<vector<int>>> memo(M , vector<vector<int>>(N , vector<int>(A+1 , -1)));
+        
+    for(int row = 0 ; row < M ; row++){
+        for(int col = 0 ; col < N ; col++){
+            res[row][col] = max(res[row][col] , findManhettan(row , col , A , B , memo));
+        }
+    }
+    return res ;
+}
+```
+
+5. [best time to buy and sell](https://www.interviewbit.com/problems/best-time-to-buy-and-sell-stock-atmost-b-times/)
+```cpp
+
+// TOP DOWN 
+
+int N ;
+
+int helper(int day , bool canbuy , int t_count , vector<int> &stocks ,  vector<vector<vector<int>>> &memo){
+    if(day == N) return 0 ;
+    if(t_count == 0) return 0 ;
+    if(memo[day][canbuy][t_count] != -1) return memo[day][canbuy][t_count] ;
+    
+    if(canbuy){
+        //buy now
+        int option1 = helper(day+1 , false , t_count , stocks , memo) - stocks[day] ;
+        // skip 
+        int option2 = helper(day+1 , true , t_count , stocks , memo) ;
+        return memo[day][canbuy][t_count] = max(option1 , option2) ;
+    }
+    // sell now and reduce t_count
+    int option1 = helper(day+1 , true , t_count-1 , stocks , memo) + stocks[day] ;
+    
+    // skip
+    int option2 = helper(day+1 , false , t_count , stocks , memo);
+    
+    return memo[day][canbuy][t_count] = max(option1 , option2);
+}
+
+int Solution::solve(vector<int> &A, int B) {
+    N = A.size() ;
+    vector<vector<vector<int>>> memo(N , vector<vector<int>>(2 , vector<int>(B+1 , -1)));
+    
+    return helper(0 , true , B , A, memo);
+        
+}
+
+// BOTTOM UP
+int Solution::solve(vector<int> &A, int B) {
+    int N = A.size() ;
+    
+    vector<vector<int>> after(2 , vector<int>(B+1 , 0));
+    vector<vector<int>> curr(2 , vector<int>(B+1 , 0));
+    
+    for(int day = N-1 ; day >= 0 ; day--){
+        for(int buy = 0 ; buy <= 1 ; buy++){
+            for(int cap = 1 ; cap <= B ; cap++){
+                if(buy){
+                    curr[buy][cap] = max(after[0][cap]-A[day] , after[1][cap]);
+                }
+                else{
+                    curr[buy][cap] = max(after[1][cap-1] + A[day], after[0][cap]);
+                }
+            }
+        }
+        after = curr ;
+    }
+    
+    return after[1][B] ;
+}
+```
+
+6. [coins in a line](https://www.interviewbit.com/problems/coins-in-a-line/)
+```cpp
+int helper(int left , int right , bool isMyChance , vector<int> &arr , vector<vector<vector<int>>> &memo){
+    if(left == right){
+        if(isMyChance) return arr[left] ;
+        return 0 ;
+    }
+    if(memo[left][right][isMyChance] != -1) return memo[left][right][isMyChance] ;
+    
+    if(isMyChance){
+        return memo[left][right][isMyChance] = max(arr[left] + helper(left+1 , right, false , arr , memo) ,arr[right]+helper(left , right-1 , false , arr, memo));
+    }
+    return memo[left][right][isMyChance] = min(helper(left+1 , right , true , arr, memo) , helper(left , right-1 , true , arr, memo));
+}
+
+int Solution::maxcoin(vector<int> &A) {
+    vector<vector<vector<int>>> memo(A.size() , vector<vector<int>>(A.size() , vector<int>(2 , -1)));
+    
+    return helper(0 , A.size()-1 , true , A , memo);    
+}
+```
+
+7. [Evaluate Expression](https://www.interviewbit.com/problems/evaluate-expression-to-true/discussion/p/expected-output-for-t-t-t-f-f-f-f-t-f-t-should-be-2539-and-should-not-be-533/17400/921)
+```cpp
+#define T first    // true 
+#define F second   // false
+
+int mod = 1003 ;
+
+void combine(char op , pair<int,int> &current , pair<int,int> leftside , pair<int,int> rightside){
+    if(op == '|'){
+        current.T = (current.T%mod + (leftside.T%mod * rightside.T%mod)%mod + (leftside.F%mod * rightside.T%mod)%mod + (leftside.T%mod * rightside.F%mod)%mod)%mod  ;
+        
+        current.F = (current.F%mod + (leftside.F%mod * rightside.F%mod)%mod)%mod ;
+    }
+    else if(op == '&'){
+        current.F = (current.F%mod + (leftside.F%mod * rightside.F%mod)%mod  + (leftside.F%mod * rightside.T%mod)%mod + (leftside.T%mod * rightside.F%mod)%mod)%mod ;
+        
+        current.T = (current.T%mod + (leftside.T * rightside.T)%mod)%mod ;
+    }
+    else{
+        current.T = (current.T%mod + (leftside.F%mod * rightside.T%mod)%mod + (leftside.T%mod * rightside.F%mod)%mod)%mod ; 
+
+        current.F = (current.F%mod + (leftside.T%mod * rightside.T%mod)%mod + (leftside.F%mod * rightside.F%mod)%mod)%mod ;    
+    }
+}
+
+pair<int,int> helper(int left , int right ,string &expr ,vector<vector<pair<int,int>>> &memo){
+    if(left == right){
+        return (expr[left] == 'T')?make_pair(1,0):make_pair(0,1) ;
+    }
+    if(memo[left][right].T != -1){
+        return memo[left][right] ;
+    }
+    
+    // "T|F&F^F" 
+    pair<int,int> current = {0 , 0};
+    
+    for(int i = left+1 ; i < right ; i = i+2 ){
+        combine(expr[i] ,current,helper(left , i-1 , expr , memo ) , helper(i+1, right , expr , memo) ) ;
+    }
+    
+    return memo[left][right] = current ;
+}
+
+int Solution::cnttrue(string A) {
+    
+    vector<vector<pair<int,int>>> memo(A.size() , vector<pair<int,int>>(A.size() , make_pair(-1,-1)));
+    
+    return helper(0 , A.size()-1 , A , memo ).T%mod ;
+    
+}
+```
+
+9. [best time to buy and sell](https://www.interviewbit.com/problems/best-time-to-buy-and-sell-stocks-iii/)
+```cpp
+int Solution::maxProfit(const vector<int> &A) {
+    int N = A.size() ;
+    
+    vector<vector<int>> after(2 , vector<int>(3 , 0));
+    vector<vector<int>> curr(2 , vector<int>(3 , 0));
+    
+    for(int day = N-1 ; day >= 0 ; day--){
+        for(int buy = 0 ; buy <= 1 ; buy++){
+            for(int cap = 1 ; cap <= 2 ; cap++){
+                if(buy){
+                    curr[buy][cap] = max(after[0][cap]-A[day] , after[1][cap]);
+                }
+                else{
+                    curr[buy][cap] = max(after[1][cap-1] + A[day], after[0][cap]);
+                }
+            }
+        }
+        after = curr ;
+    }
+    
+    return after[1][2] ;
+}
+```
+
+10. [Longest Valid Parenthesis](https://www.interviewbit.com/problems/longest-valid-parentheses/)
+```cpp
+int Solution::longestValidParentheses(string A) {
+    stack<int> st ;
+    st.push(-1);
+    int maxlen = 0 ;
+    
+    for(int i = 0 ; i < A.size() ; i++){
+        if(A[i] == '(') st.push(i);
+        else{
+            if(not st.empty()) st.pop() ;
+            if(not st.empty()){
+                maxlen = max(maxlen , i - st.top());
+            }
+            else{
+                st.push(i);
+            }
+        }
+    }
+    
+    return maxlen ;
+}
+```
+
+11. 
