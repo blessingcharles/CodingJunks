@@ -1622,4 +1622,375 @@ int Solution::longestValidParentheses(string A) {
 }
 ```
 
-11. 
+### MATRIX DP
+
+1. [Kingdom Wars](https://www.interviewbit.com/problems/kingdom-war/)
+```cpp
+int Solution::solve(vector<vector<int> > &A) {
+    int M = A.size() , N = A[0].size() ;
+    
+    int maxsum = A[M-1][N-1] ;
+    
+    for(int i = M-1 ; i >= 0 ; i--){
+        for(int j = N-1 ; j >= 0 ; j--){
+            if(j+1 < N){
+                A[i][j] = A[i][j] + A[i][j+1] ;
+            }
+            if(i+1 < M){
+                A[i][j] = A[i][j] + A[i+1][j] ;
+            }
+            if(i+1 < M and j+1 < N){
+                A[i][j] = A[i][j] - A[i+1][j+1] ;
+            }
+            maxsum = max(maxsum , A[i][j]);
+        }
+    }
+    return maxsum ;
+}
+```
+
+2. [Max Path in a triangle](https://www.interviewbit.com/problems/maximum-path-in-triangle/)
+```cpp
+#include<bits/stdc++.h>
+
+int Solution::solve(vector<vector<int> > &A) {
+    int N = A.size() ;
+    
+    for(int i = 1 ; i < N ; i++){
+        for(int j = 0 ; j < N ; j++){
+            if(i-1 >= 0 and j-1 >= 0){
+                A[i][j] = A[i][j] + max(A[i-1][j] , A[i-1][j-1]) ;
+            }
+            else{
+                A[i][j] = A[i][j] + A[i-1][j] ;
+            }
+        }
+    }
+    
+    return *max_element(A[N-1].begin() , A[N-1].end()) ;
+}
+```
+
+3. [maximum size square](https://www.interviewbit.com/problems/maximum-size-square-sub-matrix/)
+```cpp
+int helper(int row , int col , vector<vector<int>> &matrix , int &maxarea , vector<vector<int>> &memo){
+    if(row < 0 or col < 0) return 0 ;
+    if(memo[row][col] != -1){
+        return memo[row][col] ;
+    }
+    
+    if(matrix[row][col] == 0){
+        // I can't contribute
+        helper(row-1 , col-1 , matrix , maxarea , memo) ;
+        helper(row-1 , col , matrix , maxarea, memo) ;
+        helper(row , col-1 , matrix , maxarea, memo) ;
+        return memo[row][col] = 0 ;
+    }
+    int left = helper(row , col-1 , matrix , maxarea, memo);
+    int top = helper(row-1, col , matrix , maxarea, memo);
+    int side = helper(row-1 , col-1 , matrix , maxarea , memo) ;
+    
+    int sidelen = 1+min(left , min(top , side));
+    maxarea = max(maxarea , sidelen*sidelen) ;
+    
+    return memo[row][col] = sidelen ;
+    
+}
+int Solution::solve(vector<vector<int> > &A) {
+    int maxarea = 0 ;
+    vector<vector<int>> memo(A.size() , vector<int>(A[0].size() , -1));
+    
+    helper(A.size()-1 , A[0].size()-1 , A , maxarea , memo);
+    return maxarea ;
+}
+```
+
+4. [Increasing Path in Matrix](https://www.interviewbit.com/problems/increasing-path-in-matrix/)
+```cpp
+int M , N ;
+
+int helper(int row , int col , vector<vector<int>> &matrix , bool &reached , vector<vector<int>> &memo){
+    if(row == M-1 and col == N-1){
+        reached = true ;
+        return 1 ;
+    }
+    if(memo[row][col] != -1) return memo[row][col] ;
+    
+    int maxlen = 0 ;
+    
+    if(row+1 < M and matrix[row][col] < matrix[row+1][col]){
+        maxlen = helper(row+1 , col , matrix , reached , memo) ;
+    }
+    
+    if(col+1 < N and matrix[row][col] < matrix[row][col+1]){
+        maxlen = max(maxlen , helper(row , col+1 , matrix , reached , memo));
+    }
+    
+    return memo[row][col] = 1+maxlen ;
+}
+
+int Solution::solve(vector<vector<int> > &A) {
+    M = A.size() ; N = A[0].size() ;
+    bool reached = false ;
+    vector<vector<int>> memo(M , vector<int>(N , -1));
+    
+    int maxlen = helper(0 , 0 , A , reached , memo);
+    
+    return (reached)?maxlen:-1 ;
+}
+```
+
+5. [minimum difference subsets](https://www.interviewbit.com/problems/minimum-difference-subsets/)
+```cpp
+#include<bits/stdc++.h>
+
+int helper(int pos , int max_req_sum , vector<int> &arr ,vector<vector<int>> &memo){
+    if(pos < 0 or max_req_sum == 0) return 0 ;
+    if(memo[pos][max_req_sum] != -1) return memo[pos][max_req_sum] ;
+    
+    int option1 = 0 ;
+    
+    if(arr[pos] <= max_req_sum){
+        option1 = arr[pos] + helper(pos-1 , max_req_sum - arr[pos] , arr , memo);    
+    }
+    
+    return memo[pos][max_req_sum] = max(option1 , helper(pos-1 , max_req_sum , arr , memo));
+    
+}
+
+int Solution::solve(vector<int> &A) {
+    int total_sum = accumulate(A.begin() , A.end() , 0) ;
+    int req_sum = ceil(total_sum/2);
+    vector<vector<int>> memo(A.size() , vector<int>(req_sum+1 , -1));
+    
+    int duable_half = helper(A.size()-1 , req_sum , A , memo );
+    total_sum -= duable_half ;
+    
+    return abs(total_sum - duable_half) ;    
+}   
+```
+
+6. [subset sum problem](https://www.interviewbit.com/problems/subset-sum-problem/)
+```cpp
+bool helper(int pos , int target , vector<int> &arr , vector<vector<bool>> &memo){
+    if(target == 0) return true ;
+    if(pos < 0) return false ;
+    if(memo[pos][target] == false) return false ;
+    
+    if(arr[pos] <= target and helper(pos-1 , target-arr[pos] , arr , memo)){
+        return true ;
+    }
+    
+    return memo[pos][target] = helper(pos-1 , target , arr , memo);
+    
+}
+int Solution::solve(vector<int> &A, int B) {
+    vector<vector<bool>> memo(A.size() , vector<bool>(B+1 ,true));
+    
+    return helper(A.size()-1 , B , A , memo);
+}
+```
+
+7. [unique paths in grid](https://www.interviewbit.com/problems/unique-paths-in-a-grid/)
+```cpp
+// TOP DOWN
+int helper(int row , int col , vector<vector<int>> &grid , vector<vector<int>> &memo){
+    if(row == 0 and col == 0) return 1 ;
+    if(row < 0 or col < 0 or grid[row][col] == 1) return 0 ;
+    if(memo[row][col] != -1) return memo[row][col] ;
+    
+    return memo[row][col] = helper(row-1 , col , grid , memo) + helper(row , col-1 , grid , memo) ;
+}
+
+int Solution::uniquePathsWithObstacles(vector<vector<int> > &A) {
+    int M = A.size() , N = A[0].size() ;
+    if(A[0][0] == 1) return false ;
+    
+    vector<vector<int>> memo(M , vector<int>(N , -1));
+    
+    return helper(M-1 , N-1 , A , memo);
+}
+
+// BOTTOM UP
+int Solution::uniquePathsWithObstacles(vector<vector<int> > &A) {
+    int M = A.size() , N = A[0].size() ;
+    if(A[0][0] == 1) return false ;
+    
+    vector<vector<int>> dp(M , vector<int>(N , 0));
+    
+    dp[0][0] = 1 ;
+    
+    for(int i = 0 ; i < M ; i++){
+        for(int j = 0 ; j < N ; j++){
+            if(A[i][j] == 1) dp[i][j] = 0 ;
+            else if(i > 0 and j > 0){
+                dp[i][j] = dp[i-1][j] + dp[i][j-1] ;
+            }
+            else if(i > 0){
+                dp[i][j] = dp[i-1][j] ;
+            }
+            else if(j > 0){
+                dp[i][j] = dp[i][j-1] ;
+            }
+        }
+    }
+    return dp[M-1][N-1] ;
+    
+}
+```
+
+8. [Dungeon Princess](https://www.interviewbit.com/problems/dungeon-princess/)
+```cpp
+int M , N ;
+
+int helper(int row , int col , vector<vector<int>> &grid , vector<vector<int>> &memo){
+    if(row == M-1 and col == N-1){
+        return (grid[M-1][N-1] >= 0)?1:(-1*grid[M-1][N-1])+1 ;
+    }
+    if(row >= M or col >= N) return INT_MAX ;
+    
+    if(memo[row][col] != -1) return memo[row][col] ;
+    
+    int goDown = helper(row+1 , col , grid , memo) ;
+    int goRight = helper(row , col+1 , grid , memo) ;
+        
+    int healthReq = min(goDown , goRight) - grid[row][col] ;
+    
+    return memo[row][col] = (healthReq <= 0)?1:healthReq ;
+    
+}
+int Solution::calculateMinimumHP(vector<vector<int> > &A) {
+    M = A.size(), N = A[0].size() ;
+    
+    vector<vector<int>> memo(M , vector<int>(N , -1));
+    
+    return helper(0, 0, A ,memo) ;
+    
+}
+```
+
+9. [Min sum path matrix](https://www.interviewbit.com/problems/min-sum-path-in-matrix/)
+```cpp
+int Solution::minPathSum(vector<vector<int> > &A) {
+    int M = A.size() , N = A[0].size() ;
+    
+    for(int i = 0 ; i < M ; i++){
+        for(int j = 0 ; j < N ; j++){
+            if(i-1 >= 0 and j-1 >= 0){
+                A[i][j] += min(A[i-1][j] , A[i][j-1]);
+            }
+            else if(i-1 >= 0){
+                A[i][j] += A[i-1][j] ;
+            }
+            else if(j-1 >= 0){
+                A[i][j] += A[i][j-1] ;
+            }
+        }
+    }
+    
+    return A[M-1][N-1] ;
+    
+}
+```
+
+10. [Min path sum triangle](https://www.interviewbit.com/problems/min-sum-path-in-triangle/)
+```cpp
+int Solution::minimumTotal(vector<vector<int> > &A) {
+    int N = A.size() ;
+    
+    for(int i = 1 ; i < N ; i++){
+        A[i][0] += A[i-1][0] ; 
+        int M = A[i].size() ;
+        for(int j = 1 ; j < M-1 ; j++){
+            A[i][j] += min(A[i-1][j-1] , A[i-1][j]);
+        }
+        A[i][M-1] += A[i-1][M-2] ;
+    }
+    
+    return *min_element(A[N-1].begin() , A[N-1].end()) ;
+}
+```
+
+11. [Max reactangle in bin matrix](https://www.interviewbit.com/problems/max-rectangle-in-binary-matrix/)
+```cpp
+int LargestRectangleHistogram(vector<int>& histogram){
+    stack<pair<int,int>> st ;
+    st.push({0 , -1}) ;    // {height , idx} ;
+    pair<int , int> top ;
+    
+    int maxarea = 0 ;
+    for(int i = 0 ; i < histogram.size() ; i++){
+        int max_left_idx = i ;
+        
+        while(not st.empty() and st.top().first >= histogram[i]){
+            top = st.top() ; st.pop() ;
+            maxarea = max(maxarea , top.first*(i-top.second) ) ;
+            max_left_idx = top.second ;
+        }    
+        st.push({histogram[i] , max_left_idx});
+    }
+    
+    int N = histogram.size() ;
+    
+    while(not st.empty()){
+        top = st.top() ; st.pop() ;
+        maxarea = max(maxarea , (N-top.second)*top.first);
+    }
+    
+    return maxarea ;
+}
+int Solution::maximalRectangle(vector<vector<int> > &A) {
+    int M = A.size() , N = A[0].size() , maxarea = 0 ;
+    
+    for(int i = 1 ; i < M ; i++){
+        for(int j = 0 ; j < N ; j++){
+            if(A[i][j] != 0){
+                A[i][j] += A[i-1][j] ;
+            }
+        }
+    }
+    
+    for(int i = 0 ; i < M ; i++){
+        maxarea = max(maxarea , LargestRectangleHistogram(A[i]));
+    }
+    return maxarea ;
+}
+```
+
+### SUFFIX PREFIX DP
+
+1. [submatrix sum equal target](https://www.interviewbit.com/problems/sub-matrices-with-sum-zero/)
+```cpp
+int Solution::solve(vector<vector<int> > &A) {
+    if(A.size() == 0) return 0 ;
+    
+    int M = A.size() , N = A[0].size() ;
+    int target = 0 ;
+    for(int i = 0 ; i < M ; i++){
+        for(int j = 1 ; j < N ; j++){
+            A[i][j] += A[i][j-1] ;
+        }
+    }
+    // have c1 and c2 as the axis calculate the sums 
+    int count = 0 ;
+    
+    for(int c1 = 0 ; c1 < N ; c1++){
+        for(int c2 = c1 ; c2 < N ; c2++){
+            unordered_map<int , int> memo ;
+            memo[0] = 1 ;
+            int sum = 0 ;
+            
+            for(int row = 0 ; row < M ; row++){
+                int cursum = A[row][c2] - ((c1 > 0)?A[row][c1-1] : 0);
+                sum += cursum ;
+                if(memo.find(sum) != memo.end()){
+                    count += memo[sum] ;
+                }
+                memo[sum]++ ;
+            }        
+        }
+    } 
+    
+    return count ;
+}
+```

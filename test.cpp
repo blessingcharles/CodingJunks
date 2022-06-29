@@ -3,63 +3,59 @@
 
 using namespace std;
 
-unsigned int mod=1e9+7;
-pair<long long,long long> helper(string &s,int i,int j,vector<vector<pair<long long,long long>>> &dp){
-    if(i==j){
-        if(s[i]=='T'){
-            return {1,0};
-        }
-        else{
-            return {0,1};
-        }
-    }
-    if(dp[i][j]!=make_pair((long long)-1,(long long)-1)){
-        return dp[i][j];
-    }
-    
-    long long ans1=0,ans2=0;
-    for(int k=i+1;k<j;k+=2){
-        auto l=helper(s,i,k-1,dp);
-        auto r=helper(s,k+1,j,dp);
-        if(s[k]=='|'){
-            int tans1 = ((l.first*r.first)%mod + (l.first*r.second)%mod + (l.second*r.first)%mod)%mod;
-            int tans2=(l.second*r.second)%mod;
-            ans1=(ans1+tans1)%mod;
-            ans2=(ans2+tans2)%mod;
-        }
-        else if(s[k]=='&'){
-            int tans1 = (l.first*r.first)%mod;
-            int tans2=((l.first*r.second)%mod + (l.second*r.first)%mod + (l.second*r.second)%mod)%mod;
-            ans1=(ans1+tans1)%mod;
-            ans2=(ans2+tans2)%mod;
-        }
-        else{
-            int tans1 = ((l.first*r.second)%mod + (l.second*r.first)%mod)%mod;
-            int tans2= ((l.first*r.first)%mod + (l.second*r.second)%mod)%mod;
-            ans1=(ans1+tans1)%mod;
-            ans2=(ans2+tans2)%mod;
-        }
-    }
-    return dp[i][j] = {ans1,ans2};
-}
+unsigned int mod = 1e9 + 7;
 
-int evaluateExp(string & s) {
-    int n=s.size();
-    vector<vector<pair<long long,long long>>> dp(n,vector<pair<long long,long long>>(n,{-1,-1}));
-    return helper(s,0,n-1,dp).first;
-}
+int solve(vector<vector<int>> &A)
+{
+    int M = A.size(), N = A[0].size();
+    int target = 0;
 
+    for (int i = 0; i < M; i++)
+    {
+        for (int j = 1; j < N; j++)
+        {
+            A[i][j] += A[i][j - 1];
+        }
+    }
+    // have c1 and c2 as the axis calculate the sums
+    int count = 0;
+
+    for (int c1 = 0; c1 < N; c1++)
+    {
+        for (int c2 = c1; c2 < N; c2++)
+        {
+            unordered_map<int, int> memo;
+            memo[0] = 1;
+            int sum = 0;
+
+            for (int row = 0; row < M; row++)
+            {
+                int cursum = A[row][c2] - ((c1 > 0) ? A[row][c1 - 1] : 0);
+                sum += cursum;
+                if (memo.find(cursum) != memo.end())
+                {
+                    count += memo[cursum];
+                }
+                memo[cursum]++;
+            }
+        }
+    }
+
+    return count;
+}
 
 int main()
 {
-    string A = "T^T^T^F|F&F^F|T^F^T";
-    vector<string> arr = {"cat", "cats", "and", "sand", "dog"};
+    //     string A = "T^T^T^F|F&F^F|T^F^T";
+    //     vector<string> arr = {"cat", "cats", "and", "sand", "dog"};
 
-    cout << evaluateExp(A) << endl ;
-    
+    //     vector<int> cuts = {1,2,5} ;
+    //    rodCut(6 , cuts) ;
+    vector<vector<int>> arr = {{0, 0}};
+    cout << solve(arr) << endl;
     // for(auto str : wordBreak(A, arr)){
     //     cout << str << endl ;
     // }
-    
+
     return 0;
 }
