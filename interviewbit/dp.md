@@ -1994,3 +1994,183 @@ int Solution::solve(vector<vector<int> > &A) {
     return count ;
 }
 ```
+
+2. [coin sum infinite](https://www.interviewbit.com/problems/best-time-to-buy-and-sell-stocks-i/)
+```cpp
+// TOP DOWN
+int mod = 1000007 ;
+
+int helper(int pos , int req_sum , vector<int> &arr,vector<vector<int>> &memo){
+    if(req_sum == 0) return 1 ;
+    if(req_sum < 0 or pos < 0) return 0 ;
+    if(memo[pos][req_sum] != -1) return memo[pos][req_sum] ;
+    
+    // include the current element
+    int way1 = helper(pos , req_sum-arr[pos] , arr , memo)%mod ;
+    // skip it 
+    int way2 = helper(pos-1 , req_sum , arr , memo)%mod ;
+    
+    return memo[pos][req_sum] = (way1 + way2)%mod ;
+}
+
+int Solution::coinchange2(vector<int> &A, int B) {
+    vector<vector<int>> memo(A.size() , vector<int>(B+1 , -1));
+    
+    return helper(A.size()-1 , B , A , memo )%mod ;    
+}
+
+// OPTIMISED SPACE
+int Solution::coinchange2(vector<int> &A, int B) {
+    int N = A.size() ;
+    vector<int> before(B+1 , 1);
+    vector<int> curr(B+1 , 0);
+    
+    for(int i = 0 ; i <= B ; i++){
+        before[i] = (i%A[0] == 0) ;
+    }
+    
+    for(int i = 1 ; i < N ; i++){
+        for(int j = 0 ; j <= B ; j++){
+            
+            int take = 0 , notTake = 0 ;
+            notTake = before[j]%mod ;
+            
+            if(j >= A[i]){
+                take = curr[j-A[i]]%mod ;    
+            }
+            
+            curr[j] = (take + notTake)%mod ;
+            
+        }
+        
+        before = curr ;
+    }
+    return before[B]%mod ;
+    
+}
+```
+
+3. [stock 1](https://www.interviewbit.com/problems/best-time-to-buy-and-sell-stocks-i/)
+```cpp
+// TOP DOWN
+
+int helper(int pos , bool canbuy , const vector<int> &arr ,  vector<vector<int>> &memo){
+    if(pos >= arr.size()){
+        return 0 ;
+    }
+    if(memo[pos][canbuy] != -1) return memo[pos][canbuy] ;
+    
+    if(canbuy){
+        int option1 = helper(pos+1 , canbuy , arr , memo);
+        int option2 = helper(pos+1 , false , arr ,memo) - arr[pos] ;    
+        return memo[pos][canbuy] = max(option1 , option2);
+    }
+    
+    return memo[pos][canbuy] =  max(helper(pos+1 , canbuy , arr , memo) , arr[pos] ) ;    
+}
+int Solution::maxProfit(const vector<int> &A) {
+    int N = A.size() ;
+    vector<vector<int>> memo(N , vector<int>(2 , -1));
+    
+    return helper(0 , true , A , memo );
+    
+}
+
+// ONE PASS
+int Solution::maxProfit(const vector<int> &A) {
+    int N = A.size() ;
+    if(N == 0) return 0 ;
+    
+    int minStock = INT_MAX ;
+    int maxprofit = 0 ;
+    
+    for(int i = 0 ; i < N ; i++){
+        minStock = min(minStock , A[i]);
+        maxprofit = max(maxprofit , A[i] - minStock);
+    }
+    return maxprofit ;
+}
+```
+
+4. [max product subarray](https://www.interviewbit.com/problems/max-product-subarray/)
+```cpp
+int Solution::maxProduct(const vector<int> &A) {
+    int maxproduct = *max_element(A.begin() , A.end()) ;
+    int max_p = 1 , min_p = 1 ;
+    
+    for(int i = 0 ; i < A.size() ; i++){
+        if(A[i] == 0){
+            max_p = 1 ; min_p = 1 ;    
+            continue ;
+        }
+        int tmp = max_p ;
+        max_p = max(max_p*A[i] , max(min_p*A[i] , A[i]));
+        min_p = min(tmp*A[i] , min(min_p*A[i] , A[i]));
+        
+        maxproduct = max(maxproduct , max_p);
+    }
+    
+    return maxproduct ;
+}
+```
+
+5. [Arrange 2](https://www.interviewbit.com/problems/arrange-ii/)
+```cpp
+int helper(int left , int right , int k , string &A ,vector<vector<vector<int>>> &memo){
+    if(memo[left][right][k] != -1){
+        return memo[left][right][k] ;
+    }
+    
+    if(k == 1){
+        //calculate and return ;
+        int white_h = 0 , black_h = 0 ;
+        
+        for(int i = left ; i <= right ; i++){
+            if(A[i] == 'W') white_h++ ;
+            else black_h++ ;
+        }
+        return memo[left][right][1] = white_h*black_h ;
+    }
+    if(left == right){
+        if(k == 1) return 0 ;
+        return INT_MAX ;
+    }
+    
+    long min_val = INT_MAX ;
+    
+    for(int i = left ; i < right ; i++){
+        if(k%2 == 1){
+            // odd number
+            long pos1 = helper(left , i , (k/2)+1 , A , memo)  ;
+            if(pos1 != INT_MAX){
+                pos1 += helper(i+1 , right , k/2 , A , memo);
+            }
+            
+            long pos2 = helper(left , i , (k/2) , A , memo) ;
+            if(pos2 != INT_MAX){
+                pos2 += helper(i+1 , right , (k/2)+1 , A ,memo);
+            }
+            
+            min_val = min(min_val , min(pos1 , pos2));
+        }
+        else{
+            
+            long pos1 = helper(left , i , (k/2) , A , memo) ;
+            if(pos1 != INT_MAX){
+                pos1 += helper(i+1 , right , k/2 , A,memo );
+            }
+            
+            min_val = min(min_val , pos1);
+        }
+    }
+    return memo[left][right][k] = (min_val >= INT_MAX)?INT_MAX:min_val ;
+}
+
+int Solution::arrange(string A, int B) {
+    // WBWB 
+    vector<vector<vector<int>>> memo(A.size() , vector<vector<int>>(A.size() , vector<int>(B+1 , -1)));
+    
+    int ans = helper(0 , A.size()-1 , B , A , memo);
+    return (ans == INT_MAX)?-1:ans ;
+}
+```

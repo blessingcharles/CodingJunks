@@ -4,58 +4,61 @@
 using namespace std;
 
 unsigned int mod = 1e9 + 7;
-
-int solve(vector<vector<int>> &A)
-{
-    int M = A.size(), N = A[0].size();
-    int target = 0;
-
-    for (int i = 0; i < M; i++)
-    {
-        for (int j = 1; j < N; j++)
-        {
-            A[i][j] += A[i][j - 1];
+int helper(int left , int right , int k , string &A ,vector<vector<vector<int>>> &memo){
+    // if(memo[left][right][k] != -1){
+    //     return memo[left][right][k] ;
+    // }
+    
+    if(k == 1){
+        //calculate and return ;
+        int white_h = 0 , black_h = 0 ;
+        
+        for(int i = left ; i <= right ; i++){
+            if(A[i] == 'W') white_h++ ;
+            else black_h++ ;
+        }
+        cout << left << " | " << right << endl ;
+        return memo[left][right][1] = white_h*black_h ;
+    }
+    if(left == right){
+        if(k == 1) return 0 ;
+        return INT_MAX ;
+    }
+    
+    long min_val = INT_MAX ;
+    
+    for(int i = left ; i < right ; i++){
+        if(k%2 == 1){
+            // odd number
+            long pos1 = helper(left , i , (k/2)+1 , A , memo) + helper(i+1 , right , k/2 , A , memo);
+            long pos2 = helper(left , i , (k/2) , A , memo) + helper(i+1 , right , (k/2)+1 , A ,memo);
+            
+            min_val = min(min_val , min(pos1 , pos2));
+        }
+        else{
+            long pos1 = helper(left , i , (k/2) , A , memo) + helper(i+1 , right , k/2 , A,memo );
+            min_val = min(min_val , pos1);
         }
     }
-    // have c1 and c2 as the axis calculate the sums
-    int count = 0;
+    cout << left << " ^ " << right << endl ;
+    return memo[left][right][k] = min_val ;
+}
 
-    for (int c1 = 0; c1 < N; c1++)
-    {
-        for (int c2 = c1; c2 < N; c2++)
-        {
-            unordered_map<int, int> memo;
-            memo[0] = 1;
-            int sum = 0;
-
-            for (int row = 0; row < M; row++)
-            {
-                int cursum = A[row][c2] - ((c1 > 0) ? A[row][c1 - 1] : 0);
-                sum += cursum;
-                if (memo.find(cursum) != memo.end())
-                {
-                    count += memo[cursum];
-                }
-                memo[cursum]++;
-            }
-        }
-    }
-
-    return count;
+int arrange(string A, int B) {
+    // WBWB 
+    vector<vector<vector<int>>> memo(A.size() , vector<vector<int>>(A.size() , vector<int>(B+1 , -1)));
+    
+    int ans = helper(0 , A.size()-1 , B , A , memo);
+    return (ans == INT_MAX)?-1:ans ;
 }
 
 int main()
 {
-    //     string A = "T^T^T^F|F&F^F|T^F^T";
-    //     vector<string> arr = {"cat", "cats", "and", "sand", "dog"};
+    string str = "WBWB" ;
 
-    //     vector<int> cuts = {1,2,5} ;
-    //    rodCut(6 , cuts) ;
     vector<vector<int>> arr = {{0, 0}};
-    cout << solve(arr) << endl;
-    // for(auto str : wordBreak(A, arr)){
-    //     cout << str << endl ;
-    // }
+    cout << arrange(str , 2) << endl;
+  
 
     return 0;
 }
