@@ -1,31 +1,30 @@
 {
-
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
-            "name": "C++ Launch (GDB)",
+            "name": "g++ build and debug active file",
             "type": "cppdbg",
             "request": "launch",
-            "miDebuggerPath": "/usr/bin/gdb",
-            "targetArchitecture": "x64",
-            "program": "${workspaceRoot}/test",
-            "args": [],
+            "program": "${fileDirname}/${fileBasenameNoExtension}",
+            "args": [
+                "/home/th3h04x"
+            ],
             "stopAtEntry": false,
-            "cwd": "${workspaceRoot}",
-            "environment": []
-        },
-        {
-            "name": "C++ Attach (GDB)",
-            "type": "cppdbg",
-            "request": "launch",
-            "miDebuggerPath": "/usr/bin/gdb",
-            "targetArchitecture": "x64",
-            "program": "${workspaceRoot}/test",
-            "args": [],
-            "stopAtEntry": false,
-            "cwd": "${workspaceRoot}",
-            "environment": []
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "gdb"
         }
     ]
 }

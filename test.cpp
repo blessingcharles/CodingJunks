@@ -2,63 +2,42 @@
 #include <bits/stdc++.h>
 
 using namespace std;
+int mod = 100 ;
 
-unsigned int mod = 1e9 + 7;
-int helper(int left , int right , int k , string &A ,vector<vector<vector<int>>> &memo){
-    // if(memo[left][right][k] != -1){
-    //     return memo[left][right][k] ;
-    // }
-    
-    if(k == 1){
-        //calculate and return ;
-        int white_h = 0 , black_h = 0 ;
-        
-        for(int i = left ; i <= right ; i++){
-            if(A[i] == 'W') white_h++ ;
-            else black_h++ ;
-        }
-        cout << left << " | " << right << endl ;
-        return memo[left][right][1] = white_h*black_h ;
-    }
+pair<int,int> helper(int left , int right , vector<int> &arr){
     if(left == right){
-        if(k == 1) return 0 ;
-        return INT_MAX ;
+        return {1 , arr[left]%mod};    // smoke , addition
+    }
+    if(left+1 == right){
+        return {arr[left]*arr[right] , (arr[left]+arr[right])%mod } ;
     }
     
-    long min_val = INT_MAX ;
+    int minsmoke = INT_MAX , addition_val = 0 ;
+    pair<int,int> leftside , rightside ;
     
     for(int i = left ; i < right ; i++){
-        if(k%2 == 1){
-            // odd number
-            long pos1 = helper(left , i , (k/2)+1 , A , memo) + helper(i+1 , right , k/2 , A , memo);
-            long pos2 = helper(left , i , (k/2) , A , memo) + helper(i+1 , right , (k/2)+1 , A ,memo);
-            
-            min_val = min(min_val , min(pos1 , pos2));
-        }
-        else{
-            long pos1 = helper(left , i , (k/2) , A , memo) + helper(i+1 , right , k/2 , A,memo );
-            min_val = min(min_val , pos1);
+        leftside = helper(left , i , arr);
+        rightside = helper(i+1 , right , arr);
+        int smoke_generated = leftside.first*rightside.first ;
+        
+        if(smoke_generated < minsmoke){
+            minsmoke = smoke_generated ;
+            addition_val = (leftside.second + rightside.second)%mod ;
         }
     }
-    cout << left << " ^ " << right << endl ;
-    return memo[left][right][k] = min_val ;
+    
+    return {minsmoke , addition_val};
 }
 
-int arrange(string A, int B) {
-    // WBWB 
-    vector<vector<vector<int>>> memo(A.size() , vector<vector<int>>(A.size() , vector<int>(B+1 , -1)));
-    
-    int ans = helper(0 , A.size()-1 , B , A , memo);
-    return (ans == INT_MAX)?-1:ans ;
+int minSmoke(vector<int> &A) {
+    return helper(0 , A.size()-1 , A).first ;    
 }
 
 int main()
 {
-    string str = "WBWB" ;
-
-    vector<vector<int>> arr = {{0, 0}};
-    cout << arrange(str , 2) << endl;
+   
+   vector<int> arr = {2,3,4,5};
+   cout << minSmoke(arr) ;
   
-
     return 0;
 }

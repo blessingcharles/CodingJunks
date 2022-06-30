@@ -2174,3 +2174,105 @@ int Solution::arrange(string A, int B) {
     return (ans == INT_MAX)?-1:ans ;
 }
 ```
+
+### Tree Dp
+
+2. [max sum path bt](https://www.interviewbit.com/problems/max-sum-path-in-binary-tree/)
+```cpp
+int helper(TreeNode* root , int &maxsum){
+    if(not root) return 0 ;
+    
+    int leftMax = helper(root->left , maxsum);
+    int rightMax = helper(root->right , maxsum) ;
+    
+    maxsum = max(maxsum , root->val+leftMax);
+    maxsum = max(maxsum , root->val+rightMax);
+    maxsum = max(maxsum , root->val);
+    
+    maxsum = max(maxsum , root->val + leftMax + rightMax);
+    
+    return max(root->val + max(leftMax , rightMax) , root->val );
+    
+}
+int Solution::maxPathSum(TreeNode* A) {
+    int maxsum = A->val ;
+    helper(A , maxsum) ;
+    return maxsum ;
+}
+```
+
+### ADDITIONAL
+
+2. [dice throws]()
+```cpp
+//TOP DOWN 
+int range ;
+int mod = 1e9+7 ;
+
+int helper(int dices_count , int remsum , vector<vector<int>> &memo){
+    if(dices_count == 0 and remsum == 0){
+        return 1 ;
+    }
+    if(dices_count == 0 or remsum == 0){
+        return 0 ;
+    }
+    if(memo[dices_count][remsum] != -1) return memo[dices_count][remsum] ;
+    
+    int ways = 0 ;
+    
+    for(int i = 1 ; i <= range ; i++){
+        if(remsum - i >= 0){
+            ways = (ways + helper(dices_count-1 , remsum-i , memo))%mod ;
+        }    
+    }
+    return memo[dices_count][remsum] = ways%mod ;
+}
+
+// BOTTOM UP
+int Solution::findDiceSum(int A, int B, int C) {
+    range = B ;    
+    vector<vector<int>> dp(A+1 , vector<int>(C+1 , 0));
+    // return helper(A , C , memo);
+    dp[0][0] = 1;
+    
+    for(int i = 1 ; i <= A ; i++){
+        for(int j = 0 ; j <= C ; j++){
+            if(i == 0 and j == 0) continue ;
+            for(int throws = 1 ; throws <= B ; throws++){
+                if(j-throws >= 0){
+                    dp[i][j] = (dp[i][j] + dp[i-1][j-throws])%mod ; 
+                }
+            }
+        }
+    }
+    return dp[A][C] ;  
+}
+```
+
+3. [Double Increasing Series]()
+```cpp
+int mod = 1e9+7 ;
+
+int helper(int right , int seqlen , vector<vector<int>> &memo){
+    if(seqlen == 0){
+        return 1 ;
+    }
+    if(right == 0){
+        return 0 ;
+    }
+    if(memo[right][seqlen] != -1) return memo[right][seqlen] ;
+    
+    int ways = 0 ;
+    
+    for(int i = right ; i > 0 ; i--){
+        ways = (ways + helper(i/2 , seqlen-1 , memo)%mod)%mod;    
+    }
+    return memo[right][seqlen] = ways%mod ;
+}
+
+int Solution::solve(int A, int B) {
+    vector<vector<int>> memo(A+1 , vector<int>(B+1 , -1));
+    
+    return helper(A , B , memo)%mod ;    
+}
+```
