@@ -2,67 +2,59 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-int mod = 100 ;
-int ROWS , COLS ;
 
-bool isValid(int row , int col){
-    return row >= 0 and col >= 0 and row < ROWS and col < COLS ;
+int mod = 1e9+7 ;
+
+int findSums(int  curnode , vector<vector<int>> &graph ,vector<int> &pathsum ,int parent , vector<int> &cost){
+    int totalsum = 0 ;
+    
+    for(int neigh : graph[curnode]){
+        if(neigh == parent) continue ;
+        totalsum = (totalsum + findSums(neigh , graph ,pathsum , curnode , cost)%mod)%mod ;
+    }
+    
+    return pathsum[curnode] = (totalsum + cost[curnode-1]%mod)%mod ;
+    
 }
+int deleteEdge(vector<int> &A, vector<vector<int> > &B) {
+    vector<vector<int>> graph(A.size()+1);
+    
+    for(int i = 0 ; i < B.size() ; i++){
+        graph[B[i][0]].push_back(B[i][1]);
+        graph[B[i][1]].push_back(B[i][0]);
+    }
+    
+    vector<int> pathsum(A.size()+1 , 0);
+    long totalsum = findSums(1 , graph , pathsum , -1 , A);
+    long maxsum = 0 ;
+    
+    for(int i = 0 ; i < B.size() ; i++){
+        int node1 = B[i][0] ;
+        int node2 = B[i][1] ;
 
-void solve(vector<vector<char> > &A) {
-    ROWS = A.size() ; COLS = A[0].size() ;
-    vector<vector<int>> board(ROWS , vector<int>(COLS , 0));
-    queue<pair<int,int>> q ;
-    
-    for(int i = 0 ; i < ROWS ; i++){
-        for(int j =0 ; j < COLS ; j++){
-            if(A[i][j] == 'X'){
-                board[i][j] = -1 ;
-                q.push({i,j});
-            }
-        }
-    }
-    pair<int,int> curnode ;
-    int dx[4] = {1,-1,0,0};
-    int dy[4] = {0,0,-1,1};
-    
-    while(not q.empty()){
-        curnode = q.front() ; q.pop() ;
-        
-        for(int i = 0 ; i < 4 ; i++){
-            int n_row = curnode.first + dx[i] ;
-            int n_col = curnode.second + dy[i] ;
-            if(isValid(n_row , n_col) and board[n_row][n_col] != -1 and n_row != 0 and n_col != 0 and n_row != ROWS-1 and n_col != COLS-1){
-                cout << n_row << " " << n_col << endl ;
-                board[n_row][n_col]++ ;
-                q.push({n_row ,n_col}) ;
-            }
-        }
-    }
-    
-    for(int i = 1 ; i < ROWS-1 ; i++){
-        for(int j = 1 ; j < COLS-1 ; j++){
-            if(board[i][j] >= 4 ){
-                A[i][j] = 'X' ;
-            }
-        }
-    }
+        if(totalsum != pathsum[node1]){
+            long sum1 = totalsum - pathsum[node1]%mod ;
+            long sum2 = pathsum[node1]%mod ;
 
+            maxsum = max(maxsum , (sum1*sum2)%mod) ;
+        }
+        else{
+            long sum1 = totalsum - pathsum[node2]%mod ;
+            long sum2 = pathsum[node2]%mod ;
+
+            maxsum = max(maxsum , (sum1*sum2)%mod) ;
+        }
+    }
+    return maxsum ;
 }
-int main()
-{
-   
-    vector<vector<char>> bb = {{'X' , '0' , 'X'} 
-                              ,{'X' , '0' , 'X'} ,
-                               {'X' , '0' , 'X'} };
+int main(){
+    vector<int> arr = {10, 5, 12, 6};
+    vector<vector<int>> edges = {
+        {1, 2},
+        {1, 4},
+        {4, 3}
+    };
+    cout << deleteEdge(arr , edges);
 
-    solve(bb);
-
-    for(auto ff : bb){
-        for(char ch : ff){
-            cout << ch << " " ;
-        }
-        cout << endl ;
-    }
-    return 0;
+    return  0 ;
 }

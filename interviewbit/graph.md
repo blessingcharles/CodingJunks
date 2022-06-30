@@ -225,4 +225,178 @@ public:
 };
 ```
 
-6. 
+### DFS
+
+1. [path with good nodes](https://www.interviewbit.com/problems/path-with-good-nodes/)
+```cpp
+int helper(int curnode , int good_nodes , vector<int> &isGood , vector<vector<int>> &graph , int parent){
+    if(good_nodes < 0){
+        return 0 ;
+    }
+    if(graph[curnode].size() == 1){
+        // leaf node 
+        if(good_nodes-isGood[curnode-1] >= 0) return 1 ;
+        return 0 ;
+    }
+    int ways = 0 ;
+    for(int neigh_node : graph[curnode]){
+        if(neigh_node == parent) continue ;
+        ways = ways + helper(neigh_node , good_nodes - isGood[curnode-1] , isGood , graph , curnode);
+    }
+    
+    return ways ;
+}
+int Solution::solve(vector<int> &A, vector<vector<int> > &B, int C) {
+    int V = A.size() ;
+    vector<vector<int>> graph(V+1);
+    
+    for(int i = 0 ; i < B.size() ; i++){
+        graph[B[i][0]].push_back(B[i][1]);
+        graph[B[i][1]].push_back(B[i][0]);
+    }
+    
+    return helper(1 , C , A , graph , -1) ;
+}
+```
+
+2. [largest distance between nodes of a tree](https://www.interviewbit.com/problems/largest-distance-between-nodes-of-a-tree/)
+```cpp
+int maxdist ;
+
+int dfs(int curnode , vector<vector<int>> &graph , int parent){
+    if(graph[curnode].size() == 0 or (graph[curnode].size() == 1 and graph[curnode][0] == parent)) return 1 ;
+    
+    int prev_max_height = 0 ;
+    int maxheight = 0 ;
+    int maxheight1 = 0 ;
+    
+    for(int neigh : graph[curnode]){
+        if(neigh == parent) continue ;
+        
+        int res = dfs(neigh , graph , curnode) ;
+        if(res > maxheight){
+            prev_max_height = maxheight ;
+            maxheight = res ;
+            if(prev_max_height > maxheight1){
+                maxheight1 = prev_max_height ;
+            }
+        }
+        else if(res > maxheight1){
+            maxheight1 = res ;
+        }
+        
+    }
+    
+    maxdist = max(maxdist , maxheight1+maxheight);
+        
+    return 1+max(maxheight1 , maxheight)  ;
+    
+}
+int Solution::solve(vector<int> &A) {
+    int N = A.size() ;
+    vector<vector<int>> graph(N);
+    if(N == 1) return 0 ;
+    
+    maxdist = 0 ;
+    
+    int root_node = 0 ;
+    
+    for(int i = 0 ; i < A.size() ; i++){
+        if(A[i] == -1){
+            root_node = i ;        
+        }
+        else{
+            graph[A[i]].push_back(i);
+            graph[i].push_back(A[i]);
+            
+        }
+    }
+    
+    dfs(root_node , graph , -1) ;
+    return maxdist ;
+}
+```
+
+3. [cycle directed graph](https://www.interviewbit.com/problems/cycle-in-directed-graph/)
+```cpp
+
+bool isCyclic(int curnode , vector<vector<int>> &graph , vector<bool> &visited , vector<bool> &mystack){
+    mystack[curnode] = true ;
+    visited[curnode] = true ;
+    
+    for(int neigh : graph[curnode]){
+        if(mystack[neigh]) return true ;
+        
+        if(visited[neigh]) continue ;
+        
+        if(isCyclic(neigh , graph, visited , mystack)){
+            return true ;
+        }
+    }
+    mystack[curnode] = false ;
+    return false ;
+}
+
+int Solution::solve(int A, vector<vector<int> > &B) {
+    vector<vector<int>> graph(A+1) ;
+    
+    for(int i = 0 ; i < B.size() ; i++){
+        if(B[i][0] == B[i][1]) continue;
+        graph[B[i][0]].push_back(B[i][1]);
+    }
+    vector<bool> mystack(A+1 , false);
+    vector<bool> visited(A+1 , false) ;
+    
+    for(int i = 1 ; i <= A ; i++){
+        if(not visited[i]){      
+            if(isCyclic( i , graph , visited , mystack)){
+                return true ;
+            }
+        }
+    }
+    return false ;
+}
+```
+
+4. [two teams ?](https://www.interviewbit.com/problems/two-teams/)
+```cpp
+bool helper(int node ,vector<vector<int>> &l , vector<int > &visited , int color){
+
+
+    visited[node] = color ;
+
+    for(auto neighbour : l[node]){
+        if(!visited[neighbour]){
+            if(!helper(neighbour ,l, visited , 3-color)){
+                return false ;
+            }
+        }
+        else if(visited[neighbour] == color){
+            return false ;
+        }
+    }
+    return true ;
+}
+
+int Solution::solve(int A, vector<vector<int> > &B) {
+    vector<vector<int>> graph(A+1) ;
+    
+    for(int i = 0 ; i < B.size() ; i++){
+        graph[B[i][0]].push_back(B[i][1]);
+        graph[B[i][1]].push_back(B[i][0]);
+    }
+    
+    
+    vector<int> visited(A+1 , 0) ;
+    
+    for(int i = 1 ; i <= A ; i++){
+        if(visited[i] == 0){      
+            if(not helper( i , graph , visited , 1)){
+                return false ;
+            }
+        }
+    }
+    return true ;
+    
+}
+```
