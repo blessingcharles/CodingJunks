@@ -1,106 +1,86 @@
-#include<iostream>
-#include<bits/stdc++.h>
+#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
-class Solution {
-    int Keys_Req = 0 ; 
-    vector<vector<bool>> visited ;
-    int keys[26] = {0};
-    int N , M ;
-    int dx[4] = {1,-1,0,0};
-    int dy[4] = {0,0,1,-1};
-    
-    bool isInvalid(int row , int col){
-        return row < 0 or col < 0 or row >= this->M or col >= this->N ;
+
+// Here i have simply implemented dijkstra algorithm
+// idea to find distance from c to every node and find
+// distance from d to every node
+//  and then simply calculate the ans by distance from
+// c to e[0] and distance between d to e[1] + distance
+//  of the e[0] to e[1] and vice versa i.e. c to e[1]
+// and d to e[0] + distance of the e[0] to e[1]
+//  this will give you ans
+
+void fun(int src, vector<int> &dist, vector<pair<int, int>> adj[])
+{
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    dist[src] = 0;
+    pq.push({0, src});
+    while (!pq.empty())
+    {
+        int dst = pq.top().first;
+        int node = pq.top().second;
+        pq.pop();
+        for (auto it : adj[node])
+        {
+            if (dist[it.first] > dist[node] + it.second)
+            {
+                dist[it.first] = dist[node] + it.second;
+                pq.push({dist[it.first], it.first});
+            }
+        }
     }
-    int backtrack(vector<string> &grid , int row , int col , int cur_keys){
+}
 
-        if(isInvalid(row , col) or grid[row][col] == '#' or visited[row][col] == true)
-            return -1 ;
-        cout << row << "  " << col << "  " << cur_keys << endl ;
-        
-        char c = grid[row][col] ;
-        bool found_key_here = false ;
-        if(c <= 122 and c >= 97){
-            cur_keys++ ;
-            if(cur_keys == Keys_Req){
-                return 0 ;
-            }
-            keys[c-'a']++ ;
-            cout << "key found " << c << " " << keys[c-'a'] << endl ;
-            found_key_here = true ;
-        }
-        else if(c >= 65 and c <= 90){
-            // its a lock ! do we have a key ?
-            if(keys[(c + 32)-'a'] == 0){
-                // we don't have a key in this path
-                cout << "locked " << grid[row][col]+32 << endl ;
-                return -1 ;
-            }
-        }
-        visited[row][col] = true ;
-        
-        int temp = 0 , min_vals = INT_MAX;
-        bool valid_path = false ;
-        
-        for(int i = 0 ; i < 4 ; i++){
-            temp = backtrack(grid , row+dx[i] , col+dy[i] ,cur_keys) ;
-            if(temp != -1){
-                min_vals = min(min_vals ,1+temp);
-                valid_path = true ;
-            }    
-        }
-        visited[row][col] = true ;
-        if(found_key_here) keys[c-'a']-- ;
-        return (valid_path)?min_vals:-1 ;
+int solve(int A, vector<vector<int>> &B, int C, int D, vector<vector<int>> &E)
+{
+    vector<int> dist1(A + 1, INT_MAX);
+    vector<int> dist2(A + 1, INT_MAX);
+    vector<pair<int, int>> adj[A + 1];
+
+    for (int i{0}; i < B.size(); i++)
+    {
+        adj[B[i][0]].push_back({B[i][1], B[i][2]});
+        adj[B[i][1]].push_back({B[i][0], B[i][2]});
     }
-public:
-    int shortestPathAllKeys(vector<string>& grid) {
 
-        memset(keys , 0 , 26);
-        this->M = grid.size();         
-        this->N = grid[0].size();
-        visited.resize(this->M , vector<bool>(this->N , false));
-        
-        for(int i = 0 ; i < this->M ; i++){
-            for(int j = 0 ; j <this->N ; j++){
-                if(grid[i][j] <= 122 and grid[i][j] >= 97)
-                    Keys_Req++ ;
-                else if(grid[i][j] == '#'){
-                    visited[i][j] = true ; 
-                }           
-            }
-        }
-
-        for(int i = 0 ; i < this->M ; i++){
-            for(int j = 0 ; j <this->N ; j++){
-                cout << visited[i][j] << " " ;        
-            }
-            cout << endl ;
-        }
-
-        //   for(int i = 0 ; i < 26 ; i++){
-            
-        //     cout << keys[i] << endl ;
-        // }
-        
-        return backtrack(grid , 0 , 0 , 0);
+    fun(C, dist1, adj);
+    fun(D, dist2, adj);
+    // for(int i{1}; i<dist1.size(); i++)cout<<dist2[i]<<" ";
+    int ans = INT_MAX;
+    if (dist1[D] != INT_MAX)
+        ans = dist1[D];
+    for (int i{0}; i < E.size(); i++)
+    {
+        if (dist1[E[i][0]] != INT_MAX && dist2[E[i][1]] != INT_MAX)
+            ans = min({ans, dist1[E[i][0]] + dist2[E[i][1]] + E[i][2], dist1[E[i][1]] + dist2[E[i][0]] + E[i][2]});
+        // cout<<dist1[E[i][0]]<<" "<<dist2[E[i][1]]<<" "<<E[i][2]<<endl;
     }
-};
-int main(){
+    if (ans == INT_MAX)
+    {
+        if (dist1[D] != INT_MAX)
+            return dist1[D];
+        return -1;
+    }
+    return ans;
+}
 
-	vector<vector<int>> my_board = {{0,3},{1,2}};
+int main()
+{
 
-	Solution s ;
-    vector<string> grid= {"@..aA","..B#.","....b"};
+    vector<vector<int>> my_board = {{0, 3}, {1, 2}};
 
-	cout << s.shortestPathAllKeys(grid) << endl;
+    Solution s;
+    vector<string> grid = {"@..aA", "..B#.", "....b"};
 
-	// fsor(auto arr : my_board){
-	// 	for(auto ele : arr){
-	// 		cout << ele ;
-	// 	}
-	// 	cout << endl ;
-	// }
+    cout << s.shortestPathAllKeys(grid) << endl;
 
-	return 0;
+    // fsor(auto arr : my_board){
+    // 	for(auto ele : arr){
+    // 		cout << ele ;
+    // 	}
+    // 	cout << endl ;
+    // }
+
+    return 0;
 }

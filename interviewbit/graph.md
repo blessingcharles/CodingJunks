@@ -878,3 +878,134 @@ UndirectedGraphNode *Solution::cloneGraph(UndirectedGraphNode *node) {
     return helper(node);
 }
 ```
+
+### shortest path
+
+1. [sum of fib](https://www.interviewbit.com/problems/sum-of-fibonacci-numbers/)
+```cpp
+
+int Solution::fibsum(int A) {
+    vector<int> arr(2,1) ;
+    int i = 0 , j = 1 ;
+    int prev_ele = 1 ;
+    while(prev_ele < A){
+        prev_ele = arr[i] + arr[j] ;
+        arr.push_back(prev_ele);
+        i++ ; j++ ;
+    }
+    
+    int ptr = arr.size()-1 ;
+    int count = 0 ;
+    
+    while(A){
+        int rem = A%arr[ptr] ;
+        count += A/arr[ptr] ;
+        // cout << arr[ptr] << " " << count << " " ;
+        if(rem == 0){
+            return count ;
+        }
+        A = rem ;
+        ptr-- ;
+    }
+    return count ;
+}
+```
+
+2. [Useful Extra Edges](https://www.interviewbit.com/problems/useful-extra-edges/)
+```cpp
+void djisktra(int start , vector<vector<pair<int,int>>> &graph , vector<int> &dist){
+    dist[start] = 0 ;
+    priority_queue<pair<int,int> , vector<pair<int,int>> , greater<pair<int,int>> > pq ;
+    pq.push({0,start});
+    
+    while(not pq.empty()){
+        auto it = pq.top() ; pq.pop() ;
+        
+        int node = it.second ;
+        int cost = it.first ;
+        
+        for(auto neigh : graph[node]){
+            if(dist[neigh.first] > neigh.second+cost){  
+                dist[neigh.first] = neigh.second + cost ;
+                pq.push({neigh.second+cost , neigh.first});
+            }
+        }
+    }
+}
+
+int Solution::solve(int A, vector<vector<int> > &B, int C, int D, vector<vector<int> > &E) {
+    vector<vector<pair<int,int>>> graph(A+1);
+    
+    for(int i = 0 ; i < B.size() ; i++){
+        graph[B[i][0]].push_back({B[i][1] , B[i][2]});
+        graph[B[i][1]].push_back({B[i][0] , B[i][2]});
+    }    
+    
+    vector<int> dist1(A+1 , INT_MAX);
+    vector<int> dist2(A+1 , INT_MAX);
+    
+    djisktra(C , graph , dist1);
+    djisktra(D , graph , dist2);
+    
+    int ans = dist1[D]  ;
+    for(int i = 0 ; i < E.size() ; i++){
+        int node1 = E[i][0] ;
+        int node2 = E[i][1] ;
+        int cost = E[i][2] ;
+        
+        if(dist1[node1] != INT_MAX and dist2[node2] != INT_MAX){
+            ans = min(ans , cost + dist1[node1] + dist2[node2]);
+        }
+        if(dist2[node1] != INT_MAX and dist1[node2] != INT_MAX){
+            ans = min(ans , cost + dist2[node1] + dist1[node2]);
+        }
+    }
+    
+    return (ans==INT_MAX)?-1:ans ;
+}
+```
+
+3. [word ladder 2](https://www.interviewbit.com/problems/word-ladder-ii/)
+```cpp
+vector<vector<string> > Solution::findLadders(string start, string end, vector<string> &dict) {
+
+    vector<vector<string>> ans ;
+    queue<pair<string , vector<string>>> q ;
+    unordered_set<string> bucket(dict.begin() , dict.end());
+    unordered_set<string> visited ;
+    
+    q.push({start , {start}});
+    pair<string , vector<string>> curr ;
+    
+    while(not q.empty()){
+        int sz = q.size();
+        bool reached = false ;
+        while(sz--){
+            curr = q.front() ; q.pop() ;
+            visited.insert(curr.first);
+            
+            if(curr.first == end){
+                ans.push_back(curr.second);
+                reached = true ;
+                continue ;
+            }
+            for(int i = 0 ; i < curr.first.size() ; i++){
+                int prev_char = curr.first[i] ;
+                for(char ch : "abcdefghijklmnopqrstuvwxyz"){
+                    curr.first[i] = ch ;
+                    if(bucket.find(curr.first) != bucket.end() and visited.find(curr.first) == visited.end()){
+                        curr.second.push_back(curr.first);
+                        
+                        q.push({curr.first  , curr.second});
+                        
+                        curr.second.pop_back();
+                    }
+                }
+                curr.first[i] = prev_char ;
+            }
+        }    
+        if(reached) break ;
+    }
+    return ans ;
+}
+```
