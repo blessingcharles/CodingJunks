@@ -819,3 +819,62 @@ int Solution::black(vector<string> &A) {
     return count ;    
 }
 ```
+
+ ## Graph Adhoc
+
+ 1. [list to bst](https://www.interviewbit.com/problems/convert-sorted-list-to-binary-search-tree/)
+ ```cpp
+ TreeNode* buildTree(int left , int right , vector<int> &arr){
+    if(left > right) return NULL ;
+    if(left == right){
+        return new TreeNode(arr[left]);
+    }
+    int mid = left + (right-left)/2 ;
+    
+    TreeNode* root = new TreeNode(arr[mid]);
+    root->left = buildTree(left , mid-1 , arr);
+    root->right = buildTree(mid+1 , right ,arr);
+    
+    return root ;
+}
+
+TreeNode* Solution::sortedListToBST(ListNode* A) {
+    vector<int> arr ;
+    
+    while(A){
+        arr.push_back(A->val);
+        A = A->next ;
+    }
+    
+    return buildTree(0 , arr.size()-1 , arr);    
+}
+ ```
+
+ ### Graph Hashing
+
+1. [Clone Graph](https://www.interviewbit.com/problems/clone-graph/)
+```cpp
+unordered_map<int , UndirectedGraphNode* > memo ;
+
+UndirectedGraphNode* helper(UndirectedGraphNode* root){
+    UndirectedGraphNode *newroot = new UndirectedGraphNode(root->label);
+    memo[newroot->label] = newroot ;
+    
+    for(UndirectedGraphNode* neigh : root->neighbors){
+        if(memo.find(neigh->label) != memo.end()){
+            newroot->neighbors.push_back(memo[neigh->label]);
+        }
+        else{
+            newroot->neighbors.push_back( helper(neigh) );
+        }
+    }
+    
+    return newroot ;
+    
+}
+UndirectedGraphNode *Solution::cloneGraph(UndirectedGraphNode *node) {
+
+    memo.clear();    
+    return helper(node);
+}
+```
