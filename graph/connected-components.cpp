@@ -17,7 +17,12 @@ Strongly Connected Components (Kosaraju's Algorithm)
     2) A component which have a path to other component , then atleast one element in the component
         should come at top of stack .
         [So reversing the edges , thus each component get explored seperately]
+    
+    Use Case
+    1. Use to find whether a mother vertex exists (directed graph)
+    2. group of strongly strongly connected components
 */
+
 class Graph
 {
 

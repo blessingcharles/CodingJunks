@@ -1009,3 +1009,86 @@ vector<vector<string> > Solution::findLadders(string start, string end, vector<s
     return ans ;
 }
 ```
+
+### ADDITIONAL 
+
+1. [connected components](https://www.interviewbit.com/problems/connected-components/)
+2. [file search](https://www.interviewbit.com/problems/file-search/)
+```cpp
+void dfs(int curnode , vector<vector<int>> &graph, vector<bool> &visited){
+    visited[curnode] = true ;
+    
+    for(int neigh : graph[curnode]){
+        if(not visited[neigh]){
+            dfs(neigh , graph , visited);
+        }
+    }
+}
+int Solution::solve(int A, vector<vector<int> > &B) {
+    vector<vector<int>> graph(A+1);
+    vector<bool> visited(A+1 , false);
+    
+    for(vector<int> &edge : B){
+        graph[edge[0]].push_back(edge[1]);
+        graph[edge[1]].push_back(edge[0]);
+    }
+    int count = 0;
+    
+    for(int i = 1 ; i <= A ; i++){
+        if(not visited[i]){
+            count++ ;
+            dfs(i , graph , visited);
+        }
+    }
+    return count ;
+}
+
+```
+
+3. [mother vertex](https://www.interviewbit.com/problems/mother-vertex/)
+```cpp
+void topologicalSort(int curnode , vector<vector<int>> &graph , vector<bool>& visited , stack<int> &mystack){
+    visited[curnode] = true ;
+    
+    for(int neigh : graph[curnode]){
+        if(not visited[neigh]){
+            topologicalSort(neigh , graph , visited , mystack);
+        }
+    }    
+    mystack.push(curnode);
+    
+}
+void dfs(int curnode , vector<vector<int>> &graph , unordered_set<int> &visited){
+    visited.insert(curnode);
+    
+    for(int neigh : graph[curnode]){
+        if(visited.find(neigh) == visited.end()){
+            dfs(neigh , graph , visited);
+        }
+    }
+}
+
+int Solution::motherVertex(int A, vector<vector<int> > &B) {
+    vector<vector<int>> graph(A+1);
+    
+    for(vector<int> &edge : B){
+        if(edge[0] == edge[1]) continue ;
+        graph[edge[0]].push_back(edge[1]);
+    }
+    vector<bool> visited1(A+1 , false);
+    stack<int> mystack ;
+    
+    // topological sort to build a stack
+    for(int i = 1 ; i <= A ; i++){
+        if(not visited1[i]){
+            topologicalSort(i , graph , visited1 , mystack);
+        }
+    }
+
+    // if a mother vertex presents then it should be at the top of the stack and can visit all nodes
+    unordered_set<int> visited ;
+    dfs(mystack.top() , graph , visited);
+    
+    return (visited.size() == A)?true:false ;
+}
+```
