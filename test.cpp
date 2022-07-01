@@ -3,58 +3,64 @@
 
 using namespace std;
 
-int mod = 1e9+7 ;
+struct Point{
+public:
+    int x ;
+    int y ;
+    int cost ;   
+};
 
-int findSums(int  curnode , vector<vector<int>> &graph ,vector<int> &pathsum ,int parent , vector<int> &cost){
-    int totalsum = 0 ;
-    
-    for(int neigh : graph[curnode]){
-        if(neigh == parent) continue ;
-        totalsum = (totalsum + findSums(neigh , graph ,pathsum , curnode , cost)%mod)%mod ;
-    }
-    
-    return pathsum[curnode] = (totalsum + cost[curnode-1]%mod)%mod ;
-    
+struct Comparator{
+    bool operator()(const Point &p1 , const Point &p2){
+        return p1.cost > p2.cost ;
+    }    
+};
+int RM , CM ;
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0 or row >= RM or col >= CM ;
 }
-int deleteEdge(vector<int> &A, vector<vector<int> > &B) {
-    vector<vector<int>> graph(A.size()+1);
+
+int knight(int ROW, int COL, int C, int D, int E, int F) {
+    if(ROW == 1 and COL == 1) return 0 ;
     
-    for(int i = 0 ; i < B.size() ; i++){
-        graph[B[i][0]].push_back(B[i][1]);
-        graph[B[i][1]].push_back(B[i][0]);
+    RM = ROW+1 ; CM = COL+1 ;
+    
+    vector<vector<int>> board(ROW+1 , vector<int>(COL+1 , INT_MAX));
+    board[C][D] = 0 ;
+    priority_queue<Point , vector<Point> , Comparator> pq ; 
+    pq.push({C , D , 0 });
+    
+    int dx[] = {2,1,-1,-2,2,1,-2,-1};
+    int dy[] = {-1,-2,-2,-1,1,2,1,2};
+    Point curnode ;
+    
+    while(not pq.empty()){
+        curnode = pq.top() ; pq.pop() ;
+        if(curnode.x == E and curnode.y == F) return curnode.cost ;
+        
+        for(int i = 0 ; i < 8 ; i++){
+            int neigh_x = curnode.x + dx[i] ;
+            int neigh_y = curnode.y + dy[i] ;
+            int cost = curnode.cost + 1 ;
+            
+            if(isInvalid(neigh_x , neigh_y) or board[neigh_x][neigh_y] <= cost) continue ;
+            
+            if(neigh_x == E and neigh_y == F){
+                cout << curnode.x << " " << curnode.y << endl ;
+            }
+            board[neigh_x][neigh_y] = cost ;
+            
+            pq.push({neigh_x , neigh_y , cost});
+        }           
+        
     }
     
-    vector<int> pathsum(A.size()+1 , 0);
-    long totalsum = findSums(1 , graph , pathsum , -1 , A);
-    long maxsum = 0 ;
-    
-    for(int i = 0 ; i < B.size() ; i++){
-        int node1 = B[i][0] ;
-        int node2 = B[i][1] ;
-
-        if(totalsum != pathsum[node1]){
-            long sum1 = totalsum - pathsum[node1]%mod ;
-            long sum2 = pathsum[node1]%mod ;
-
-            maxsum = max(maxsum , (sum1*sum2)%mod) ;
-        }
-        else{
-            long sum1 = totalsum - pathsum[node2]%mod ;
-            long sum2 = pathsum[node2]%mod ;
-
-            maxsum = max(maxsum , (sum1*sum2)%mod) ;
-        }
-    }
-    return maxsum ;
+    return (board[E][F] == INT_MAX)?-1:board[E][F] ;
 }
-int main(){
-    vector<int> arr = {10, 5, 12, 6};
-    vector<vector<int>> edges = {
-        {1, 2},
-        {1, 4},
-        {4, 3}
-    };
-    cout << deleteEdge(arr , edges);
+int main()
+{
 
-    return  0 ;
+    cout << knight(2,20,1,18,1,5);
+
+    return 0;
 }
