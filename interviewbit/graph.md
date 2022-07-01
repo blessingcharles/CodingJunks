@@ -1092,3 +1092,52 @@ int Solution::motherVertex(int A, vector<vector<int> > &B) {
     return (visited.size() == A)?true:false ;
 }
 ```
+
+4. [path](https://www.interviewbit.com/problems/path-in-matrix/)
+```cpp
+int ROW , COL ;
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0 or row >= ROW or col >= COL ;
+}
+int dx[4] = {1,-1,0,0};
+int dy[4] = {0,0,1,-1};
+
+bool dfs(int row , int col , vector<vector<int>> &graph){
+    if(graph[row][col] == 2){
+        return true ;
+    }
+    graph[row][col] = 0 ;
+    
+    for(int i = 0 ; i < 4 ; i++){
+        int neigh_r = row + dx[i] ;
+        int neigh_c = col + dy[i] ;
+        
+        if(isInvalid(neigh_r , neigh_c) or graph[neigh_r][neigh_c] == 0) continue ;
+        
+        if(dfs(neigh_r , neigh_c , graph)){
+            return true ;
+        }
+    }    
+    
+    return false ;    
+}
+int Solution::checkPath(vector<vector<int> > &A) {
+    ROW = A.size() ; COL = A[0].size() ;
+    
+    for(int i = 0 ; i < ROW ; i++){
+        for(int j = 0 ; j < COL ; j++){
+            if(A[i][j] == 1){
+                // source found
+                if(dfs( i , j , A)){
+                    return true ;
+                }
+                else{
+                    return false ;
+                }
+            }
+        }
+    }
+    
+    return false ;
+}
+```
