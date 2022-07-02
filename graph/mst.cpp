@@ -54,9 +54,7 @@ public:
                 this->rank[s2] += this->rank[s1] ;
             }
             return true ;
-
         }
-
         //failed to join because cycle present
         return false ;
     }
