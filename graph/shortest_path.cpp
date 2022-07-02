@@ -40,6 +40,27 @@ public:
 3) bellman ford (sssp on weighted graph with -ve edges)[but doesnot work for graph with -ve cycled edges]
 4) floyd warshall (apsp on all graphs)
 */
+
+int bellmonFord(int n, int m, int src, int dest, vector<vector<int>> &edges) {
+    // Relax all edges |V| - 1 times. A simple shortest path from src to any other vertex can have
+    // at-most |V| - 1 edges
+    vector<int> dist(n+1 , 1e9);
+    dist[src-1] = 0 ;
+    
+    for(int i = 0 ; i < n-1 ; i++){
+        for(int i = 0 ; i < edges.size() ; i++){
+            int u = edges[i][0]-1 ; 
+            int v = edges[i][1]-1 ;
+            int weight = edges[i][2] ;
+            if(dist[u] != 1e9 and weight + dist[u] < dist[v]){
+                dist[v] = dist[u] + weight ;
+            }
+        }
+    }
+    
+    return dist[dest-1];
+}
+
 class WeightedGraph{
 
 private:
@@ -123,7 +144,7 @@ public:
                         dist[y] = dist[i] + weight ;
                     }
                 }
-           }
+           }    
         }
 
         if(verbose){
