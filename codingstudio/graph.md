@@ -909,3 +909,240 @@ vector<vector<int>> stronglyConnectedComponents(int n, vector<vector<int>> &edge
     return ans ;
 }
 ```
+
+22. [bellman ford](https://www.codingninjas.com/codestudio/problems/bellmon-ford_2041977)
+```cpp
+int bellmonFord(int n, int m, int src, int dest, vector<vector<int>> &edges) {
+    vector<int> dist(n+1 , 1e9);
+    dist[src-1] = 0 ;
+    
+    for(int i = 0 ; i < n-1 ; i++){
+        for(int i = 0 ; i < edges.size() ; i++){
+            int u = edges[i][0]-1 ; 
+            int v = edges[i][1]-1 ;
+            int weight = edges[i][2] ;
+            if(dist[u] != 1e9 and weight + dist[u] < dist[v]){
+                dist[v] = dist[u] + weight ;
+            }
+        }
+    }
+    
+    return dist[dest-1];
+}
+```
+
+21. [isGraph Tree](https://www.codingninjas.com/codestudio/problems/is-graph-tree_1115787?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+bool isCyclic(int curnode , vector<vector<int>> &graph ,unordered_set<int> &visited , int parent){
+    
+    visited.insert(curnode);    
+    for(int neigh : graph[curnode]){
+        if(visited.find(neigh) == visited.end()){
+            if(isCyclic(neigh , graph ,visited , curnode)){
+                return true ;
+            }
+        }
+        else if(neigh != parent){
+                return true ;
+        }
+    }
+    return false ;
+}
+bool isGraphTree(int n, vector<vector<int>> &edges)
+{
+    
+    // Write your code here.
+    unordered_set<int> visited ;
+    vector<vector<int>> graph(n) ;
+    for(int i = 0 ; i < edges.size() ; i++){
+        graph[edges[i][0]].push_back(edges[i][1]);
+        graph[edges[i][1]].push_back(edges[i][0]);
+    }
+    
+    if(isCyclic(0 , graph , visited , -1)){
+         return false ;
+    }
+    if(visited.size() < n) return false ;
+    
+    return true ;
+}
+```
+
+22. [course schedule 2](https://www.codingninjas.com/codestudio/problems/course-schedule-ii_1069243?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+vector<int> findSchedule(int numCourses, vector<pair<int, int>> &prerequisites) {
+    vector<vector<int>> graph(numCourses+1);
+    vector<int> indegree(numCourses+1 , 0);
+
+    for(int i = 0 ; i < prerequisites.size() ; i++){
+        indegree[prerequisites[i].first]++ ;
+        graph[prerequisites[i].second].push_back(prerequisites[i].first);
+    }   
+    queue<int> q ;
+    
+    for(int i = 1 ; i <= numCourses ; i++){
+        if(indegree[i] == 0){
+            q.push(i);
+        }
+    }
+    vector<int> res ;    
+    while(not q.empty()){
+        int curr = q.front() ; q.pop() ;
+        res.push_back(curr) ;
+        for(int neigh : graph[curr]){
+            indegree[neigh]-- ;
+            if(indegree[neigh] == 0){
+                q.push(neigh);
+            }
+        }
+    }
+    if(res.size() == numCourses){
+        return res ;
+    }
+    return vector<int>() ;
+    
+}
+```
+
+23. [covid spread](https://www.codingninjas.com/codestudio/problems/covid-spread_980228?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int ROW , COL ;
+
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0 or row >= ROW or col >= COL ;
+}
+int covidSpread(vector<vector<int>> &houses)
+{
+    int infected_houses = 0 ;
+    int empty_houses = 0 ;
+    
+    queue<pair<int,int>> q ;
+    ROW = houses.size() ; COL = houses[0].size() ;    
+    for(int i = 0 ; i < ROW ; i++){
+        for(int j = 0 ; j < COL ; j++){
+            if(houses[i][j] == 0) empty_houses++ ;
+            else if(houses[i][j] == 2){
+                q.push({i,j});            
+            }
+        }
+    }
+    int dx[4] = {1,-1,0,0};
+    int dy[4] = {0,0,1,-1};
+    
+    int time_taken = 0 ;
+    while(not q.empty()){
+        int sz = q.size();
+        while(sz--){
+            int row = q.front().first , col = q.front().second ;
+            q.pop() ;   
+            infected_houses++ ;
+            for(int i = 0 ; i < 4 ; i++){
+                int neigh_r = row + dx[i] ;
+                int neigh_c = col + dy[i] ;
+                if(isInvalid(neigh_r , neigh_c)) continue ;
+                if(houses[neigh_r][neigh_c] != 1) continue ;
+                houses[neigh_r][neigh_c] = 2 ;
+                q.push({neigh_r , neigh_c});
+            }
+        }
+        time_taken++ ; 
+    }
+    if(infected_houses == (ROW*COL-empty_houses)) return time_taken-1 ;
+    return -1 ;
+    
+}
+```
+
+24. [possible bipartition](https://www.codingninjas.com/codestudio/problems/possible-bipartition_1262278?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+bool isCycle(int curnode , vector<vector<int>> &graph , vector<int> &colored , int color){
+    colored[curnode] = color ;
+    for(int neigh : graph[curnode]){
+        if(colored[neigh] == 0){
+            if(isCycle(neigh , graph , colored , 3-color)){
+                return true ;
+            }
+        }
+        else if(colored[neigh] == color){
+            return true ;
+        }
+    }
+    return false ;
+}
+int splitGroups(int n, vector<vector<int>> &dislike)
+{
+	vector<vector<int>> graph(n+1);
+    
+    for(int i = 0 ; i < dislike.size() ; i++){
+        graph[dislike[i][0]].push_back(dislike[i][1]);
+        graph[dislike[i][1]].push_back(dislike[i][0]);
+    }
+    vector<int> colored(n+1 , 0) ;
+    for(int i = 1 ; i <= n ; i++){
+        if(not colored[i]){
+            if(isCycle(i , graph , colored , 1)){
+                return 0 ;
+            }
+        }
+    }
+    return 1 ;
+}
+```
+
+25. [shortest alternate path](https://www.codingninjas.com/codestudio/problems/shortest-alternate-colored-path_1281318?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+vector<int> shortestAlternateColoredPath(int n, vector<vector<int>>& redEdges, vector<vector<int>>& blueEdges) 
+{
+    vector<vector<pair<int,int>>> graph(n);
+    for(int i = 0 ; i < redEdges.size() ; i++){
+        graph[redEdges[i][0]].push_back({redEdges[i][1] ,1});
+    }
+    for(int i = 0 ; i < blueEdges.size() ; i++){
+        graph[blueEdges[i][0]].push_back({blueEdges[i][1] ,2}) ;
+    }
+    vector<int> visited(n , -1);
+    set<pair<int,int>> memo ;
+    
+    int curdist = 0 ;
+    queue<pair<int,int>> q ; // {node , color}
+    q.push({0,0});
+    pair<int,int> curnode ;
+    
+    while(not q.empty()){
+        int sz = q.size() ;
+
+        while(sz--){
+            curnode = q.front() ; q.pop() ;
+            
+            if(memo.find(curnode) != memo.end()) continue ;
+            memo.insert(curnode);
+            
+            if(visited[curnode.first] == -1)
+                 visited[curnode.first] = curdist ;
+            
+            for(auto neigh : graph[curnode.first]){
+                if(memo.find(neigh) != memo.end()) continue ;                
+                if(neigh.second == curnode.second) continue ;
+                q.push(neigh);
+            }
+            
+        }
+        curdist++ ;
+
+    }
+    visited[0] = 0 ;
+    return visited ;
+}
+```
+
+26. 
