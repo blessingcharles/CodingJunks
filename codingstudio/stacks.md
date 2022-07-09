@@ -455,4 +455,245 @@ unordered_map<int , list<pair<int,int>>::iterator > memo ;
 };
 ```
 
-14. 
+14. [largest rectangle in histogram](https://www.codingninjas.com/codestudio/problems/largest-rectangle-in-a-histogram_1058184?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int largestRectangle(vector<int> & heights) {
+    stack<pair<int,int>> st ; // value , pos
+    st.push({0 , -1});
+    int N = heights.size() ;
+    pair<int,int> curr ;
+    int max_area = 0 ;
+    
+    for(int i = 0 ; i < N ; i++){
+        int max_left = i ;
+        
+        while(not st.empty() and heights[i] <= st.top().first){
+            curr = st.top() ; st.pop() ;
+            max_area = max(max_area , curr.first*(i-curr.second));
+            max_left = curr.second ;    
+        }
+        st.push({heights[i] , max_left});
+    }
+    
+    while(not st.empty()){
+        curr = st.top() ; st.pop() ;
+        max_area = max(max_area , curr.first*(N-curr.second));
+    }
+    return max_area ;
+}
+```
+
+15. [min cost to make str valid](https://www.codingninjas.com/codestudio/problems/minimum-cost-to-make-string-valid_1115770?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int findMinimumCost(string str) {
+  // Write your code here
+    if((str.size()&1) == 1) return -1 ;
+    stack<char> st ;
+    // }}{{
+    int ops = 0 ;
+    
+    for(char ch : str){
+        if(ch == '{') st.push('{');
+        else{
+            if(not st.empty()) st.pop() ;
+            else{
+                ops++ ;
+                st.push('{');
+            }
+        }
+    }
+    while(not st.empty()){
+        ops++ ;
+        st.pop() ; st.pop() ;
+    }
+    return ops ;
+}
+```
+
+16. [minStack](https://www.codingninjas.com/codestudio/problems/design-a-stack-that-supports-getmin-in-o-1-time-and-o-1-extra-space_842465?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+class SpecialStack {
+    public:
+    stack<int> minStack ;
+    stack<int> st ;
+    
+    void push(int data) {
+        st.push(data);
+        if(minStack.empty() or minStack.top() >= data){
+            minStack.push(data);
+        }
+    }
+    int pop() {
+        if(isEmpty()) return -1 ;
+        if(minStack.top() == st.top()){
+            minStack.pop() ;
+        }
+        int ele = st.top() ; st.pop() ;
+        return ele ;
+    }
+
+    int top() {
+        return st.top() ;
+    }
+    bool isEmpty() {
+        return st.empty() ;
+    }
+    int getMin() {
+        if(isEmpty()) return -1 ;
+        
+        return minStack.top() ;
+    }  
+};
+```
+
+17. [diagonal sum](https://www.codingninjas.com/codestudio/problems/diagonal-sum_790722?leftPanelTab=0)
+```cpp
+#include <bits/stdc++.h>
+
+void helper(BinaryTreeNode<int>* root,unordered_map<int,long long> &memo , int &maxlevel ,int marker){
+    if(root == NULL) return ;
+    maxlevel = max(maxlevel , marker);
+    memo[marker] += root->data ;
+    
+    helper(root->left , memo , maxlevel , marker+1);
+    helper(root->right , memo , maxlevel , marker);
+    
+}
+
+vector < long long > diagonalSum(BinaryTreeNode < int >* root) {
+    if(not root) return {} ;
+    
+    unordered_map<int , long long> memo ;
+    int maxlevel = 0 ;
+    helper(root , memo , maxlevel , 0);
+    vector<long long> ans(maxlevel+1);
+    for(int i = 0 ; i <= maxlevel ; i++){
+        ans[i] = memo[i];
+    }
+    return ans ;
+}
+```
+
+18. [insert at bottom](https://www.codingninjas.com/codestudio/problems/insert-an-element-at-its-bottom-in-a-given-stack_1171166?leftPanelTab=0)
+```cpp
+stack<int> pushAtBottom(stack<int>& myStack, int x) 
+{
+    stack<int> myst ;
+    while(not myStack.empty()){
+        myst.push(myStack.top()) ; myStack.pop() ;
+    }
+    myStack.push(x);
+    while(not myst.empty()){
+        myStack.push(myst.top()) ; myst.pop() ;
+    }
+    return myStack ;
+}
+```
+
+19. [max of all subarray k](https://www.codingninjas.com/codestudio/problems/maximum-of-all-subarrays-of-size-k_1071161?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+vector<int> maximumInAllSubarraysOfSizeK(vector<int> arr, int n, int k)
+{
+    deque<int> st ;
+    
+    for(int i = 0 ; i < k ; i++){
+        while(not st.empty() and arr[st.back()] <= arr[i]){
+            st.pop_back();
+        }
+        st.push_back(i);
+    }
+    int right = k ;
+    vector<int> ans ;
+    ans.push_back(arr[st.front()]);
+    int left = 0 ;
+    
+    while(right < n){
+        //remove the left side
+        if(not st.empty() and st.front() == left){
+            st.pop_front() ;
+        }
+        
+        while(not st.empty() and arr[st.back()] <= arr[right]){
+            st.pop_back();
+        }
+        st.push_back(right);  
+        ans.push_back(arr[st.front()]);
+        right++ ; left++ ;
+    }
+    return ans ;
+}   
+```
+
+20. [remove consecutive duplicates](https://www.codingninjas.com/codestudio/problems/remove-consecutive-duplicates-from-string_630473?leftPanelTab=0)
+```cpp
+string removeConsecutiveDuplicates(string str) 
+{
+    string res = "" ;
+    res.push_back(str[0]);
+    int N = str.size() ;
+    
+    for(int i = 1 ; i < N ; i++){
+        while(i < N and str[i] == str[i-1]) i++ ;
+        if(i < N){
+            res.push_back(str[i]);
+        }
+    }
+    return res ;
+}
+```
+
+21. [bst iterator](https://www.codingninjas.com/codestudio/problems/bst-iterator_1112601?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+class BSTiterator
+{
+public:
+    vector<int> arr ;
+    int ptr = 0 ;
+    void helper(TreeNode<int> *root){
+        if(not root) return ;
+        helper(root->left);
+        arr.push_back(root->data);
+        helper(root->right);
+    }
+    
+    BSTiterator(TreeNode<int> *root)
+    {
+        // write your code here
+        helper(root); ptr = 0 ;
+    }
+
+    int next()
+    {
+        return arr[ptr++] ;
+    }
+
+    bool hasNext()
+    {
+        return (ptr < arr.size());
+    }
+};
+```
+
+22. [mirror tree](https://www.codingninjas.com/codestudio/problems/convert-binary-tree-to-mirror-tree_873140?leftPanelTab=0)
+```cpp
+BinaryTreeNode<int>* helper(BinaryTreeNode<int>* root){
+    if(not root) return NULL ;
+    BinaryTreeNode<int>* temp = root->left ;
+    root->left = helper(root->right);
+    root->right = helper(temp);
+    return root ;
+}
+void mirrorTree(BinaryTreeNode<int> *root) {
+    root = helper(root);
+}
+```
