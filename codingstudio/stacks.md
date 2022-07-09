@@ -697,3 +697,112 @@ void mirrorTree(BinaryTreeNode<int> *root) {
     root = helper(root);
 }
 ```
+23. [odd even diff](https://www.codingninjas.com/codestudio/problems/odd-even-level_794960?leftPanelTab=0)
+```cpp
+void evenOddLevelDifference(BinaryTreeNode<int>* root){
+    if(not root){
+        cout << 0 << endl ;
+        return ;
+    }
+    int level = 0 ; 
+	queue<BinaryTreeNode<int>* > q ;
+    q.push(root);
+    long long oddsum = 0 , evensum = 0 ;
+    BinaryTreeNode<int>* curr ;
+    
+    while(not q.empty()){
+        int sz = q.size() ;
+        long long cursum = 0 ;
+        while(sz--){
+            curr = q.front() ; q.pop() ;
+            cursum += curr->data ;
+            if(curr->left){
+                q.push(curr->left);
+            }
+            if(curr->right){
+                q.push(curr->right);
+            }
+        }
+        if((level&1) == 1) oddsum += cursum ;
+        else evensum += cursum ;
+        level++ ;
+    }
+    cout << abs(oddsum-evensum) << endl ;
+}
+```
+24. [sort stack](https://www.codingninjas.com/codestudio/problems/abc_1229513?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+void insert(stack<int> &st , int curr){
+    if(st.empty() or st.top() <= curr){
+        st.push(curr);
+        return ;
+    }
+    int tt = st.top() ; st.pop() ;
+    insert(st , curr);
+    st.push(tt);
+}
+void helper(stack<int> &st){
+    if(st.empty()) return ;
+    int curr_ele = st.top() ; st.pop() ;
+    helper(st);
+    insert(st , curr_ele);
+}
+stack<int> sortStack(stack<int> &s)
+{
+   	helper(s);
+    return s ;
+}
+```
+
+25. [max equal stack sum](https://www.codingninjas.com/codestudio/problems/maximum-equal-stack-sum_1062571?leftPanelTab=0)
+```cpp
+int getSum(stack<int> st){
+    int cursum = 0 ;
+    while(not st.empty()){
+        cursum += st.top() ; st.pop() ;
+    }
+    return cursum ;
+}
+
+int maxSum(stack<int> &stk1, stack<int> &stk2, stack<int> &stk3) {
+    int sum1 = getSum(stk1);
+    int sum2 = getSum(stk2) ;
+    int sum3 = getSum(stk3) ;
+    
+    int minsum = min({sum1 , sum2 , sum3});
+    while(true){
+        if(sum1 > minsum){
+            sum1 -= stk1.top() ; stk1.pop() ;
+        }
+        if(sum2 > minsum){
+            sum2 -= stk2.top() ; stk2.pop() ;
+        }
+        if(sum3 > minsum){
+            sum3 -= stk3.top() ; stk3.pop() ;
+        }
+        if(sum1 == sum2 and sum2 == sum3) break ;
+        minsum = min({sum1 , sum2 , sum3});
+    }
+    return sum1 ;
+}
+```
+
+26. [interleave queue](https://www.codingninjas.com/codestudio/problems/interleave-the-first-half-of-the-queue-with-the-second-half_1169450?leftPanelTab=0)
+```cpp
+void interLeaveQueue(queue < int > & q) {
+    vector<int> arr ;
+    while(not q.empty()){
+        arr.push_back(q.front()) ; q.pop() ;
+     }
+    int N = arr.size() ;
+    int mid = N/2 ;
+    int right = mid , left = 0;
+    while(right < N){
+       q.push(arr[left++]);
+        q.push(arr[right++]);
+    }
+}
+```
+27. 
