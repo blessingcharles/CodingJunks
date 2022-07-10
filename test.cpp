@@ -1,56 +1,76 @@
 #include <iostream>
+
 #include<bits/stdc++.h>
-
 using namespace std ;
-bool isOperator(char ch){
-    return ch == '+' or ch == '-' or ch == '*' or ch == '/' ;
-}
-int mod = 1e9+7 ;
 
-int calc(long num1 , long num2 , char op){
-    if(op == '+'){
-        return (num1+num2)%mod ;
-    }   
-    else if(op == '-'){
-        return (num1-num2) ;
+void repeat(string &word , long count){
+    count-- ;
+    string ww = word ;
+    while(count--){
+        word += ww ;
     }
-    else if(op == '*'){
-        return (num1*num2)%mod ;
-    }
-    else{
-        return (num1/num2) ;
-    }
-    return 0 ;
+}
+bool isNum(char ch){
+    return ch >= '0' and ch <= '9' ;
 }
 
-int evaluatePostfix(string &exp) {
+string decodeString(string s)
+{
     stack<string> st ;
-    int N = exp.size() ;
-    if(N == 0) return 0 ;
-    
-    for(int i = 0 ; i < N ; i++){
-        if(isOperator(exp[i])){
-            long num2 = stol(st.top()) ; st.pop() ;
-            long num1 = stol(st.top()) ; st.pop() ;
+    stack<string> res ;
+
+    int ptr = s.size()-1 ;
+    int closing_brackets = 0 ;
+    while(ptr >= 0){
+        if(s[ptr] == ']'){
+            st.push("]");
+            closing_brackets++ ;
+            ptr-- ;
+        }
+        else if(s[ptr] == '['){
+            closing_brackets-- ;
+            //pop the strings untill ']' occurs
+            string words = "" ;
+            while(not st.empty() and st.top() != "]"){
+                words += st.top() ; st.pop() ;
+            }
+            st.pop() ;
+            ptr-- ;
             
-            int res = calc(num1 , num2 , exp[i]);
-            st.push(to_string(res));
-            i++ ;
+            // get the count repeat it and push it onto the stack
+            string count = "" ;
+            while(ptr >= 0  and isNum(s[ptr])){
+                count.push_back(s[ptr--]);
+            }
+            reverse(count.begin() , count.end());
+            long cc = 1 ;
+            if(count.size() > 0) cc = stol(count);
+            repeat(words , cc);
+            if(closing_brackets > 0)
+                st.push(words);
+            else
+                res.push(words) ;
         }
         else{
-            //build the digits untill space character occurs
-            string num = "" ;
-            while(i < N and exp[i] != ' '){
-                num.push_back(exp[i++]);
+            //form the strings
+            int len = 0 ;
+            while(ptr >= 0 and s[ptr] != '['){
+                ptr-- ; len++ ;
             }
-            st.push(num);
+            st.push(s.substr(ptr+1 , len));
         }
     }
-    return stoi(st.top());
+    string ans = "" ;
+    while(not res.empty()){
+        ans += res.top() ; res.pop() ;
+    }
+    return ans ;
 }
 
 int main()
 {
-    string exp = "" ;
-    cout << evaluatePostfix();
+    string exp = "3[a2[b]]" ;
+    string exp1 = "abc2[abcd]2[z]" ;
+
+    cout << decodeString(exp1);
 }

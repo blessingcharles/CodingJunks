@@ -984,3 +984,167 @@ vector<int> ninjaCircularArray(int n, vector<int> &nums) {
    return res ;
 }
 ```
+
+33. [decode string](https://www.codingninjas.com/codestudio/problems/decode-string_696319?leftPanelTab=0)
+```cpp
+
+bool isNum(char ch){
+    return ch >= '0' and ch <= '9' ;
+}
+int N ;
+
+
+string helper(string &s , int &pos){
+    string word = "" ;
+    int num = 0 ;
+    
+    while(pos < N){
+        if(s[pos] == '['){
+            pos++ ;
+            string n_word = helper(s , pos);
+            while(num > 0){
+                word += n_word ; 
+                num-- ;
+            }
+        }
+        else if(s[pos] == ']'){
+            pos++ ;
+            return word ;
+        }
+        else if(isNum(s[pos])){
+            num = num*10 + (s[pos++] - '0') ;
+        }
+        else{
+            word.push_back(s[pos++]);
+        }
+    }
+    return word ;
+}
+string decodeString(string s){
+    N = s.size() ;
+    int pos = 0 ;
+    return helper(s , pos);
+}
+```
+
+34. [stack using queue](https://www.codingninjas.com/codestudio/problems/stack-using-queue_795152?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+class Stack {
+	// Define the data members.
+    queue<int> q ;
+   public:
+    Stack() {
+        // Implement the Constructor.
+    }
+
+    int getSize() {
+        return q.size() ;
+    }
+
+    bool isEmpty() {
+        return q.empty() ;
+    }
+
+    void push(int element) {
+        int sz = q.size();
+        q.push(element);
+        while(sz--){
+            q.push(q.front()) ; q.pop() ;
+        }
+    }
+    int pop() {
+        if(q.empty()) return -1 ;
+        int ele = q.front() ; q.pop() ;
+        return ele ;
+    }
+
+    int top() {
+        if(q.empty()) return -1;
+        return q.front() ;
+    }
+};
+```
+
+35. [deepest leaves sum](https://www.codingninjas.com/codestudio/problems/deepest-leaves-sum_797824?leftPanelTab=0)
+```cpp
+int maxDepth(TreeNode<int>* root){
+    if(not root) return 0 ;
+    return 1+max(maxDepth(root->left) , maxDepth(root->right));
+}
+int maxlevel ;
+int sumDeepest(TreeNode<int>* root , int level){
+    if(not root) return 0 ;
+    if(level == maxlevel) return root->data ;
+    
+    return sumDeepest(root->left , level+1) + sumDeepest(root->right , level+1);
+}
+int deepestLeavesSum(TreeNode<int>* root)
+{
+    maxlevel = maxDepth(root);
+    return sumDeepest(root , 1);
+}
+```
+
+36. [is subsequence](https://www.codingninjas.com/codestudio/problems/is-subsequence_892991?leftPanelTab=0)
+```cpp
+bool isSubSequence(string &str1, string &str2) {
+    int M = str1.size() , N = str2.size() ;
+    int ptr1 = 0 ,ptr2 = 0 ;
+    while(ptr1 < M and ptr2 < N){
+        if(str1[ptr1] == str2[ptr2]) ptr1++ ;
+        ptr2++ ;
+    }
+    return ptr1 == M ;
+}
+```
+
+37. [order of pets](https://www.codingninjas.com/codestudio/problems/find-the-order-in-which-pets-are-bought-from-the-pet-shop_1199010?leftPanelTab=0)
+```cpp
+vector < int > findOrder(vector < vector < int > > arr, int n) 
+{
+    queue<pair<int,int>> dogs , cats ;
+    vector<int> res ;
+    int time = 0 ;
+    for(int i = 0 ; i < arr.size() ; i++){
+        if(arr[i][0] == 1){
+            // they are giving pets
+            if(arr[i][2] == 0){
+                //dog 
+                dogs.push({arr[i][1],time++});
+            }        
+            else{
+                cats.push({arr[i][1],time++});
+            }
+        }
+        else{
+            // adopting pets
+            if(arr[i][1] == 0){
+                // dogs
+                int uid = dogs.front().first ; dogs.pop() ;
+                res.push_back(uid) ;
+            }
+            else if(arr[i][1] == 1){
+                int uid = cats.front().first ; cats.pop() ;
+                res.push_back(uid);
+            }
+            else{
+                if(dogs.size() == 0){
+                    res.push_back(cats.front().first) ; cats.pop() ;
+                }
+                else if(cats.size() == 0){
+                    res.push_back(dogs.front().first) ; dogs.pop() ;
+                }
+                else if(cats.front().second < dogs.front().second){
+                    res.push_back(cats.front().first) ; cats.pop() ;
+                }
+                else{
+                    res.push_back(dogs.front().first) ; dogs.pop() ;
+                }
+            }
+        }
+    }
+```
+
+38. 
