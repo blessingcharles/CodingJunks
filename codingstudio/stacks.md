@@ -805,4 +805,182 @@ void interLeaveQueue(queue < int > & q) {
     }
 }
 ```
-27. 
+27. [stack permutation](https://www.codingninjas.com/codestudio/problems/valid-stack-permutation_1170061?leftPanelTab=0)
+```cpp
+bool validStackPermutation(vector<int> &first, vector<int> &other){
+	stack<int> st ;
+    int ptr1 = 0 , N = other.size();
+    
+    for(int ele : first){
+        st.push(ele);
+        while(not st.empty() and other[ptr1] == st.top()){
+            st.pop() ; ptr1++ ;
+        }
+    }
+    return ptr1 == N ;
+}
+```
+
+28. [connect n ropes](https://www.codingninjas.com/codestudio/problems/connect-n-ropes-with-minimum-cost_630476?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+long long connectRopes(int* arr, int n)
+{
+    priority_queue<long long , vector<long long> , greater<long long>> pq ;
+    for(int i = 0 ; i < n ; i++){
+        pq.push(arr[i]);
+    }
+    
+    long long cursum = 0 ;
+    while(pq.size() > 1){
+        long long r1 = pq.top() ; pq.pop() ;
+        long long r2 = pq.top() ; pq.pop() ;
+        cursum = cursum + r1+r2 ;
+        pq.push(r1+r2);
+    }
+    return cursum ;
+}
+```
+
+29. [max stack](https://www.codingninjas.com/codestudio/problems/max-stack_985280?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+class MaxStack {
+public:    	
+	stack<int> st ;
+    stack<int> m_st ;
+    
+	MaxStack() {
+		// Write your code here.
+	}
+	
+	void specialPush(int value) {
+        st.push(value);
+        if(m_st.empty() or value >= m_st.top()){
+            m_st.push(value);
+        }
+    }
+    bool isEmpty(){
+        return st.empty() ;
+    }
+    
+	// Return the popped value.
+	int specialPop() {
+        if(isEmpty()){
+            return -1 ;
+        }
+        int ele = st.top() ; st.pop();
+        if(m_st.top() == ele) m_st.pop();
+        return ele ;
+    }
+
+	// Return value at the top of stack.
+	int specialTop() {
+        if(isEmpty()) return -1 ;
+        return st.top() ;
+    }
+
+	// Return maximum value in stack.
+	int specialMax() {
+        if(isEmpty()) return -1 ;
+        return m_st.top() ;        
+	}
+};
+```
+
+30. [Evaluate Postfix]()
+```cpp
+bool isOperator(char ch){
+    return ch == '+' or ch == '-' or ch == '*' or ch == '/' ;
+}
+int mod = 1e9+7 ;
+
+int calc(long num1 , long num2 , char op){
+    if(op == '+'){
+        return (num1+num2)%mod ;
+    }   
+    else if(op == '-'){
+        return (num1-num2) ;
+    }
+    else if(op == '*'){
+        return (num1*num2)%mod ;
+    }
+    else{
+        return (num1/num2) ;
+    }
+    return 0 ;
+}
+
+int evaluatePostfix(string &exp) {
+    stack<string> st ;
+    int N = exp.size() ;
+    if(N == 0) return 0 ;
+    
+    for(int i = 0 ; i < N ; i++){
+        if(isOperator(exp[i])){
+            long num2 = stol(st.top()) ; st.pop() ;
+            long num1 = stol(st.top()) ; st.pop() ;
+            
+            int res = calc(num1 , num2 , exp[i]);
+            st.push(to_string(res));
+            i++ ;
+        }
+        else{
+            //build the digits untill space character occurs
+            string num = "" ;
+            while(i < N and exp[i] != ' '){
+                num.push_back(exp[i++]);
+            }
+            st.push(num);
+        }
+    }
+    return stoi(st.top());
+}
+```
+
+31. [online stock span](https://www.codingninjas.com/codestudio/problems/span-of-ninja-coin_1475049?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+vector<int> findSpans(vector<int> &price) {
+    stack<int> st ;
+    int N = price.size() ;
+    vector<int> res(N);
+    
+    for(int i = 0 ; i < N ; i++){
+         while(not st.empty() and price[st.top()] <= price[i]) st.pop() ;
+         if(st.empty()){
+             // I took control of all
+             res[i] = i+1 ;
+         }
+        else{
+            res[i] = i-st.top() ;
+        }
+        st.push(i);
+    }
+    return res ;
+}
+```
+
+32. [ninja circular array](https://www.codingninjas.com/codestudio/problems/ninja-s-circular-array_2221409?leftPanelTab=0)
+```cpp
+vector<int> ninjaCircularArray(int n, vector<int> &nums) {
+   stack<int> st ;
+   vector<int> res(n,-1);
+   
+   for(int i = 2*n-1 ; i >= 0 ; i--){
+       int idx = i%n ;
+       while(not st.empty() and st.top() <= nums[idx]){
+           st.pop() ;
+       }
+       if(not st.empty()){
+           res[idx] = st.top() ;
+       }
+       st.push(nums[idx]);
+   }
+    
+   return res ;
+}
+```

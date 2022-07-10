@@ -2,35 +2,55 @@
 #include<bits/stdc++.h>
 
 using namespace std ;
+bool isOperator(char ch){
+    return ch == '+' or ch == '-' or ch == '*' or ch == '/' ;
+}
+int mod = 1e9+7 ;
 
-#include<bits/stdc++.h>
-
-string shortestSubstring(string s)
-{
-    unordered_set<char> myset(s.begin() , s.end());
-    int n = myset.size() ;
-    int left = 0 , right = 0 ;
-    unordered_map<char , int> memo ; 
-    int left_idx = 0 ,right_idx , maxlen = s.size() ;
-    
-    while(right < n){
-        memo[s[right]]++ ;
-        while(memo.size() == n){
-            int curlen  = right-left+1 ;
-            if(curlen < maxlen){
-                left_idx = left ;
-                maxlen = curlen ;
-            }
-            memo[s[left]]-- ;
-            if(memo[s[left]] == 0) memo.erase(memo[s[left]]);
-            left++ ;
-        }
-        right++ ;
+int calc(long num1 , long num2 , char op){
+    if(op == '+'){
+        return (num1+num2)%mod ;
+    }   
+    else if(op == '-'){
+        return (num1-num2) ;
     }
-    return s.substr(left_idx ,maxlen);
+    else if(op == '*'){
+        return (num1*num2)%mod ;
+    }
+    else{
+        return (num1/num2) ;
+    }
+    return 0 ;
+}
+
+int evaluatePostfix(string &exp) {
+    stack<string> st ;
+    int N = exp.size() ;
+    if(N == 0) return 0 ;
+    
+    for(int i = 0 ; i < N ; i++){
+        if(isOperator(exp[i])){
+            long num2 = stol(st.top()) ; st.pop() ;
+            long num1 = stol(st.top()) ; st.pop() ;
+            
+            int res = calc(num1 , num2 , exp[i]);
+            st.push(to_string(res));
+            i++ ;
+        }
+        else{
+            //build the digits untill space character occurs
+            string num = "" ;
+            while(i < N and exp[i] != ' '){
+                num.push_back(exp[i++]);
+            }
+            st.push(num);
+        }
+    }
+    return stoi(st.top());
 }
 
 int main()
 {
-    cout << shortestSubstring("abbbcbbbbabbc");
+    string exp = "" ;
+    cout << evaluatePostfix();
 }
