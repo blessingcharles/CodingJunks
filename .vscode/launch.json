@@ -13,7 +13,7 @@
                 "/home/th3h04x"
             ],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
+            "cwd": "${workspaceFolder}/test.cpp",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",

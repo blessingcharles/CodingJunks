@@ -1147,4 +1147,401 @@ vector < int > findOrder(vector < vector < int > > arr, int n)
     }
 ```
 
-38. 
+38. [next greater in linked list](https://www.codingninjas.com/codestudio/problems/next-greater-node-in-linked-list_1262083?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+vector<int> findNextGreaterNodeList(Node* head)
+{
+    vector<int> arr ;
+    stack<int> st ;
+    while(head){
+        arr.push_back(head->data) ;
+        head = head->next ;
+    }
+    vector<int> res(arr.size() , 0) ;
+    
+    for(int i = arr.size()-1 ; i >= 0 ;i--){
+        while(not st.empty() and st.top() <= arr[i]){
+            st.pop() ;
+        }
+        if(not st.empty()){
+            res[i] = st.top() ;
+        }
+        st.push(arr[i]) ;
+    }
+    return res ;
+}
+```
+
+39. [circular tour](https://www.codingninjas.com/codestudio/problems/find-the-first-circular-tour-that-visits-all-the-petrol-pumps_799923?leftPanelTab=1)
+```cpp
+int firstCircularTour(vector<int>& petrol, vector<int>& distance, int N)
+{
+	long long gas = 0 ;
+    long long dis =0 ;
+    
+    int starting_point = 0 ;
+    long long rem_gas= 0 ;
+    
+    for(int i = 0 ; i < petrol.size() ; i++){
+        gas += petrol[i] ;
+        dis += distance[i] ;
+        rem_gas = rem_gas + petrol[i] - distance[i] ;
+        if(rem_gas < 0){
+            rem_gas = 0 ;
+            starting_point = i+1 ;
+        }
+    }
+    if(gas-dis < 0) return -1 ;
+    
+    return starting_point ;
+}
+}
+```
+
+40. [sum of minvals in subarray](https://www.codingninjas.com/codestudio/problems/sum-of-the-minimum-values-in-subarrays_1473824?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int sumOfSubarrayMins(vector<int>& arr, int n) {
+    stack<int> st , st2 ;
+    vector<int> left(n,1) , right(n,1);
+    for(int i = 0 ; i < n ; i++){
+        while(not st.empty() and arr[st.top()] >= arr[i]){
+            st.pop() ;
+        }
+        if(st.empty()){
+            left[i] = i+1 ;
+        }
+        else{
+            left[i] = i-st.top() ;
+        }
+        st.push(i);
+    }
+    for(int i = n-1 ; i >= 0 ; i--){
+        while(not st2.empty() and arr[st2.top()] > arr[i]){
+            st2.pop() ;
+        }
+        if(st2.empty()){
+            right[i] = n-i ;
+        }
+        else{
+            right[i] = st2.top()-i ;
+        }
+        st2.push(i);
+    }
+         int MOD = 1e9+7;
+        int res = 0;
+        for(int i=0; i<n; i++)
+        {
+            long long prod = (left[i]*right[i])%MOD;
+            prod = (prod*arr[i])%MOD;
+            res = (res + prod)%MOD;
+        }
+        
+        return res%MOD;
+}
+```
+
+41. [browser history](https://www.codingninjas.com/codestudio/problems/browser_2427908?leftPanelTab=0)
+```cpp
+class Node{
+  public:
+    string url ;
+    Node* next , *prev ;
+    Node(string &u){
+        url = u ;
+        next = NULL ;
+        prev = NULL ;
+    }
+};
+class Browser
+{
+    public:
+    Node* head ;
+    Browser(string &homepage)
+    {
+        head = new Node(homepage);
+    }
+    void visit(string &url)
+    {
+        head->next = new Node(url);
+        head->next->prev = head ;
+        head = head->next ;
+    }
+    string back(int steps)
+    {
+        while(steps-- and head->prev){
+            head = head->prev ;
+        }        
+        return head->url ;
+    }
+
+    string forward(int steps)
+    {
+        while(steps-- and head->next){
+            head = head->next ;
+        }
+        return head->url ;
+    }
+};
+```
+42. [first negative in every window](https://www.codingninjas.com/codestudio/problems/first-negative-in-every-window_759333?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+vector<int> firstNegative(vector<int> arr, int n, int k) {
+    vector<int> res ;
+    queue<int> q ;
+    for(int i = 0 ; i < k ; i++){
+        if(arr[i] < 0) q.push(arr[i]);
+    }
+    int left = 0 ;
+    
+    for(int right = k ; right < n ; right++ , left++){
+        if(q.empty()){
+            res.push_back(0);
+        }
+        else{
+            res.push_back(q.front());
+        }
+        if(arr[right] < 0) q.push(arr[right]);
+        
+        if(not q.empty() and arr[left] == q.front()) q.pop();
+    }
+    if(q.empty()) res.push_back(0);
+    else res.push_back(q.front());
+    return res ;
+}
+```
+
+43. [reverse first k elements in queue](https://www.codingninjas.com/codestudio/problems/reverse-first-k-elements-of-queue_982771?leftPanelTab=0)
+```cpp
+queue<int> reverseElements(queue<int> q, int k)
+{
+    vector<int> arr(k);
+    while(k--){
+        arr[k] = q.front() ; q.pop();
+    }
+    queue<int> res ;
+    for(int ele : arr){
+        res.push(ele);
+    }
+    while(not q.empty()){
+        res.push(q.front()) ; q.pop() ;
+    }
+    return res ;
+}
+```
+44. [task scheduler](https://www.codingninjas.com/codestudio/problems/task-scheduler_1070424?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int taskScheduler(string tasks, int n, int t) {
+    vector<int> charmap(26 , 0);
+    for(char ch : tasks){
+        charmap[ch-'A']++ ;
+    }
+    sort(charmap.begin() , charmap.end() , greater<int>());
+    int maxval = charmap[0]-1 ;
+    int idle_slots = maxval*t  ;
+    for(int i = 1 ; i < 26 ; i++){
+        idle_slots -= min(charmap[i] , maxval);
+    }
+    return (idle_slots < 0)?n:idle_slots+n ;
+}
+
+#include<bits/stdc++.h>
+
+int taskScheduler(string tasks, int n, int t) {
+    int time = 0 ;
+    queue<pair<int,int>> q ;
+    priority_queue<int> pq ;
+    unordered_map<char , int> memo ;
+    for(char ch : tasks){
+        memo[ch]++ ;
+    }
+    for(auto it = memo.begin() ; it != memo.end() ; it++){
+        pq.push(it->second);
+    }
+    while(not pq.empty() or not q.empty()){
+        time++ ;
+        if(not pq.empty()){
+            int tt = pq.top() ; pq.pop() ;
+            // we can't do this task untill time+t hours
+            if(tt-1 > 0){
+                q.push({tt-1 , time+t});
+            }
+        }
+        //can we add anything from queue
+        if(not q.empty() and q.front().second == time){
+            pq.push(q.front().first); q.pop() ;
+        }
+    
+    }
+    return time ;
+}
+```
+
+45. [Longest valid parenthesis](https://www.codingninjas.com/codestudio/problems/longest-valid-parentheses_1089563?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int longestValidParentheses(string s) {
+    stack<int> st ; st.push(-1);
+    int maxlen = 0 ;
+    
+    for(int i = 0 ; i < s.size() ; i++){
+        if(s[i] == '('){
+            st.push(i);
+        }
+        else{
+            if(not st.empty()) st.pop() ;
+            
+            if(not st.empty()){
+                maxlen = max(maxlen , i-st.top());
+            }
+            else{
+                st.push(i);
+            }
+        }
+    }
+    return maxlen ;
+}
+```
+
+46. [queue using two stacks](https://www.codingninjas.com/codestudio/problems/queue-using-two-stacks_1170062?leftPanelTab=0)
+```cpp
+class Queue{
+    // Stacks to be used in the operations.
+    stack<int> stk1, stk2;
+    
+    public:
+    // Enqueues 'X' into the queue. Returns true after enqueuing.
+    bool enqueue(int X){
+        stk1.push(X);
+        return true ;
+    }
+    /*
+      Dequeues top element from queue. Returns -1 if the queue is empty, 
+      otherwise returns the popped element.
+    */
+    int dequeue(){
+        if(stk1.empty() and stk2.empty()) return -1 ;
+        if(not stk2.empty()){
+            int ele = stk2.top(); stk2.pop() ;
+            return ele ;
+        }
+        while(not stk1.empty()){
+            stk2.push(stk1.top()) ; stk1.pop() ;
+        }
+          int ele = stk2.top(); stk2.pop() ;
+        return ele ;
+    }
+};
+```
+
+47. [prime factors 3 5 and 7](https://www.codingninjas.com/codestudio/problems/find-the-kth-number-with-prime-factors-3-5-and-7_1229405?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+long long findKthElement(int k){
+    vector<long long> arr(1,1);
+    long ptr1 = 0 , ptr2 = 0 , ptr3 = 0 ;
+    unordered_set<long long> memo ;
+    
+    while(arr.size() <= k){
+        long long mul3 = arr[ptr1]*3 ;
+        long long mul5 = arr[ptr2]*5 ;
+        long long mul7 = arr[ptr3]*7 ;
+        if(mul3 <= mul5 and mul3 <= mul7){
+            if(memo.find(mul3) == memo.end()){
+                arr.push_back(mul3);
+                memo.insert(mul3) ;   
+            }
+            ptr1++ ;
+        }
+        else if(mul5 <= mul7){
+            if(memo.find(mul5) == memo.end()){
+                arr.push_back(mul5);
+                memo.insert(mul5) ;
+            }
+            ptr2++ ;
+        }
+        else{
+            if(memo.find(mul7) == memo.end()){
+                arr.push_back(mul7);
+                memo.insert(mul7);
+            }
+            ptr3++ ;
+        }
+    }
+    return arr[k] ;
+}
+```
+
+48. [stamping the sequence]()
+```cpp
+class Solution {
+public:
+    
+bool canReplace(int idx , string &target , string &stamp){
+    for(int i = 0 ; i < stamp.size(); i++){
+        if(target[i+idx] != '?' and target[i+idx] != stamp[i]){
+            return false ;
+        }
+    }
+    return true ;
+}
+void replace(int idx , string &target , int &count , int m){
+    for(int i = 0 ; i < m ; i++){
+        if(target[i+idx] != '?'){
+            count++ ;
+            target[i+idx] = '?' ;
+        }
+    }
+}
+    vector<int> movesToStamp(string stamp, string target) {
+        int m = stamp.size() , n = target.size() ;
+        vector<int> ans ;
+        // convert the target into "?"
+        int count = 0 ;
+        vector<int> visited(n , false);
+        while(count != n){
+            bool modified_once = false ;
+            for(int i = 0 ; i <= n-m ; i++){
+                if(not visited[i] and canReplace(i , target , stamp)){
+                    replace(i , target , count , m);
+                    visited[i] = true ;
+                    modified_once = true ;
+                    ans.push_back(i);
+                    if(count == n) break ;
+                }
+            }
+            if(not modified_once) return {};
+        }
+        reverse(ans.begin() , ans.end());
+        return ans ;
+    }
+};
+```
+
+49. [verify preorder from bst](https://www.codingninjas.com/codestudio/problems/verify-preorder-sequence-in-binary-search-tree_1281309?leftPanelTab=1)
+```cpp
+#include<bits/stdc++.h>
+
+bool isBSTPreorder(vector<int> &arr) 
+{
+    stack<int> st ;
+    int root = INT_MIN ;
+    for(int ele : arr){
+        if(root > ele) return false ;
+        while(not st.empty() and st.top() < ele){
+            root = st.top() ;
+            st.pop() ;
+        }
+        st.push(ele) ;
+    }
+    return true ;
+}
+```
+
+50. 
