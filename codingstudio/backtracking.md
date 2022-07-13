@@ -113,4 +113,56 @@ vector<string> getAllValidSentences(string &sentence, vector<string> &dictionary
 }
 ```
 
-5. 
+5. [islands count](https://www.codingninjas.com/codestudio/problems/find-number-of-islands_630512?leftPanelTab=3)
+```cpp
+int M , N ;
+int dx[8] = {1,1,1,-1,-1,-1,0,0} ;
+int dy[8] = {1,0,-1,1,0,-1,1,-1} ;
+
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0 or row >= M or col >= N ;
+}
+void dfs(int row , int col , int **arr){
+    arr[row][col] = 0 ;
+    
+    for(int i = 0 ; i < 8 ; i++){
+        int neigh_r = row + dx[i] ;
+        int neigh_c = col + dy[i] ;
+        
+        if(isInvalid(neigh_r , neigh_c) or arr[neigh_r][neigh_c] == 0){
+            continue ;
+        }
+        dfs(neigh_r , neigh_c , arr);
+    }
+}
+
+int getTotalIslands(int** arr, int n, int m)
+{
+    M = n ; N = m ; 
+    int islands = 0 ;
+    for(int i = 0 ; i < M ; i++){
+        for(int j = 0 ; j < N ; j++){
+            if(arr[i][j] == 1){
+                islands++ ;
+                dfs(i,j,arr);
+            }
+        }
+    }
+    return islands ;
+}
+```
+
+6. [partial bst](https://www.codingninjas.com/codestudio/problems/validate-bst_799483?leftPanelTab=0)
+```cpp
+bool helper(BinaryTreeNode<int> *root , int minval, int maxval){
+    if(not root) return true ;
+    if(root->data > maxval or root->data < minval) return false ;
+    
+    return helper(root->left ,minval , root->data) and helper(root->right , root->data , maxval);
+}
+bool validateBST(BinaryTreeNode<int> *root) {
+    return helper(root , INT_MIN , INT_MAX);
+ }
+```
+
+7. 
