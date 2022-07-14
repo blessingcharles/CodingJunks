@@ -1,71 +1,53 @@
 #include <iostream>
 
 #include <bits/stdc++.h>
-using namespace std;
+using namespace std ;
 
-class Solution
+int M , N ;
+int dx[4] =   {1,-1,0,0};
+int dy[4] =   {0,0,1,-1};
+char dir[4] = {'D' ,'U' , 'R' , 'L'};
+
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0 or row >= M or col >= N ;
+}
+
+void helper(int row , int col ,vector<vector<bool>> &arr,string &path , vector<string> &res){
+    if(row == M-1 and col == N-1){
+        res.push_back(path); return ;
+    }
+    cout << row << endl ;
+    for(int i = 0 ; i < 4 ; i++){
+        int neigh_r = row + dx[i] ;
+        int neigh_c = col + dy[i] ;
+        if(isInvalid(neigh_r , neigh_c) or arr[neigh_r][neigh_c] == 0){
+            continue ;
+        }
+        cout << neigh_r << " " << neigh_c << endl ;
+        arr[neigh_r][neigh_c] = 0 ;
+        path.push_back(dir[i]);
+        helper(neigh_r , neigh_c , arr, path , res);
+        path.pop_back();
+        arr[neigh_r][neigh_c] = 1 ;
+        
+    }
+}
+vector<string> findAllPaths( vector<vector<bool>> &arr)
 {
-public:
-    bool canReplace(int idx, string &target, string &stamp)
-    {
-        for (int i = 0; i < stamp.size(); i++)
-        {
-            if (target[i + idx] != '?' and target[i + idx] != stamp[i])
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-    void replace(int idx, string &target, int &count, int m)
-    {
-        for (int i = 0; i < m; i++)
-        {
-            if (target[i + idx] != '?')
-            {
-                count++;
-                target[i + idx] = '?';
-            }
-        }
-    }
-    vector<int> movesToStamp(string stamp, string target)
-    {
-        int m = stamp.size(), n = target.size();
-        vector<int> ans;
-        // convert the target into "?"
-        int count = 0;
-        vector<int> visited(n, false);
-        while (count != n)
-        {
-            bool modified_once = false;
-            for (int i = 0; i <= n - m; i++)
-            {
-                if (not visited[i] and canReplace(i, target, stamp))
-                {
-                    replace(i, target, count, m);
-                    cout << i << "Replcing "<< target << endl ;
-                    visited[i] = true;
-                    modified_once = true;
-                    ans.push_back(i);
-                    if (count == n)
-                        break;
-                }
-            }
-            if (not modified_once){
-                return {-1};
-            }
-        }
-        reverse(ans.begin(), ans.end());
-        return ans;
-    }
-};
+    vector<string> ans ;
+    M = ans.size() ; N = ans[0].size() ;
+    cout << "hi" ;
+    // if(arr[0][0] == 0 or arr[M-1][N-1] == 0) return ans ;
+    // arr[0][0] = 0 ;
+    // string path = "" ;
+    // helper(0,0,arr , path , ans);
+    return ans ;
+}
 
 int main()
 {
-    string exp = "abc";
-    string target = "ababc" ;
-    Solution s ;
-    for(int ele : s.movesToStamp(exp , target)){
+    vector<vector<bool>>  arr = {{1,1},{1,1}} ;
+    for(string ele : findAllPaths(arr)){
         cout << ele << " " ;
     }
 }

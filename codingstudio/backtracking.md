@@ -552,4 +552,178 @@ void printParantheses(int n) {
 }
 ```
 
-17. 
+17. [k path sum in bt](https://www.codingninjas.com/codestudio/problems/k-sum-path-in-a-binary-tree_893543?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+void helper(BinaryTreeNode<int> *root , int target , vector<int> &container , vector<vector<int>> &ans){
+    if(not root) return ;
+    container.push_back(root->data);
+    helper(root->left , target , container , ans);
+    helper(root->right , target , container , ans);
+    
+    int sum = 0 ;
+    vector<int> temp ;
+    
+    for(int i = container.size()-1 ; i >= 0 ; i--){
+        sum += container[i];
+        temp.push_back(container[i]);
+        if(sum == target){
+            ans.push_back(temp);
+        }
+    }
+    
+    container.pop_back();
+}
+vector<vector<int>> kPathSum(BinaryTreeNode<int> *root, int k) {
+    vector<vector<int>> ans ;
+    vector<int> container ;
+    helper(root , k , container , ans);
+    for(vector<int> &t : ans) reverse(t.begin() , t.end());
+    return ans ;
+}
+```
+
+18. [path in maze](https://www.codingninjas.com/codestudio/problems/paths-in-a-maze_981287?leftPanelTab=0)
+```cpp
+int M , N ;
+int dx[4] =   {1,-1,0,0};
+int dy[4] =   {0,0,1,-1};
+char dir[4] = {'D' ,'U' , 'R' , 'L'};
+
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0 or row >= M or col >= N ;
+}
+
+void helper(int row , int col ,vector<vector<bool>> &arr,string &path , vector<string> &res){
+    if(row == M-1 and col == N-1){
+        res.push_back(path); return ;
+    }
+    for(int i = 0 ; i < 4 ; i++){
+        int neigh_r = row + dx[i] ;
+        int neigh_c = col + dy[i] ;
+        if(isInvalid(neigh_r , neigh_c) or arr[neigh_r][neigh_c] == 0){
+            continue ;
+        }
+        arr[neigh_r][neigh_c] = 0 ;
+        path.push_back(dir[i]);
+        helper(neigh_r , neigh_c , arr, path , res);
+        path.pop_back();
+        arr[neigh_r][neigh_c] = 1 ;
+        
+    }
+}
+vector<string> findAllPaths( vector<vector<bool>> &arr)
+{
+    vector<string> ans ;
+    M = arr.size() ; N = arr[0].size() ;
+    if(arr[0][0] == 0 or arr[M-1][N-1] == 0) return ans ;
+    arr[0][0] = 0 ;
+    string path = "" ;
+    helper(0,0,arr , path , ans);
+    return ans ;
+}
+```
+
+19. [letter combination](https://www.codingninjas.com/codestudio/problems/letter-combinations-of-a-phone-number_983623?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+unordered_map<char , string> memo = {
+    {'2', "abc"} ,
+    {'3' , "def"} ,
+    {'4' , "ghi"} ,
+    {'5' , "jkl"} ,
+    {'6' , "mno"} ,
+    {'7' , "pqrs"} ,
+    {'8' , "tuv"} ,
+    {'9' , "wxyz"} 
+};
+void helper(string &str , int pos , string &curpath , vector<string> &res){
+    if(pos == str.size()){
+        res.push_back(curpath) ;
+        return ;
+    }
+    for(char ch : memo[str[pos]]){
+        curpath.push_back(ch);
+        helper(str , pos+1 , curpath , res);
+        curpath.pop_back();
+    }
+}
+vector<string> combinations(string s){
+	string curpath = "" ;
+    vector<string> res ;
+    helper(s , 0 , curpath , res);
+    return res ;
+}
+```
+
+20. [bst to greater sum tree](https://www.codingninjas.com/codestudio/problems/convert-bst-to-the-greater-sum-tree_800290?leftPanelTab=0)
+```cpp
+int helper(TreeNode<int> *root , int topsum){
+    if(not root){
+        return 0 ;
+    }
+    int rs = helper(root->right , topsum);
+    int ls = helper(root->left , topsum+root->val+rs);
+    int temp = root->val ;
+    root->val = rs + topsum ;
+    return temp+ls+rs ;
+}
+TreeNode<int> *convertBstToGreaterSum(TreeNode<int> *root)
+{
+    helper(root , 0);
+    return root ;
+}
+```
+
+21. [maze with N doors and key](https://www.codingninjas.com/codestudio/problems/maze-with-n-doors-and-1-key_839809?leftPanelTab=0)
+```cpp
+int N ;
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0 or row >= N or col >= N ;
+}
+
+bool helper(int row , int col , vector<vector<int>> &maze , bool keyused , vector<vector<vector<bool>>> &memo){
+    if(row == N-1 and col == N-1) return true ;
+    if(memo[row][col][keyused] == false) return false ;
+    
+    if(not isInvalid(row+1 , col)){
+        if(maze[row+1][col] == 0){
+            // no key req 
+            if(helper(row+1 , col , maze , keyused , memo)){
+                return true ;
+            }
+        }
+        else if(not keyused){
+            if(helper(row+1 , col , maze , true , memo)){
+                return true ;
+            }
+        }
+    }    
+    //rightward
+    if(not isInvalid(row , col+1)){
+        if(maze[row][col+1] == 0){
+            // no key req 
+            if(helper(row , col+1 , maze , keyused , memo)){
+                return true ;
+            }
+        }
+        else if(not keyused){
+            if(helper(row , col+1 , maze , true , memo)){
+                return true ;
+            }
+        }
+    }    
+    return memo[row][col][keyused]=false ;
+}
+
+bool mazeWithNDoorsAnd1Key(vector<vector<int>> &maze, int n)
+{
+    N = n ;
+    vector<vector<vector<bool>>> memo(n , vector<vector<bool>>(n,vector<bool>(2,true)));
+    return (maze[0][0] == 1)?helper(0,0,maze,true , memo):helper(0,0,maze,false , memo);
+}
+```
+
+22. 
