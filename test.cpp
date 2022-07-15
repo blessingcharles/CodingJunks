@@ -3,51 +3,55 @@
 #include <bits/stdc++.h>
 using namespace std ;
 
-int M , N ;
-int dx[4] =   {1,-1,0,0};
-int dy[4] =   {0,0,1,-1};
-char dir[4] = {'D' ,'U' , 'R' , 'L'};
-
-bool isInvalid(int row , int col){
-    return row < 0 or col < 0 or row >= M or col >= N ;
-}
-
-void helper(int row , int col ,vector<vector<bool>> &arr,string &path , vector<string> &res){
-    if(row == M-1 and col == N-1){
-        res.push_back(path); return ;
-    }
-    cout << row << endl ;
-    for(int i = 0 ; i < 4 ; i++){
-        int neigh_r = row + dx[i] ;
-        int neigh_c = col + dy[i] ;
-        if(isInvalid(neigh_r , neigh_c) or arr[neigh_r][neigh_c] == 0){
-            continue ;
+#include<bits/stdc++.h>
+string remover(string board){
+    if(board.size() < 3) return board ;  
+    string res = "" ;
+    int N = board.size() ;
+    
+    for(int i = 0 ; i < board.size() ;i++){
+        if(i < N-2 and board[i] == board[i+1] and board[i] == board[i+2]){
+            i += 2 ;
+        }    
+        else{
+            res.push_back(board[i]);
         }
-        cout << neigh_r << " " << neigh_c << endl ;
-        arr[neigh_r][neigh_c] = 0 ;
-        path.push_back(dir[i]);
-        helper(neigh_r , neigh_c , arr, path , res);
-        path.pop_back();
-        arr[neigh_r][neigh_c] = 1 ;
-        
     }
+    cout << board << " " << res << endl ;
+    return res ;
 }
-vector<string> findAllPaths( vector<vector<bool>> &arr)
-{
-    vector<string> ans ;
-    M = ans.size() ; N = ans[0].size() ;
-    cout << "hi" ;
-    // if(arr[0][0] == 0 or arr[M-1][N-1] == 0) return ans ;
-    // arr[0][0] = 0 ;
-    // string path = "" ;
-    // helper(0,0,arr , path , ans);
-    return ans ;
+int helper(string board , string &hand , unordered_set<int> used){
+    board = remover(board);
+    if(board.size() == 0) return 0 ;
+    if(used.size() == hand.size()){
+        return INT_MAX ;
+    }
+    int minlen = INT_MAX ;
+    
+    for(int i = 0 ; i < hand.size() ; i++){
+        if(used.find(i) != used.end()) continue ;
+        used.insert(i);
+        for(int j = 1 ; j < board.size() ; j++){
+            string new_board = remover(board.substr(0,j) + hand[i] + board.substr(j)) ;       
+            minlen = min(minlen , helper(new_board , hand , used));
+        }
+        used.erase(i);
+    }
+    return (minlen == INT_MAX)?minlen:1+minlen ;
 }
 
+int minInsertions(string &board, string &hand) 
+{
+    unordered_set<int> used ;    
+	int ans = helper(board , hand ,used);
+    return (ans == INT_MAX)?-1:ans ;
+}
 int main()
 {
-    vector<vector<bool>>  arr = {{1,1},{1,1}} ;
-    for(string ele : findAllPaths(arr)){
-        cout << ele << " " ;
-    }
+    vector<string> arr = {"of" , "on" , "pon"};
+    vector<vector<char>> bb = {{'g' , 'n'} , {'o' , 'p'}};
+    string b = "GYGG" ;
+    string h = "YY";
+    cout << minInsertions(b,h);
+
 }

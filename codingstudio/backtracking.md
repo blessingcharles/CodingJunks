@@ -726,4 +726,583 @@ bool mazeWithNDoorsAnd1Key(vector<vector<int>> &maze, int n)
 }
 ```
 
-22. 
+22. [flip game 2](https://www.codingninjas.com/codestudio/problems/ninja-and-flip-game_1232645?leftPanelTab=0)
+```cpp
+bool canNinjaWin(string& str) {
+    for(int i = 0 ; i < str.size()-1 ; i++){
+        if(str[i] == '$' and str[i+1] == '$'){
+            string tt = str.substr(0,i) + "**" + str.substr(i+2);
+            if(not canNinjaWin(tt)){
+                // if opponent can't win
+                return true ;
+            }            
+        }
+    }
+    return false ;
+}
+```
+
+23. [num with same consecutive diff](https://www.codingninjas.com/codestudio/problems/numbers-with-same-consecutive-differences_1235179?leftPanelTab=0)
+```cpp
+void helper(int num , int len , int diff , vector<int> &ans){
+    if(len == 0){
+        ans.push_back(num) ; 
+        return  ;
+    }
+    int next_num1 =(num%10)-diff ;
+    if(next_num1 >= 0){
+        helper(num*10+next_num1 , len-1 , diff , ans);
+    }
+    int next_num2 = (num%10)+diff ;
+    if(next_num2 == next_num1) return ;
+    
+    if(next_num2 <= 9){
+        helper(num*10+next_num2 , len-1 , diff , ans);
+    }
+}
+
+vector<int> numberWithSameConsecutiveDifference(int N, int K)
+{
+	vector<int> ans ;
+    for(int i = 1 ; i <= 9 ; i++){
+        helper(i ,N-1,K , ans);
+    }
+    return ans ;
+}
+```
+24. [number of squareful array](https://www.codingninjas.com/codestudio/problems/number-of-squareful-arrays_1235194?leftPanelTab=0)
+```cpp
+bool isSquare(long num){
+    long ss = sqrt(num) ;
+    return (ss*ss) == num ;
+}
+int counter ;
+void helper(int cc , vector<int> &arr , vector<bool> &used , int prev){
+    if(cc == arr.size()){
+        counter++ ; return ;        
+    }
+    for(int i = 0 ; i < arr.size() ; i++){
+        if(used[i]) continue ;
+        if(i > 0 and arr[i] == arr[i-1] and not used[i-1]) continue ;
+        if(prev != -1 and not isSquare(prev+arr[i])) continue ;
+        used[i] = true ;
+        helper(cc+1 , arr, used , arr[i]);
+        used[i] = false ;
+    }
+}
+int numberOfSquarefulArrays(vector<int>& arr, int n){
+    vector<bool> used(n , false);
+    sort(arr.begin() , arr.end());
+    counter = 0 ;
+    
+    helper(0 , arr , used , -1);    
+    return counter ;
+}
+```
+25. [flood fill](https://www.codingninjas.com/codestudio/problems/flood-fill_1082141?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int M , N ;
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0 or row >= M or col >= N ;
+}
+int dx[4] = {1,-1,0,0};
+int dy[4] = {0,0,-1,1};
+
+vector<vector<int>> floodFill(vector<vector<int>> &image, int n, int m, int x, int y, int p) {
+    M = n ; N = m ;
+    queue<pair<int,int>> q ;
+    q.push({x,y});
+    int target = image[x][y] ;
+    image[x][y] = p ;
+    
+    while(not q.empty()){
+        int row = q.front().first , col = q.front().second ;
+        q.pop() ;
+        for(int i = 0 ; i < 4 ; i++){
+            int neigh_r = row + dx[i] ;
+            int neigh_c = col + dy[i] ;
+            if(isInvalid(neigh_r , neigh_c) or image[neigh_r][neigh_c] != target){
+                continue ;
+            }
+            image[neigh_r][neigh_c] = p ;
+            q.push({neigh_r , neigh_c});
+        }
+    }
+    return image ;
+}
+```
+26. [max depth of bt](https://www.codingninjas.com/codestudio/problems/maximum-depth-of-a-binary-tree_1090542?leftPanelTab=0)
+```cpp
+int findMaxDepth(TreeNode<int> *root) 
+{
+    if(not root) return 0 ;
+    int ls = findMaxDepth(root->left);
+    int rs = findMaxDepth(root->right);
+    return 1+max(ls,rs);
+}
+```
+27. [factor combination](https://www.codingninjas.com/codestudio/problems/factor-combinations_1232628?leftPanelTab=0)
+```cpp
+int maxf ;
+void helper(int start ,int target, vector<int> &path , vector<vector<int>> &ans){
+    if(target == 1){
+        ans.push_back(path);
+        return ;
+    }
+    if(start > target) return ;
+    for(int i = start ; i < maxf ;i++){
+        if(target%i == 0){
+            path.push_back(i);
+            helper(i , target/i , path , ans);
+            path.pop_back();
+            if(target/i == 1) break ;
+        }    
+    }
+}
+vector<vector<int>> factorCombinations(int n) 
+{
+	vector<vector<int>> ans ;
+    vector<int> path ;
+    maxf = n ;
+    helper(2 , n , path , ans);
+    return ans ;
+}
+```
+28. [largest valid sequence](https://www.codingninjas.com/codestudio/problems/construct-the-lexicographically-largest-valid-sequence_1233105?leftPanelTab=0)
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+int N ;
+bool helper(vector<int> &arr , int pos , vector<bool> &visited){
+    if(pos == arr.size()){
+        return true ;
+    }
+    if(arr[pos] != -1){
+        return helper(arr , pos+1 , visited);
+    }
+    for(int i = N ; i >= 1 ; i--){
+        if(visited[i]) continue ;
+        visited[i] = true ;
+        arr[pos] = i ;
+        if(i == 1){
+            if(helper(arr , pos+1 , visited)){
+                return true ;
+            }          
+        }
+        else if(pos+i < arr.size() and arr[pos+i] == -1){
+            arr[pos+i] = i ;
+            if(helper(arr , pos+1 , visited)){
+                return true ;
+            }
+            arr[pos+i] = -1 ;
+        }
+        visited[i] = false ;
+        arr[pos] = -1 ;
+    }        
+    return false ;    
+}
+vector<int> validSequence(int n)
+{
+    vector<int> arr(2 * n - 1, -1);
+    vector<bool> visited(n+1 , false);
+    N = n;
+    helper(arr, 0, visited);
+    return arr;
+}
+```
+29. [word ladder 1](https://www.codingninjas.com/codestudio/problems/word-search_892986?leftPanelTab=0)
+```cpp
+int M , N ;
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0 or row >= M or col >= N ;
+}
+int dx[4] = {1,-1,0,0};
+int dy[4] = {0,0,1,-1};
+bool dfs(int row , int col , int pos , vector<vector<char>> &board , string &word){
+    if(pos == word.size()) return true ;
+    char curchar = board[row][col] ;
+    board[row][col] = '.' ;
+    
+    for(int i = 0 ; i < 4 ; i++){
+        int neigh_r = row + dx[i] , neigh_c = col + dy[i] ;
+        if(isInvalid(neigh_r , neigh_c) or board[neigh_r][neigh_c] != word[pos]) continue ;
+        if(dfs(neigh_r , neigh_c , pos+1 , board , word)) return true ;
+    }
+    board[row][col] = curchar ;
+    return false ;
+}
+bool present(vector<vector<char>> &board, string word, int n, int m) 
+{
+    M = n ; N = m ;
+    for(int i = 0 ; i < M ; i++){
+        for(int j = 0 ; j < N ; j++){
+            if(board[i][j] == word[0] and dfs(i,j,1 , board , word)){
+                return true ;
+            }
+        }
+    }
+    return false ;
+}
+```
+
+30. [word boggle](https://www.codingninjas.com/codestudio/problems/word-boggle_1081474?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int M , N ;
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0 or row >= M or col >= N ;
+}
+int dx[8] = {1,1,1,-1,-1,-1,0,0};
+int dy[8] = {-1,0,1,-1,0,1,1,-1};
+
+bool dfs(int row , int col , int pos , vector<vector<char>> &board , string &word){
+    if(pos == word.size()) return true ;
+    char curchar = board[row][col] ;
+    board[row][col] = '.' ;
+    
+    for(int i = 0 ; i < 8 ; i++){
+        int neigh_r = row + dx[i] , neigh_c = col + dy[i] ;
+        if(isInvalid(neigh_r , neigh_c) or board[neigh_r][neigh_c] != word[pos]) continue ;
+        if(dfs(neigh_r , neigh_c , pos+1 , board , word)){
+             board[row][col] = curchar ;
+            return true ;
+        }
+    }
+    board[row][col] = curchar ;
+    return false ;
+}
+vector<string> findPossibleWords(vector<string> arr, vector<vector<char>> mat){
+	sort(arr.begin() , arr.end());
+    vector<string> res ;
+    M = mat.size() ; N = mat[0].size() ;
+    for(string &word : arr){
+        bool founded = false ;
+        for(int i = 0 ; i < M ; i++){
+            for(int j = 0 ; j < N ; j++){
+                   if(mat[i][j] == word[0] and dfs(i,j,1 , mat , word)){
+                        res.push_back(word);
+                        founded = true ;
+                        break ;
+                   }
+            }
+            if(founded) break ;
+        }
+    }
+    return res ;
+}
+```
+
+31. [settle debt]()
+```cpp
+#include<bits/stdc++.h>
+bool isSameSign(int num1 , int num2){
+    return (num1 < 0) ^ (num2 > 0);
+}
+
+int dfs(int start , vector<int> &transactions){
+    while(start < transactions.size() and transactions[start] == 0){
+        start++ ;
+    }
+    if(start == transactions.size()) return 0 ;
+    
+    int minval = INT_MAX ;
+    for(int i = start+1 ; i < transactions.size() ; i++){
+        if(isSameSign(transactions[start] , transactions[i])){
+            continue ;            
+        }    
+        transactions[i] += transactions[start] ;
+        minval = min(minval , 1+dfs(start+1 , transactions));
+        transactions[i] -= transactions[start] ;
+    }
+    return minval ;
+}
+int settleDebt(vector<vector<int>> &arr){
+    unordered_map<int , int> memo ;
+    for(vector<int> &t : arr){
+        memo[t[0]] -= t[2] ;
+        memo[t[1]] += t[2] ;
+    }
+    vector<int> transactions ;
+    for(auto it = memo.begin() ; it != memo.end() ; it++){
+        if(it->second != 0){
+            transactions.push_back(it->second);
+        }
+    }
+    return dfs(0,transactions);
+}
+```
+
+32. [Remove Invalid Parenthesis](https://www.codingninjas.com/codestudio/problems/remove-invalid-parentheses_1263697?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int MAXSIZE = 0 ;
+
+void helper(int pos , int points , string &str , string &curpath, unordered_set<string> &res){
+    if(pos == str.size()){
+        if(points == 0 and curpath.size() >= MAXSIZE){
+            if(curpath.size() > MAXSIZE){
+                res.clear() ;
+                MAXSIZE = curpath.size() ;
+            }
+            res.insert(curpath);
+        }
+        return ;
+    }
+    
+    if(MAXSIZE > str.size()-pos+curpath.size()) return ;
+    
+    if(str[pos] == '('){
+        helper(pos+1 , points , str , curpath , res);
+        curpath.push_back('(');
+        helper(pos+1 , points+1 , str , curpath , res);
+        curpath.pop_back();
+    }
+    else if(str[pos] == ')'){
+        if(points > 0){
+            curpath.push_back(')');
+            helper(pos+1 , points-1 , str , curpath , res);
+            curpath.pop_back();
+        }
+        helper(pos+1 , points , str , curpath , res);
+    }
+    else{
+        curpath.push_back(str[pos]);
+        helper(pos+1 , points , str , curpath , res);
+        curpath.pop_back();
+    }
+}
+vector<string> removeInvalidParentheses(string &str)
+{
+    MAXSIZE = 0 ;
+    string curpath ;
+    unordered_set<string> res ;
+    helper(0 ,0, str , curpath , res);
+    return vector<string>(res.begin() , res.end()) ;
+}
+```
+
+33. [all path in dag](https://www.codingninjas.com/codestudio/problems/minimum-number-of-vertices-to-reach-all-nodes_1380287?leftPanelTab=0)
+```cpp
+int target ;
+#include<bits/stdc++.h>
+void dfs(int node , vector<vector<int>> &graph , vector<int> &curpath , vector<vector<int>> &res){
+    curpath.push_back(node);
+    if(node == target){
+        res.push_back(curpath);
+        curpath.pop_back() ;
+        return ;
+    }
+    for(int neigh : graph[node]){
+        dfs(neigh , graph , curpath , res);
+    }
+    curpath.pop_back() ;
+}
+vector<vector<int>> allPathsFromSourceToTarget(int n, vector<vector<int>>& edges)
+{
+	vector<vector<int>> graph(n);
+    for(int i = 0 ; i < edges.size() ; i++){
+        graph[edges[i][0]].push_back(edges[i][1]);
+    }
+    target = n-1 ;
+    vector<int> curpath ;
+    vector<vector<int>> res ;
+    dfs(0 , graph , curpath , res);
+    sort(res.begin() , res.end());
+    return res ;
+}
+```
+
+34. [maximum length of chain](https://www.codingninjas.com/codestudio/problems/maximum-length-of-chain_1063253?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int getLongestChainLength(vector<vector<int>> &pp)
+{
+   	sort(pp.begin() , pp.end() , [](const vector<int> &a , const vector<int> &b){
+           return a[1] < b[1] ; 
+    });
+    int maxlen = 1 ;
+    int prev = pp[0][1] ;
+    int idx = 1 ;
+    while(idx < pp.size()){
+        if(pp[idx][0] > prev){
+            maxlen++ ;
+            prev = pp[idx][1] ;
+        }
+        idx++ ;
+    }
+    return maxlen ;
+}
+```
+
+35. [path more than dist k](https://www.codingninjas.com/codestudio/problems/find-if-there-is-a-path-of-more-than-k-length-from-a-source_1229512?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int reqsum ;
+
+bool helper(int node , int cursum , vector<bool> &visited , vector<vector<pair<int,int>>> &graph){
+    if(cursum >= reqsum) return true ;
+    
+    visited[node] = true ;
+    for(auto &neigh : graph[node]){
+        if(visited[neigh.first]) continue ;
+        if(helper(neigh.first , cursum + neigh.second , visited , graph)){
+            return true ;
+        }
+    }
+    visited[node] = false ;
+    return false ;
+}
+string pathMoreThanK(int n, int m, int k, vector<vector<int>>& edges)
+{
+    vector<bool> visited(n , false);
+    vector<vector<pair<int,int>>> graph(n);
+    reqsum = k ;
+    for(vector<int> &e : edges){
+        graph[e[0]].push_back({e[1] , e[2]});
+        graph[e[1]].push_back({e[0] , e[2]});
+    }
+    return (helper(0 , 0 , visited , graph))?"YES":"NO" ;
+}
+```
+
+36. [path sum2](https://www.codingninjas.com/codestudio/problems/finding-paths_1281314?leftPanelTab=0)
+```cpp
+int target ;
+void helper(TreeNode<int> *root , int cursum ,vector<int> &curpath ,vector<vector<int>> &res){
+    if(not root) return ;
+    curpath.push_back(root->data);
+    if(not root->left and not root->right){
+        if(cursum + root->data == target){
+            res.push_back(curpath);
+        }
+        curpath.pop_back();
+        return ;
+    }
+    helper(root->left , cursum+root->data , curpath , res);
+    helper(root->right , cursum+root->data , curpath , res);
+    
+    curpath.pop_back();
+}
+vector<vector<int>> KSumPaths(TreeNode<int> *root, int k)
+{
+	vector<vector<int>> res ;
+    vector<int> curpath ;
+    target = k ;
+    helper(root , 0 , curpath , res);
+    return res ;
+}
+```
+37. [find permutation](https://www.codingninjas.com/codestudio/problems/find-permutations_1171049?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int nums ;
+bool can_i_place(int pos , int ele , vector<int> &arr){
+    int nxt_idx = pos + ele + 1 ;
+    if(nxt_idx >= arr.size()) return false ;
+    if(arr[nxt_idx] != 0) return false ;
+    return true ;
+}
+
+bool helper(int pos ,vector<int> &arr , unordered_set<int> &used){
+    if(used.size() == nums) return true ;
+    if(pos > arr.size()) return false ;
+    
+    if(arr[pos] != 0) return helper(pos+1 , arr , used); 
+    
+    for(int i = nums ; i >= 1 ; i--){
+        if(used.find(i) != used.end()) continue ;
+        if(can_i_place(pos , i , arr)){
+            used.insert(i) ;
+            
+            arr[pos] = i ;
+            arr[pos+i+1] = i ;
+            if(helper(pos+1 , arr , used)) return true ;
+            arr[pos] = 0 ;
+            arr[pos+i+1] = 0 ;
+            
+            used.erase(i) ;
+        }
+    }
+    return false ;
+}
+vector<int> findPermutation(int N)
+{
+	unordered_set<int> used ;
+    vector<int> arr(2*N , 0) ;
+    nums = N ;
+    if(not helper(0 , arr , used)) return vector<int>() ;
+    return arr ;
+}
+```
+38. [path with max gold](https://www.codingninjas.com/codestudio/problems/path-with-maximum-gold_1214654?leftPanelTab=0)
+```cpp
+int M , N ;
+int dx[4] = {1,-1,0,0};
+int dy[4] = {0,0,1,-1};
+
+bool isInvalid(int row ,int col){
+    return row < 0 or col <0 or row >= M or col >= N ;
+}
+int helper(int row , int col , vector<vector<int>> &grid){
+    int curgold = grid[row][col] ;
+    grid[row][col] = 0 ;
+    int maxg = 0 ;
+    
+    for(int i = 0 ; i < 4 ; i++){
+        int neigh_r = row + dx[i] ;
+        int neigh_c = col + dy[i] ;
+        if(isInvalid(neigh_r , neigh_c) or grid[neigh_r][neigh_c] == 0){
+            continue ;
+        }
+        maxg = max(maxg , helper(neigh_r , neigh_c , grid)) ;        
+    }
+    grid[row][col] = curgold ;
+    
+    return maxg+curgold ;
+}
+int maxGold(vector<vector<int>> &grid, int n, int m)
+{
+	int maxg = 0 ;
+    M = n ; N = m ;
+    for(int i = 0 ; i < M ; i++){
+        for(int j = 0 ; j < N ; j++){
+            if(grid[i][j] != 0){
+                maxg = max(maxg , helper(i , j , grid));
+            }
+        }
+    }
+    return maxg ;
+}
+```
+
+39. [number with same consecutive diff](https://www.codingninjas.com/codestudio/problems/digits-with-the-same-consecutive-difference_1232624?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int diff , len ;
+void helper(int curr , unordered_set<int> &res , string &path){
+    if(path.size() == len){
+        res.insert(stoi(path));
+        return ;
+    }
+    if(curr >= 10 or curr < 0) return ;
+    path.push_back(curr+'0');
+    helper(curr+diff , res , path);
+    helper(curr-diff , res , path);
+    path.pop_back();
+}
+
+vector<int> digitsSameConsecDiff(int n, int k) {
+    unordered_set<int> res ;
+    string path = "" ;
+    diff = k ;
+    len = n ;
+    for(int i = 1 ; i < 10 ;i++){
+        helper(i , res , path);
+    }
+    return vector<int>(res.begin() , res.end()) ;
+}
+```
