@@ -1306,3 +1306,445 @@ vector<int> digitsSameConsecDiff(int n, int k) {
     return vector<int>(res.begin() , res.end()) ;
 }
 ```
+
+40. [arrangements](https://www.codingninjas.com/codestudio/problems/arrangement_1235171?leftPanelTab=0)
+```cpp
+
+bool isPossible(int idx , int ele){
+    return (idx%ele == 0) or (ele%idx == 0) ;
+}
+int helper(int pos ,vector<int>& arr){
+    if(pos == arr.size()){
+          return 1 ;  
+    } 
+    int tt = 0 ;
+    for(int i = pos ; i < arr.size() ; i++){
+        if(isPossible(pos+1 , arr[i])){
+            swap(arr[i] , arr[pos]);
+            tt += helper(pos+1 , arr);  
+            swap(arr[i] , arr[pos]);
+        }
+    }
+    return tt ;
+}
+int countArrangement(int n) {
+    vector<int> arr(n);
+    for(int i = 1; i <= n ; i++){
+        arr[i-1] = i ;
+    }
+    return helper(0 , arr);
+}
+```
+41. [print all paths](https://www.codingninjas.com/codestudio/problems/print-all-paths_920553?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int target ;
+void dfs(int node , vector<vector<int>> &graph , vector<int> &curpath , set<vector<int>> &paths ,  vector<bool> &visited){
+    curpath.push_back(node);
+    if(node == target){
+        paths.insert(curpath);
+    }
+    else{
+        visited[node] = true ;
+        for(int neigh : graph[node]){
+            if(visited[neigh]) continue ;
+            dfs(neigh , graph , curpath , paths , visited);
+        }
+        visited[node] = false ;
+    }
+    curpath.pop_back();
+}
+
+vector< vector<int> > printAllPaths(int n, int m, vector< vector<int> > & edges, int s, int d)
+{
+    target =d ;    
+	set<vector<int>> paths ;
+    vector<vector<int>> graph(n) ;
+    vector<int> curpath ;
+    vector<bool> visited(n , false);
+    
+    for(vector<int> &e : edges){
+        graph[e[0]].push_back(e[1]);
+        graph[e[1]].push_back(e[0]);
+    }
+    dfs(s , graph , curpath , paths , visited);
+    return vector<vector<int>>(paths.begin() , paths.end());
+}
+```
+
+42. [m coloring problem](https://www.codingninjas.com/codestudio/problems/m-coloring-problem_991934?leftPanelTab=1)
+```cpp
+#include<bits/stdc++.h>
+string graphColoring(vector<vector<int>>& adj, int n, int m)
+{
+    if(n == 1) return "Yes" ;
+    
+    // two coloring problem
+    vector<vector<int>> graph(n);
+    for(int i = 0 ; i < n ; i++){
+        for(int j = 0 ; j < n ; j++){
+            if(adj[i][j] == 1){
+                graph[i].push_back(j);
+                graph[j].push_back(i);
+            }
+        }
+    }
+    vector<int> colored(n , 1);
+    int maxColor = 1 ;
+    vector<bool> visited(n , false);
+    
+    for(int node = 0 ; node < n ; node++){
+        if(visited[node]) continue ;
+        visited[node] = true ;
+        // Do BFS
+        queue<int> q ;
+        q.push(node) ;
+        while(not q.empty()){
+            int curr = q.front() ; q.pop() ;
+            for(int neigh : graph[curr]){
+                if(colored[curr] == colored[neigh]){
+                    colored[neigh] += 1 ;
+                    maxColor = max({maxColor ,colored[neigh] , colored[curr]});
+                    if(maxColor > m) return "No" ;
+                }
+                if(not visited[neigh]){
+                    visited[neigh] = true ;
+                    q.push(neigh);
+                }
+            }
+        }   
+        
+    }
+    return "Yes" ;
+}
+```
+
+43. [melidos and elizabeth](https://www.codingninjas.com/codestudio/problems/meliodas-and-elizabeth_992847?leftPanelTab=0)
+```cpp
+int N ;
+
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0 or row >= N or col >= N ;
+}
+
+int helper(int row , int col ,vector<vector<int>> &maze){
+    if(isInvalid(row , col)) return 0 ;
+    if(row == N/2 and col == N/2) return 1 ;
+    if(maze[row][col] == 0) return 0 ;
+    
+    int cur_val = maze[row][col] ;
+    maze[row][col] = 0 ;
+    int ways = 0 ;
+    ways += helper(row+cur_val , col , maze );
+    ways += helper(row-cur_val , col , maze);    
+    
+    ways += helper(row , col+cur_val , maze);    
+    ways += helper(row , col-cur_val , maze );    
+    
+    maze[row][col] = cur_val ;
+    return ways ;
+}
+int countPaths(vector<vector<int>> &maze){
+    N = maze.size() ;
+    
+    int ways = 0 ;
+    ways += helper(0,0 , maze );
+    ways += helper(0 , N-1 , maze);
+    ways += helper(N-1 , 0 , maze );
+    ways += helper(N-1 , N-1 , maze);
+    return ways ;
+}
+```
+44. [letter case permutation](https://www.codingninjas.com/codestudio/problems/letter-case-permutation_1232630?leftPanelTab=0)
+```cpp
+char toLower(char ch){
+    if(ch >= 97 and ch <= 122) return ch ;
+    return ch+32 ;
+}
+char toUpper(char ch){
+    if(ch >= 65 and ch <= 90) return ch ;
+    return ch-32 ;
+}
+
+void helper(int pos , string &s , string &curpath , vector<string> &res){
+    if(pos == s.size()){
+        res.push_back(curpath);
+        return ;
+    }    
+    if(isdigit(s[pos])){
+        curpath.push_back(s[pos]);
+        helper(pos+1 , s , curpath , res);
+        curpath.pop_back();
+        return ;
+    }
+    //make the digit lowercase
+    curpath.push_back(toLower(s[pos]));
+    helper(pos+1 , s , curpath , res);
+    curpath.pop_back();
+    //make the digit uppercase
+    curpath.push_back(toUpper(s[pos]));
+    helper(pos+1 , s , curpath , res);
+    curpath.pop_back();
+}
+vector<string> letCasePermutation(string s) 
+{
+    vector<string> res ;
+    string curpath = "" ;
+    helper(0 , s , curpath , res);
+    return res ;
+}
+```
+
+45. [synonymous sentence](https://www.codingninjas.com/codestudio/problems/synonymous-sentences_1262309?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+void getSynonyms(string &str , unordered_set<string> &visited , unordered_map<string , vector<string>> &dict){
+     visited.insert(str);
+     for(string &syn : dict[str]){
+         if(visited.find(syn) == visited.end()){
+             getSynonyms(syn , visited , dict);
+         }
+     }
+}
+
+void helper(int pos ,vector<string> &sentence ,vector<string> &curr , unordered_map<string , vector<string>> &dict , vector<vector<string>> &res){
+    if(pos == sentence.size()){
+        res.push_back(curr);
+        return ;
+    }
+    unordered_set<string> visited ;
+    getSynonyms(sentence[pos] ,visited , dict);
+    
+    for(auto it = visited.begin() ; it != visited.end() ; it++){
+        curr.push_back(*it);
+        helper(pos+1,sentence , curr , dict , res);
+        curr.pop_back();
+    }
+ 
+}
+vector<vector<string>> findSentences(vector<vector<string>>& synonyms, vector<string>& sentence) {
+    unordered_map<string ,vector<string>> dict ;
+    for(int i = 0 ; i < synonyms.size() ; i++){
+        dict[synonyms[i][0]].push_back(synonyms[i][1]);
+        dict[synonyms[i][1]].push_back(synonyms[i][0]);
+    }
+    vector<vector<string>> res ;
+    vector<string> curr ;
+    helper(0 , sentence , curr , dict , res);
+    sort(res.begin() , res.end()) ;
+    return res ;
+}
+```
+
+46. [stepping numbers](https://www.codingninjas.com/codestudio/problems/stepping-numbers_1262352?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+void helper(int curr , int left , int right , vector<int> &res){
+    if(curr > right) return ;
+    if(curr >= left){
+        res.push_back(curr);
+    }
+    // we can add a digit by sub 1 and add 1
+    int last_dig = curr%10 ;
+    if(last_dig != 0){
+        helper((curr*10)+(last_dig-1) , left , right , res);
+    }
+    if(last_dig != 9){
+        helper((curr*10)+(last_dig+1) , left , right , res);
+    }
+}
+vector<int> findSteppingNumbers(int l, int r) {
+	vector<int> res ;
+    
+    for(int i = 1 ; i <= 9 ; i++){
+        helper(i , l , r , res);
+    }
+    sort(res.begin() , res.end());
+    return res ;
+}
+```
+
+47. [24 game](https://www.codingninjas.com/codestudio/problems/ninja-and-the-game_1266041?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+string operators = "+-*/" ;
+
+bool helper(vector<double> nums){
+    if(nums.size() == 1){
+        return (abs(nums[0] - 24.00) <= 0.0001) ;
+    }
+    for(int i = 0 ; i < nums.size() ; i++){
+        for(int j = 0 ; j < nums.size() ; j++){
+            if(i == j) continue ;
+            vector<double> next_nums ;
+            for(int k = 0 ; k < nums.size() ; k++){
+                if(k != i and k != j) next_nums.push_back(nums[k]);
+            }
+            for(char op : operators){
+                if((op == '+' or op == '*') and i > j) continue ;
+                if(op == '/' and nums[j] == 0.00) continue ;
+                switch(op){
+                    case '+':
+                        next_nums.push_back(nums[i]+nums[j]) ;
+                        break ;
+                    case '-':
+                        next_nums.push_back(nums[i]-nums[j]) ;
+                        break ;
+                    case '*':
+                        next_nums.push_back(nums[i]*nums[j]) ;
+                        break ;
+                    case '/':
+                        next_nums.push_back(nums[i]/nums[j]) ;
+                        break ;
+                }
+            if(helper(next_nums)) return true ;
+            next_nums.pop_back() ;
+            }
+
+        }
+    }
+}
+bool judge(vector<int> &nums) {
+    // Write your code here.
+    vector<double> arr ;
+    for(int ele : nums){
+        arr.push_back(ele*1.00) ;
+    }
+    return helper(arr);
+}
+```
+
+48. [max length of unqiue concat string](https://www.codingninjas.com/codestudio/problems/string-concatination_2195424?leftPanelTab=0)
+
+```cpp
+#include<bits/stdc++.h>
+bool can_i_include(unordered_set<char> &str , string &s){
+    unordered_set<char> checker(s.begin() , s.end());
+    if(checker.size() != s.size()) return false ;
+    
+    for(char ch : s){
+        if(str.find(ch) != str.end()) return false ;
+    }
+    return true ;
+}
+
+void helper(int &maxlen ,unordered_set<char> curstr , vector<string> &arr, int pos){
+    maxlen = max(maxlen , (int )curstr.size());
+    if(pos == arr.size()) return ;
+    
+    helper(maxlen , curstr , arr , pos+1);
+    
+    if(can_i_include(curstr , arr[pos])){
+        for(char ch : arr[pos]){
+            curstr.insert(ch);
+        }         
+        helper(maxlen , curstr ,arr,pos+1);
+    }
+}
+
+int stringConcatenation(vector<string> &arr)
+{
+    int maxlen  = 0 ;
+    unordered_set<char> curstr ;
+    helper(maxlen ,curstr,arr,0);
+    return maxlen ;
+}
+// OPTIMISATION
+#include<bits/stdc++.h>
+bool can_i_include(vector<char> &charmap ,string &s){
+   for(char ch : s){
+       charmap[ch - 'a']++ ;
+       if(charmap[ch-'a'] > 1) return false ;
+   }
+    return true ;
+}
+
+void helper(int &maxlen,vector<char> charmap,int cur_count,vector<string> &arr, int pos){
+    
+    maxlen = max(maxlen , cur_count);
+    if(pos == arr.size()) return ;
+    
+    helper(maxlen ,charmap ,cur_count , arr , pos+1);
+    
+    if(can_i_include(charmap , arr[pos])){
+        for(char ch : arr[pos]){
+               charmap[ch-'a'] = 1 ;
+        }         
+        helper(maxlen ,charmap , cur_count + arr[pos].size() ,arr,pos+1);
+    }
+}
+
+int stringConcatenation(vector<string> &arr)
+{
+    int maxlen  = 0 ;
+    vector<char> charmap(26 , 0);
+    
+    helper(maxlen ,charmap,0,arr,0);
+    return maxlen ;
+}
+```
+
+49. [All sentence with same order](https://www.codingninjas.com/codestudio/problems/all-sentences-with-same-order_2547165?leftPanelTab=0)
+```cpp
+void helper(int pos , string &str , vector<string> &curpath , vector<vector<string>> &res){
+    if(pos == str.size()){
+        res.push_back(curpath);
+        return ;
+    }
+    //Myself forms a string
+    curpath.push_back(string(1,str[pos]));
+    helper(pos+1 , str , curpath , res);
+    curpath.pop_back();
+    
+    if(curpath.size() != 0){
+        //form with previous str
+        string tt = curpath.back() ; curpath.pop_back() ;
+        tt.push_back(str[pos]);
+        curpath.push_back(tt);
+        helper(pos+1 , str , curpath , res);
+        tt.pop_back();
+        curpath.pop_back();
+        curpath.push_back(tt);
+    }
+    
+}
+vector<vector<string>> allSentences(int n, string s) {
+    vector<string> curpath ;
+    vector<vector<string>> res ;
+    helper(0 , s , curpath , res);
+    return res ;
+}
+```
+
+50. [combinations](https://www.codingninjas.com/codestudio/problems/combinations_3625257?leftPanelTab=0)
+```cpp
+int SIZE ;
+int N ;
+
+void helper(int ele , vector<int> &curpath , vector<vector<int>> &res){
+    if(curpath.size() == SIZE){
+        res.push_back(curpath);
+        return ;
+    }
+    if(ele > N or curpath.size() > SIZE) return ;
+    if((curpath.size() + (N-ele+1)) < SIZE) return ;
+    
+    // include this element
+    curpath.push_back(ele);
+    helper(ele+1 , curpath , res);
+    curpath.pop_back();
+    // don't include this element
+    helper(ele+1 , curpath , res);
+}
+vector<vector<int>> combinations(int n, int k)
+{
+    vector<int> curpath ;
+    vector<vector<int>> res ;
+    SIZE = k ;
+    N = n ;
+    helper(1 ,curpath , res);
+    
+    return res ;
+}
+```

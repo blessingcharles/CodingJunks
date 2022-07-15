@@ -3,55 +3,56 @@
 #include <bits/stdc++.h>
 using namespace std ;
 
-#include<bits/stdc++.h>
-string remover(string board){
-    if(board.size() < 3) return board ;  
-    string res = "" ;
-    int N = board.size() ;
-    
-    for(int i = 0 ; i < board.size() ;i++){
-        if(i < N-2 and board[i] == board[i+1] and board[i] == board[i+2]){
-            i += 2 ;
-        }    
-        else{
-            res.push_back(board[i]);
-        }
-    }
-    cout << board << " " << res << endl ;
-    return res ;
-}
-int helper(string board , string &hand , unordered_set<int> used){
-    board = remover(board);
-    if(board.size() == 0) return 0 ;
-    if(used.size() == hand.size()){
-        return INT_MAX ;
-    }
-    int minlen = INT_MAX ;
-    
-    for(int i = 0 ; i < hand.size() ; i++){
-        if(used.find(i) != used.end()) continue ;
-        used.insert(i);
-        for(int j = 1 ; j < board.size() ; j++){
-            string new_board = remover(board.substr(0,j) + hand[i] + board.substr(j)) ;       
-            minlen = min(minlen , helper(new_board , hand , used));
-        }
-        used.erase(i);
-    }
-    return (minlen == INT_MAX)?minlen:1+minlen ;
-}
-
-int minInsertions(string &board, string &hand) 
+string graphColoring(vector<vector<int>>& adj, int n, int m)
 {
-    unordered_set<int> used ;    
-	int ans = helper(board , hand ,used);
-    return (ans == INT_MAX)?-1:ans ;
+    // two coloring problem
+    vector<vector<int>> graph(n);
+    for(int i = 0 ; i < n ; i++){
+        for(int j = 0 ; j < n ; j++){
+            if(adj[i][j] == 1){
+                graph[i].push_back(j);
+                graph[j].push_back(i);
+            }
+        }
+    }
+    vector<int> colored(n , 1);
+    int maxColor = 1 ;
+    vector<bool> visited(n , false);
+    
+    for(int node = 0 ; node < n ; node++){
+        if(visited[node]) continue ;
+        visited[node] = true ;
+        // Do BFS
+        queue<int> q ;
+        q.push(node) ;
+        while(not q.empty()){
+            int curr = q.front() ; q.pop() ;
+            for(int neigh : graph[curr]){
+                if(colored[curr] == colored[neigh]){
+                    colored[neigh] += 1 ;
+                    maxColor = max({maxColor ,colored[neigh] , colored[curr]});
+                    if(maxColor > m) return "No" ;
+                }
+                if(not visited[neigh]){
+                    visited[neigh] = true ;
+                    q.push(neigh);
+                }
+            }
+        }   
+        
+    }
+    return "Yes" ;
 }
 int main()
 {
-    vector<string> arr = {"of" , "on" , "pon"};
-    vector<vector<char>> bb = {{'g' , 'n'} , {'o' , 'p'}};
-    string b = "GYGG" ;
-    string h = "YY";
-    cout << minInsertions(b,h);
+    vector<vector<int>> gg = {
+        {0,0,0,0,0} ,
+        {0,0,0,0,0} ,
+        {0,0,0,1,0} ,
+        {0,0,1,0,1} , 
+        {0,0,0,1,0} , 
+    }; 
+
+    cout <<  graphColoring(gg , 5 , 2) ;
 
 }
