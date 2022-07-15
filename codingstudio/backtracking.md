@@ -1748,3 +1748,85 @@ vector<vector<int>> combinations(int n, int k)
     return res ;
 }
 ```
+
+51. [unique paths](https://www.codingninjas.com/codestudio/problems/unique-robot-paths_3657116?leftPanelTab=0)
+```cpp
+int M , N ;
+int h ;
+int dx[4] = {1,-1,0,0};
+int dy[4] = {0,0,1,-1};
+
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0 or row >= M or col >= N ;
+}
+
+int helper(int row , int col , int avail_rooms , vector<vector<int>> &arr){
+    if(avail_rooms == 0 and arr[row][col] == 2) return 1 ;
+    if(arr[row][col] == 2) return 0 ;
+    arr[row][col] = -1 ;
+    int ways = 0 ;
+    
+    for(int i = 0 ; i < 4 ; i++){
+        int neigh_r = row + dx[i] ;
+        int neigh_c = col + dy[i] ;
+        
+        if(isInvalid(neigh_r , neigh_c) or arr[neigh_r][neigh_c] == -1){
+            continue ;
+        }
+        if(arr[neigh_r][neigh_c] == 0)
+            ways += helper(neigh_r , neigh_c , avail_rooms-1 , arr);
+        else
+            ways += helper(neigh_r , neigh_c , avail_rooms , arr);
+    }
+    arr[row][col] = 0 ;
+    return ways ;
+}
+int robotPaths(int n, int m, vector<vector<int>> arr) {
+    M = n ; N = m ;
+    int start_r , start_c ;
+    int rooms = 0 ;
+    
+    for(int i = 0 ; i < M ; i++){
+        for(int j = 0 ; j < N ; j++){
+            if(arr[i][j] == 0){
+                rooms++ ;
+            }
+            else if(arr[i][j] == 1){
+                start_r = i ; start_c = j ;
+            }
+        }
+    }
+    return helper(start_r , start_c , rooms , arr);
+}
+```
+
+52. [combination sum 3](https://www.codingninjas.com/codestudio/problems/combination-sum-iii_5038357?leftPanelTab=0)
+```cpp
+int SIZE ;
+
+void helper(int ele , int reqsum , vector<int> &curpath , vector<vector<int>> &res){
+    if(curpath.size() == SIZE and reqsum == 0){
+        res.push_back(curpath);
+        return ;
+    }
+    if(curpath.size() == SIZE or reqsum <= 0 or ele >= 10) return ;
+    
+    //include this element
+    curpath.push_back(ele);
+    helper(ele+1 , reqsum-ele , curpath , res);
+    curpath.pop_back();
+    
+    helper(ele+1 , reqsum, curpath , res);
+}
+
+vector<vector<int>> combinationSum3(int k, int n) {
+    vector<vector<int>> res ;
+    vector<int> curpath ;
+    if(n > 45) return res ;
+    SIZE = k ;
+    helper(1 , n , curpath , res);
+    return res ;
+}
+```
+
+53. 
