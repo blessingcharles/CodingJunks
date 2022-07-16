@@ -941,3 +941,275 @@ BinaryTreeNode<int> *modifyTree(BinaryTreeNode<int> *root, int low, int high) {
     return root ;
 }
 ```
+
+34. [flip equivalent bt](https://www.codingninjas.com/codestudio/problems/flip-equivalent-binary-tree_1234687?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+bool flipEquivalent(TreeNode<int> *root1, TreeNode<int> *root2) {
+    if(not root1 and not root2) return true ;
+    if(not root1 or not root2) return false ;
+    if(root1->data != root2->data) return false ;
+    
+    int op1 = flipEquivalent(root1->left , root2->left) and flipEquivalent(root1->right , root2->right);
+    if(op1) return true ;
+    int op2 = flipEquivalent(root1->right , root2->left) and flipEquivalent(root1->left , root2->right);
+    return op2 ;
+}
+```
+
+35. [max diff between node and ancestors](https://www.codingninjas.com/codestudio/problems/maximum-difference-between-node-and-ancestor_980227?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+void helper(BinaryTreeNode<int>* root , int maxval , int minval , int &maxdiff){
+    if(not root) return ;
+    maxdiff = max(maxdiff , abs(root->data - minval));
+    maxdiff = max(maxdiff , abs(root->data - maxval));
+    helper(root->left , max(maxval , root->data) , min(minval , root->data) , maxdiff);
+     helper(root->right , max(maxval , root->data) , min(minval , root->data) , maxdiff);
+    
+}
+int maxAncestorDiff(BinaryTreeNode<int>* root) {
+    int maxdiff = 0 ;
+    
+    if(not root) return 0 ;
+    helper(root->left ,root->data , root->data , maxdiff );
+    helper(root->right ,root->data , root->data , maxdiff );
+    return maxdiff ;
+}
+```
+
+36. [count nodes](https://www.codingninjas.com/codestudio/problems/count-complete-binary-tree-nodes_982774?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+int countNodes(TreeNode<int> *root)
+{
+    if(not root) return 0 ;
+    return 1 + countNodes(root->left) + countNodes(root->right) ;
+}
+```
+
+37. [corresponding node in bt](https://www.codingninjas.com/codestudio/problems/confusing-number_1235244?topList=top-trees-interview-questions)
+```cpp
+TreeNode<int>* helper(TreeNode<int> *root , int target){
+    if(not root) return NULL ;
+    if(root->val == target){
+        return root ;
+    }
+    TreeNode<int>* ls = helper(root->left , target);
+    if(ls) return ls ;
+    return helper(root->right , target);
+}
+TreeNode<int>* getCloneNode(TreeNode<int>* original, TreeNode<int>* cloned, TreeNode<int>* node) {
+    return helper(cloned , node->val) ;
+}
+```
+
+38. [closest leaf](https://www.codingninjas.com/codestudio/problems/closest-leaf-to-given-node-in-binary-tree_983627?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+BinaryTreeNode<int> *start ;
+void helper(BinaryTreeNode<int> *root, int target ,unordered_map<BinaryTreeNode<int> * ,BinaryTreeNode<int> *> &parents){
+    queue<BinaryTreeNode<int> *> q ;
+    q.push(root);
+    while(not q.empty()){
+        root = q.front() ; q.pop() ;
+        if(root->data == target){
+            start = root ;
+        }
+        if(root->left){
+            parents[root->left] = root ;
+            q.push(root->left);
+        }
+        if(root->right){
+            parents[root->right] = root ; 
+            q.push(root->right);
+        }
+    }
+}
+int findClosestLeafNodeDistance(BinaryTreeNode<int> *root, int x) {
+    unordered_map<BinaryTreeNode<int> * ,BinaryTreeNode<int> *> parents ;
+    start = NULL ;
+    parents[root] = NULL ;
+    helper(root , x , parents);
+    queue<BinaryTreeNode<int> *> q ;
+    q.push(start) ;
+    int level = 0 ;
+    unordered_set<BinaryTreeNode<int> *> visited ;
+    if(not start) return -1 ;
+    
+    visited.insert(start) ;  
+    BinaryTreeNode<int> *pp , *curr ;
+    
+    while(not q.empty()){
+        int sz = q.size() ;
+        while(sz--){
+            curr = q.front() ; q.pop() ;
+            if(not curr->left and not curr->right) return level ;
+            if(curr->left and visited.find(curr->left) == visited.end()){
+                q.push(curr->left);
+                visited.insert(curr->left);
+            }
+            if(curr->right and visited.find(curr->right) == visited.end()){
+                q.push(curr->right);
+                visited.insert(curr->right);
+            }
+            pp = parents[curr];
+            if(pp and visited.find(pp) == visited.end()){
+                visited.insert(pp);
+                q.push(pp);
+            }
+        }
+        level++ ;
+    }
+    return -1 ;
+}
+```
+
+39. [sum root to leaf](https://www.codingninjas.com/codestudio/problems/sum-root-to-leaf_1095657?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+long mod = 1e9+7 ;
+
+void helper(BinaryTreeNode<int> *root , long cursum , long &totalsum){
+    if(not root) return ;
+    cursum = (cursum*10)%mod+root->data ;
+
+    if(not root->left and not root->right){
+        totalsum = (totalsum+cursum)%mod ;
+        return ;    
+    }
+    helper(root->left , cursum , totalsum);
+    helper(root->right , cursum , totalsum);
+}
+int rootToLeafSum( BinaryTreeNode<int>* root) {
+    long totalsum = 0 ;
+    helper(root , 0 , totalsum);
+    return totalsum ;
+}
+```
+
+40. [flatten bt to linked list](https://www.codingninjas.com/codestudio/problems/flatten-binary-tree-to-linked-list_1112615?topList=top-trees-interview-questions)
+```cpp
+void flatten(TreeNode<int> *root){
+    if(not root) return ;
+    flatten(root->left) ;
+    flatten(root->right) ;
+    while(root->left){
+        TreeNode<int> *tt = root->right ;
+        root->right = root->left ;
+        while(root->right){
+            root = root->right ;
+        }
+        root->right = tt ;
+        root->left = NULL ;
+    }
+}
+TreeNode<int> *flattenBinaryTree(TreeNode<int> *root)
+{
+    flatten(root);
+    return root ;
+}
+```
+
+41. [path sum 3](https://www.codingninjas.com/codestudio/problems/number-of-ways-for-the-sum-k_1164407?topList=top-trees-interview-questions)
+```cpp
+#include<bits/stdc++.h>
+int target ;
+
+void helper(TreeNode<int> *root , unordered_map<int,int> &memo , int &count , int cursum){
+    if(not root) return ;
+    cursum = cursum + root->data ;
+    count += memo[cursum - target] ;
+    memo[cursum]++ ;
+    helper(root->left , memo , count , cursum);
+    helper(root->right , memo , count , cursum);
+    memo[cursum]-- ;
+}
+int noWays(TreeNode < int > * root, int k) {
+    unordered_map<int , int> memo ;
+    target = k ;
+    memo[0] = 1 ;
+    int count = 0 ;
+    helper(root , memo , count , 0);
+    return count ;
+}
+```
+
+42. [range sum of bst](https://www.codingninjas.com/codestudio/problems/range-sum-of-bst_1262280?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+int low , high ;
+void helper(TreeNode<int> *root , int &totalsum){
+    if(not root) return ;
+    if(root->data > high){
+        // may be left side
+        helper(root->left , totalsum);
+        return ;
+    }
+    if(root->data < low){
+        helper(root->right , totalsum) ;
+        return ;
+    }
+    totalsum += root->data ;
+    helper(root->left , totalsum);
+    helper(root->right , totalsum);
+    
+}
+int rangeSum(TreeNode<int> *root, int l, int h)
+{
+    low = l ; high = h ;
+    int totalsum = 0 ;
+    helper(root , totalsum);
+    return totalsum ;
+}
+```
+
+43. [bst to sorted dll](https://www.codingninjas.com/codestudio/problems/bst-to-sorted-dll_1263694?topList=top-trees-interview-questions&leftPanelTab=0)
+
+```cpp
+void helper(TreeNode<int> *root , vector<TreeNode<int>* > &inorder){
+    if(not root) return ;
+    helper(root->left , inorder);
+    inorder.push_back(root);
+    helper(root->right ,inorder);
+}
+TreeNode<int>* bstToSortedDLL(TreeNode<int> *root)
+{
+    if(not root) return root ;
+    vector<TreeNode<int>* > inorder ;
+    helper(root , inorder);
+    inorder[0]->left = NULL ;
+    
+    if(inorder.size() > 1){
+        inorder[0]->right = inorder[1] ;
+    }
+    for(int i = 1 ; i < inorder.size()-1 ; i++){
+        inorder[i]->left = inorder[i-1] ;
+        inorder[i]->right = inorder[i+1] ;
+    }
+    if(inorder.size() > 1){
+        inorder.back()->right = NULL ;
+        inorder.back()->left = inorder[inorder.size()-2] ;
+    }
+    return inorder[0] ;
+}
+
+// OPTIMISATION
+TreeNode<int> *head ;
+void helper(TreeNode<int> *root , TreeNode<int>* &prev){
+    if(not root) return ;
+    helper(root->left , prev) ;
+    if(not head){
+        head = root ;
+    }
+    else{
+        prev->right = root ;
+        root->left = prev ;
+    }
+    prev = root ;
+    helper(root->right , prev);
+}
+TreeNode<int>* bstToSortedDLL(TreeNode<int> *root)
+{
+    if(not root) return root ;
+    head = NULL ;
+    TreeNode<int> *prev = NULL ;
+    helper(root , prev);
+    return head ;
+}
+```
