@@ -1213,3 +1213,487 @@ TreeNode<int>* bstToSortedDLL(TreeNode<int> *root)
     return head ;
 }
 ```
+
+44. [populating next right ptr](https://www.codingninjas.com/codestudio/problems/populating-next-right-pointers-in-each-node_1263696?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+void connectNext(TreeNode<int> *root){
+    if(not root) return ;
+    queue<TreeNode<int> *> q ;
+    q.push(root);
+    TreeNode<int> *curr ;
+    
+    while(not q.empty()){
+        int sz = q.size() ;
+        while(sz--){
+            curr = q.front() ; q.pop() ;
+            if(curr->left){
+                q.push(curr->left);
+            }
+            if(curr->right){
+                q.push(curr->right);
+            }
+            if(sz != 0){
+                curr->next = q.front() ;
+            }
+        }
+    }
+}
+```
+
+45. [merge bt](https://www.codingninjas.com/codestudio/problems/fasdf_1263729?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+BinaryTreeNode* mergeTrees(BinaryTreeNode* root1, BinaryTreeNode* root2)
+{
+    if(not root2){
+        return root1 ;
+    }
+    if(not root1){
+        return root2 ;
+    }
+    root1->data += root2->data ;
+    root1->left = mergeTrees(root1->left , root2->left) ;
+    root1->right = mergeTrees(root1->right , root2->right) ;
+    return root1 ;
+}
+```
+
+46. [print bt](https://www.codingninjas.com/codestudio/problems/print-binary-tree_1266040?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int maxdepth(TreeNode<int> *root){
+    if(not root) return 0 ;
+    return 1+max(maxdepth(root->left) ,maxdepth(root->right));
+}
+void helper(int level , int left , int right , TreeNode<int> *root , vector<vector<string>> &mat){
+    if(not root) return  ;
+    int mid = left + (right - left)/2 ;
+    mat[level][mid] = to_string(root->data) ;
+    helper(level+1 , left , mid-1 , root->left , mat);
+    helper(level+1 , mid+1 , right , root->right , mat);
+}
+
+vector<vector<string>> printTree(TreeNode<int> *root) {
+    int R = maxdepth(root);
+    int C = pow(2 , R) - 1 ;
+    vector<vector<string>> mat(R , vector<string>(C , "")) ;
+    helper(0 , 0 , C-1 , root , mat);    
+    return mat ;
+}
+```
+
+47. [min cost tree from leaf nodes]()
+```cpp
+#include<bits/stdc++.h>
+int max_arr(vector<int> &arr , int l , int r){
+    int max_ele = arr[l] ;
+    for(int i = l+1 ; i <= r ; i++){
+        max_ele = max(max_ele , arr[i]);
+    }
+    return max_ele ;
+}
+
+int helper(vector<int> &arr , int left , int right , vector<vector<int>> &memo){
+    if(left >= right) return 0 ;
+    if(memo[left][right] != -1) return memo[left][right] ;
+    
+    int res = INT_MAX ;
+    for(int i = left ; i < right ; i++){
+        int left_leaves = max_arr(arr , left , i);
+        int right_leaves = max_arr(arr ,i+1 , right);
+        
+        res = min(res , left_leaves*right_leaves + helper(arr , left , i,memo) + helper(arr , i+1 , right , memo));
+    }
+    return memo[left][right] = res ;
+}
+int minimumCostTreeFromLeafNodes(vector<int> &arr){
+    vector<vector<int>> memo(arr.size() , vector<int>(arr.size() , -1));
+    return helper(arr , 0 , arr.size()-1 , memo);
+}
+```
+
+48. [distributing coins](https://www.codingninjas.com/codestudio/problems/distributing-coins_1266092?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+int moves = 0 ;
+int helper(BinaryTreeNode* root){
+    if(not root) return  0 ;
+    int ls = helper(root->left) ;
+    int rs = helper(root->right) ;
+    moves += abs(ls) + abs(rs) ;
+    return root->data + ls + rs - 1 ;
+}
+int distributeCoins(BinaryTreeNode* root)
+{
+    moves = 0 ;
+    helper(root);
+    return moves ;
+}
+```
+
+49. [max bt](https://www.codingninjas.com/codestudio/problems/maximum-tree_1266104?topList=top-trees-interview-questions)
+```cpp
+int maxidx(vector<int> &arr , int l , int r){
+    int max_idx = l ;
+    for(int i = l+1 ; i <= r ; i++){
+        if(arr[max_idx] < arr[i]){
+            max_idx = i ;
+        }
+    }
+    return max_idx ;
+}
+BinaryTreeNode<int> *helper(vector<int> &tree , int l , int r){
+    if(l > r) return NULL ;
+    if(l == r){
+        return new BinaryTreeNode<int>(tree[l]);
+    }
+    int m_idx = maxidx(tree , l ,r);
+    BinaryTreeNode<int>* root = new BinaryTreeNode<int>(tree[m_idx]) ;
+    root->left = helper(tree , l , m_idx-1);
+    root->right = helper(tree , m_idx+1 , r);
+    return root ;
+}
+BinaryTreeNode<int> *constructMaximumBinaryTree(vector<int> &tree, int n) {
+    return helper(tree , 0 , n-1);
+}
+```
+50. [bt from inorder and postorder](https://www.codingninjas.com/codestudio/problems/construct-binary-tree-from-inorder-and-postorder-traversal_1266106?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+TreeNode<int>* helper(int left , int right , int &pos , vector<int> &post , unordered_map<int,int> &memo){
+    if(left > right) return NULL ;
+    if(left == right){
+        return new TreeNode<int>(post[pos--]);
+    }
+    int ele = post[pos--] ;
+    TreeNode<int> *root = new TreeNode<int>(ele);
+    root->right = helper(memo[ele]+1 , right , pos , post , memo );
+    root->left = helper(left , memo[ele]-1 , pos , post , memo);
+    return root ;
+}
+TreeNode<int>* getTreeFromPostorderAndInorder(vector<int>& postOrder, vector<int>& inOrder) 
+{
+    unordered_map<int,int> memo ;
+    for(int i = 0 ; i < inOrder.size() ; i++){
+        memo[inOrder[i]] = i ;
+    }
+    
+    int pos = postOrder.size()-1 ;
+    return helper(0 , pos , pos , postOrder , memo) ;
+}
+```
+
+51. [unique bst]()
+```cpp
+#include<bits/stdc++.h>
+unordered_map<int,long long> memo ;
+
+long long int numTrees(int n) 
+{
+    if(n <= 1) return 1 ;
+    if(memo.find(n) != memo.end()) return memo[n] ;
+    long long res = 0 ;
+    for(int i = 0 ; i < n ; i++){
+        res += numTrees(i)*numTrees(n-i-1) ;
+    }
+    
+    return memo[n] = res ;
+}
+```
+
+52. [ballons game](https://www.codingninjas.com/codestudio/problems/balloons-game_1279641?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int maxval = 0 ; 
+int maxele ;
+void traverse(Balloons<int> *root , unordered_map<int,int> &memo){
+    if(not root) return ;
+    memo[root->data]++ ;
+    if(memo[root->data] > maxval){
+        maxval = memo[root->data] ;
+        maxele = root->data ;
+    }
+    else if(memo[root->data] == maxval){
+        maxele = min(maxele , root->data);
+    }
+    traverse(root->left , memo);
+    traverse(root->right , memo);
+}
+
+int balloonsGame(Balloons<int> *root)
+{
+    unordered_map<int,int> memo ;
+    maxval = 0 ;
+    traverse(root , memo);
+    return maxele ;
+}
+```
+
+53. [break the tree](https://www.codingninjas.com/codestudio/problems/break-the-tree_1279898?topList=top-trees-interview-questions&leftPanelTab=3)
+```cpp
+long long totalsum = 0 ;
+long long maxproduct = 0 ;
+
+void getsum(TreeNode<int> *root){
+    if(not root) return ;
+    totalsum += root->data ;
+    getsum(root->left);
+    getsum(root->right);
+}
+
+int findMax(TreeNode<int> *root){
+    if(not root) return 0 ;
+   
+    int subtreesum = root->data + findMax(root->left) + findMax(root->right) ;
+    long long rem = totalsum - subtreesum ;
+    maxproduct = max(maxproduct , rem*(subtreesum));
+    return subtreesum ;
+}
+int maxProduct(TreeNode<int> *root)
+{
+    totalsum = 0 ;
+    maxproduct = 0 ;
+    getsum(root);
+    findMax(root);
+    int mod = 1e9+7 ;
+    return maxproduct%mod ;
+}
+```
+54. [insertion in bst](https://www.codingninjas.com/codestudio/problems/insert-into-a-binary-search-tree_1279913?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+TreeNode<int>* insertionInBST(TreeNode<int>* root, int val)
+{
+    if(not root) return new TreeNode<int>(val) ;
+    
+    if(root->val < val){
+        root->right = insertionInBST(root->right , val);
+    }
+    else{
+        root->left = insertionInBST(root->left ,val);
+    }
+    return root ;
+} 
+```
+
+55. [bt from pre and post](https://www.codingninjas.com/codestudio/problems/create-a-binary-tree-from-postorder-and-preorder-traversal_1279921?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+Node* build(int l1, int r1, vector<int> &preorder , vector<int> &postorder , unordered_map<int,int> &pre , unordered_map<int,int> &post){
+    if(l1 > r1) return NULL ;
+    if(l1 == r1) return new Node(preorder[l1]) ;
+    
+    Node* root = new Node(preorder[l1]) ;
+    int middle = pre[postorder[post[preorder[l1]]-1]] ;
+    root->left = build(l1+1 , middle-1 ,preorder , postorder , pre,post);
+    root->right = build(middle , r1 , preorder , postorder , pre , post);
+    return root ;
+}
+Node* createTreeFromPostPre(vector<int> postorder, vector<int> preorder, int n) {
+    unordered_map<int , int> pre ;
+    unordered_map<int,int> post ;
+    for(int i = 0 ; i < postorder.size() ; i++){
+        pre[preorder[i]] = i ;        
+        post[postorder[i]] = i ;
+    }
+    
+    return build(0 , n-1 , preorder , postorder , pre , post);
+}
+```
+
+56. [lca of bt](https://www.codingninjas.com/codestudio/problems/lowest-common-ancestor-of-a-binary-tree-iii_1280134?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+BinaryTreeNode<int> *leastCommonAncestor(BinaryTreeNode<int> *n1, BinaryTreeNode<int> *n2)
+{  
+    unordered_set<BinaryTreeNode<int> *> arr ;
+    while(n1){
+        arr.insert(n1);
+        n1 = n1->parent ;
+    }
+    while(n2){
+        if(arr.find(n2) != arr.end()) return n2 ;
+        n2 = n2->parent ;
+    }
+    return NULL ;
+}
+```
+
+57. [equal tree partition](https://www.codingninjas.com/codestudio/problems/equal-tree-partition_1280137?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+long totalsum = 0 ;
+long halfsum = 0 ;
+void getsum(TreeNode<int> *root){
+    if(not root) return ;
+    totalsum += root->data ;
+    getsum(root->left);
+    getsum(root->right);
+}
+pair<int ,bool> helper(TreeNode<int> *root){
+    if(not root) return {0,false} ;
+    
+    pair<int,bool> ls = helper(root->left);
+    if(ls.second) return {0,true};
+    pair<int,bool> rs = helper(root->right);
+    if(rs.second) return {0 , true};
+    int subtreesum = root->data + ls.first + rs.first ;
+    if(subtreesum == halfsum) return {0,true};
+    return {subtreesum , false};
+}
+
+bool checkEqualTree(TreeNode<int> *root) {
+    totalsum = 0 ;
+    getsum(root);
+    if((totalsum&1) == 1) return false ;
+    halfsum = totalsum/2 ;
+    return helper(root).second ;
+}
+```
+
+58. [house robber 3](https://www.codingninjas.com/codestudio/problems/amusement-park_1280139?topList=top-trees-interview-questions&leftPanelTab=1)
+```cpp
+// DP
+int helper(BinaryTreeNode<int>* root , bool canIplay , unordered_map<BinaryTreeNode<int> * ,pair<bool , int>> &memo){
+    if(not root) return 0 ;
+    if(memo.find(root) != memo.end() and memo[root].first == canIplay){
+        return memo[root].second ;
+    }
+    int res = 0 ;
+    
+    if(canIplay){
+        res += root->data ;
+        res += helper(root->left , false , memo) + helper(root->right ,false , memo);
+    }
+    // can't play now
+    int notPlay = helper(root->left , true , memo) + helper(root->right , true , memo);
+    res = max(res , notPlay);
+    memo[root] = {canIplay , res};
+    
+    return res ;
+}
+
+int fun(BinaryTreeNode<int>* root)
+{
+    unordered_map<BinaryTreeNode<int> * ,pair<bool , int>> memo ;
+    return helper(root , true , memo);    
+}
+// OPTIMISATION
+pair<int,int> helper(BinaryTreeNode<int>* root){
+    if(not root) return {0,0} ;
+    
+    pair<int,int> ls = helper(root->left);
+    pair<int,int> rs = helper(root->right);
+    
+    int withRoot = root->data + ls.second + rs.second ;
+    int withOutRoot = max(ls.first, ls.second) + max(rs.first , rs.second);
+    
+    return {withRoot , withOutRoot} ;
+}
+
+int fun(BinaryTreeNode<int>* root)
+{
+    pair<int,int> res = helper(root);
+    return max(res.first , res.second);
+}
+```
+
+59. [check if bt is complete](https://www.codingninjas.com/codestudio/problems/check-whether-binary-tree-is-complete_1280147?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int isCompleteBinaryTree(TreeNode<int> *root)
+{
+    queue<TreeNode<int> *> q ;
+    q.push(root);
+    int req_nodes = 1 ;
+    while(not q.empty()){
+        int nodes_count = 0 ;
+        int sz = q.size() ;
+        bool null_occured = false ;
+        while(sz--){
+            TreeNode<int>* root = q.front() ; q.pop() ;
+            nodes_count++ ;
+            if(root->left){
+                if(null_occured) return false ;
+                q.push(root->left);
+            }
+            else null_occured = true ;
+            if(root->right){
+                if(null_occured) return false ;
+                q.push(root->right) ;
+            }
+            else null_occured = true ;
+        }
+        if(not q.empty() and nodes_count != req_nodes) return false ;
+        req_nodes = req_nodes << 1 ;        
+    }
+    return 1 ;
+}
+```
+
+60. [collect leaves](https://www.codingninjas.com/codestudio/problems/collect-leaves_1281192?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+unordered_map<BinaryTreeNode<int> * , int > childcount ;
+unordered_map<BinaryTreeNode<int> * ,BinaryTreeNode<int>*> parent ;
+
+void findLeafs(BinaryTreeNode<int> *root , queue<BinaryTreeNode<int> *> &q){
+    if(not root) return ;
+    if(not root->left and not root->right){
+        q.push(root);
+        return ;
+    }
+    if(root->left){
+        parent[root->left] = root ;
+        childcount[root]++ ;
+        findLeafs(root->left , q);        
+    }
+    if(root->right){
+        parent[root->right] = root ;
+        childcount[root]++ ;
+        findLeafs(root->right , q);
+    }
+}
+
+vector<vector<int>> collectLeaves(BinaryTreeNode<int> *root) {
+    vector<vector<int>> res ;
+    if(not root) return res ;
+    queue<BinaryTreeNode<int> *> q ;
+    childcount.clear() ;
+    parent.clear() ;
+    parent[root] = NULL ;
+    
+    findLeafs(root , q );
+    while(not q.empty()){
+        int sz = q.size() ;
+        vector<int> temp ;
+        while(sz--){
+            root = q.front() ; q.pop() ;
+            temp.push_back(root->data) ;
+            
+            BinaryTreeNode<int>* pp = parent[root] ; 
+            if(not pp) continue ;
+            childcount[pp]-- ;
+            if(childcount[pp] == 0){
+                q.push(pp);
+            }
+        }
+        res.push_back(temp);
+    }
+    return res ;
+}
+```
+
+61. [nodes in complete bt](https://www.codingninjas.com/codestudio/problems/nodes-in-complete-binary-tree_1281151?topList=top-trees-interview-questions&leftPanelTab=0)
+```cpp
+int countNodes(BinaryTreeNode<int> *root) {
+    if(not root) return 0 ;
+    int ls = 0 , rs = 0 ;
+    BinaryTreeNode<int> *l = root , *r = root ;
+    while(l){
+        ls++ ; l = l->left ;
+    }
+    while(r){
+        rs++ ; r = r->right ;
+    }
+    if(ls==rs) return (1<<ls)-1 ;
+    return 1+countNodes(root->left)+countNodes(root->right) ;
+}
+```
