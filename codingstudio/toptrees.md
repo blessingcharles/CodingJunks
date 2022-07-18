@@ -2250,3 +2250,40 @@ int maxPathSum(TreeNode<int>* root)
    return ans ;
 }
 ```
+
+79. [serialize and deserialize n array tree](https://www.codingninjas.com/codestudio/problems/serialize-and-deserialize-an-n-ary-tree_1376416?leftPanelTab=1)
+```cpp
+#include<bits/stdc++.h>
+void serialize(TreeNode<int> *root , string &res){
+    res += "," + to_string(root->data) ;
+    for(TreeNode<int> *ch : root->child){
+        serialize(ch , res);
+    }
+    res+= ",#" ;
+} 
+TreeNode<int> *deserialize(int &pos , vector<string> &arr){
+    if(arr[pos] == "#") return NULL ;
+    TreeNode<int> *root = new TreeNode<int>(stoi(arr[pos++]));
+    while(true){
+        TreeNode<int> *child = deserialize(pos , arr);
+        if(child == NULL) break ;
+        root->child.push_back(child);
+    }
+    pos++ ;
+    return root ;
+}
+TreeNode<int> *SerDeser(TreeNode<int> *root)
+{
+    string res = "" ;
+    serialize(root , res);
+    res = res.substr(1) ;
+    vector<string> arr ;
+    string tt ;
+    stringstream ss(res);
+    while(getline(ss , tt , ',')){
+        arr.push_back(tt);
+    }
+    int pos = 0 ;
+    return deserialize(pos , arr);
+}
+```
