@@ -593,3 +593,390 @@ public:
     }
 };
 ```
+
+17. [distinct subsequences](https://leetcode.com/problems/distinct-subsequences-ii/submissions/)
+```cpp
+class Solution {
+public:
+int mod = 1e9+7 ;
+int helper(int pos , string &str , vector<int> &memo){
+    if(pos >= str.size()) return 1 ;
+    if(memo[pos] != -1) return memo[pos] ;
+    
+    int ans = 1 ;
+    unordered_set<char> charmap ;    
+    for(int i = pos ; i < str.size() ; i++){
+        if(charmap.find(str[i]) != charmap.end()) continue ;
+        charmap.insert(str[i]);
+        ans = (ans+helper(i+1 , str , memo))%mod;
+    }
+    return memo[pos] = ans%mod ;
+}
+    int distinctSubseqII(string s) {
+        vector<int> memo(s.size() , -1);
+        return helper(0 , s , memo)-1 ;
+    }
+};
+#include<bits/stdc++.h>
+int mod = 1e9+7 ;
+
+int distinctSubsequences(string s) 
+{
+    unordered_map<char , long long> prev ;
+    vector<long long> counts(s.size()+1 , 0);
+    counts[0] = 1 ;
+    for(int i = 1 ; i <= s.size() ; i++){
+        counts[i] = (counts[i-1]*2)%mod ;
+        if(prev.find(s[i-1]) != prev.end()){
+            counts[i] -= counts[prev[s[i-1]]] ;
+        }
+        prev[s[i-1]] = i-1 ;
+    }    
+    
+    int n = s.size() ;
+    if(counts[n]%mod > 0) return counts[n]%mod ;
+    return (counts[n]%mod+mod) ;
+}
+```
+
+18. [rod cutting problem](https://www.codingninjas.com/codestudio/problems/rod-cutting-problem_800284?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+int helper(int ele , int curlen , vector<int> &price , vector<vector<int>> &memo){
+    if(ele == 0 or curlen == 0) return 0 ;
+    if(memo[ele][curlen] != -1) return memo[ele][curlen];
+    
+    
+    //can we cut the element from curlen
+    int op1 = 0 ;
+    if(curlen-ele >= 0){
+        op1 = price[ele-1] + helper(ele , curlen-ele , price , memo);
+    }
+    return memo[ele][curlen] = max(op1 , helper(ele-1 , curlen , price , memo));
+}
+int cutRod(vector<int> &price, int n)
+{
+    vector<vector<int>> memo(n+1 , vector<int>(n+1 ,-1));
+    return helper(n , n , price , memo);
+}
+```
+
+19. [dice throws](https://www.codingninjas.com/codestudio/problems/dice-throws_799924?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int FACE ;
+long mod = 1e9+7 ;
+
+int helper(int dice , int target , vector<vector<int>> &memo){
+    if(target == 0 and dice == 0) return 1 ;
+    if(target <= 0 or dice <= 0) return 0 ;
+    
+    if(memo[dice][target] != -1) return memo[dice][target] ;
+    
+    
+    long ans = 0 ;
+    for(int i = 1 ; i <= FACE ; i++){
+        ans = (ans + helper(dice-1 , target-i , memo))%mod ;
+    }
+    return memo[dice][target] = ans;
+}
+int diceThrows(int d, int f, int s) {
+    FACE = f ;
+    vector<vector<int>> memo(d+1 , vector<int>(s+1 , -1));
+    return helper(d , s , memo);
+}
+```
+20. [avoiding traps](https://www.codingninjas.com/codestudio/problems/avoiding-traps_839704?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+int avoidTraps(vector<int>& obstacles, int n) 
+{
+    if(obstacles.size() == 0) return 1 ;
+    
+    int i = 2 ;
+    while(true){
+        bool flag = true ;
+        for(int ob : obstacles){
+            if(ob%i == 0){
+                flag = false ;
+                break ;
+            }
+        }
+        if(flag) return i ;
+        i++ ;
+    }
+    return -1 ;
+}
+```
+21. [house robber 2](https://www.codingninjas.com/codestudio/problems/house-robber_839733?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+long long int helper(int start, int pos , vector<int>& house , bool isfirst , vector<vector<long long int>> &memo){
+    if(pos == start) return house[start] ;
+    if(pos < start) return 0 ;
+    if(memo[pos][isfirst] != -1) return memo[pos][isfirst] ;
+    
+    return memo[pos][isfirst] = max(helper(start , pos-2 , house , isfirst , memo)+house[pos],helper(start , pos-1 , house , isfirst , memo));    
+}
+long long int houseRobber(vector<int>& house)
+{
+    
+    int N = house.size() ;
+    if(N == 1) return house[0] ;
+    
+    vector<vector<long long int>> memo(N , vector<long long int>(2, -1));    
+    return max(helper(0 ,N-2 , house , true , memo) , helper(1 , N-1 , house , false , memo));
+}
+```
+22. [kth ancestor in bt](https://www.codingninjas.com/codestudio/problems/kth-ancestor-of-a-node-in-binary-tree_842561?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int T ;
+bool helper(BinaryTreeNode<int> *root , vector<int> &ancestors){
+    if(not root) return false ;
+    if(root->data == T) return true ;
+    ancestors.push_back(root->data);
+
+    if(helper(root->left , ancestors)) return true ;
+    if(helper(root->right , ancestors)) return true ;
+    ancestors.pop_back();
+    return false ;
+}
+int findKthAncestor(BinaryTreeNode<int> *root, int target, int k) {
+    vector<int> ancestors ;
+    T = target ;
+    helper(root , ancestors);
+    if(ancestors.size() < k) return -1 ;
+    return ancestors[ancestors.size()-k] ;    
+}
+```
+23. [ways to arrange balls](https://www.codingninjas.com/codestudio/problems/ways-to-arrange-balls_845177?topList=top-dynamic-programming-questions)
+```cpp
+#include<bits/stdc++.h>
+#define N 16
+long long int memo[16][16][16][4] ;
+long long int helper(int a , int b , int c , int prev_idx){
+    if(a == 0 and b == 0 and c == 0) return 1 ;
+    if(memo[a][b][c][prev_idx+1] != -1)
+         return memo[a][b][c][prev_idx+1] ;
+    
+    long long int ans = 0 ;
+    if(a > 0 and (prev_idx == -1 or prev_idx != 0) ){
+        ans += helper(a-1 , b , c , 0);
+    }
+    if(b > 0  and (prev_idx == -1  or prev_idx != 1) ){
+        ans += helper(a , b-1 , c , 1);
+    }
+    if(c > 0  and ( prev_idx == -1 or prev_idx != 2) ){
+        ans += helper(a , b , c-1 , 2);
+    }
+    return memo[a][b][c][prev_idx+1] = ans ;
+}
+long long int totalWays(int a, int b, int c)
+{
+    memset(memo ,-1 ,sizeof(memo) );
+    return helper(a,b,c,-1);
+}
+```
+
+24. [longest pal subsequence](https://www.codingninjas.com/codestudio/problems/longest-palindromic-subsequence_842787?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int dp[101][101] ;
+
+int helper(int left , int right , string &s){
+    if(left == right) return 1 ;
+    if(left > right) return 0 ;
+    if(dp[left][right] != -1) return dp[left][right] ;
+    if(s[left] == s[right]) 
+        return dp[left][right]=2+helper(left+1 , right-1 , s);
+    
+    return dp[left][right]=max(helper(left+1 , right , s ) , helper(left , right-1 , s));
+}
+int longestPalindromeSubsequence(string s){
+    memset(dp , -1 , sizeof(dp));
+    return helper(0 , s.size()-1 , s);    
+}
+```
+
+25. [no of dearrangements](https://www.codingninjas.com/codestudio/problems/count-derangements_873861?topList=top-dynamic-programming-questions&leftPanelTab=1)
+```cpp
+#include<bits/stdc++.h>
+unordered_map<int , long long int> memo ;
+long long int mod = 1e9+7 ;
+
+long long int helper(int n){
+    if(n == 1) return 0 ;
+    if(n == 2) return 1 ;
+    if(memo.find(n) != memo.end()) return memo[n] ;
+    
+    return memo[n] = ((n-1)*(helper(n-1)%mod + helper(n-2)%mod)%mod)%mod ;
+}
+long long int countDerangements(int n) {
+   return helper(n) ;
+}
+```
+
+26. [minimum no of taps to water](https://www.codingninjas.com/codestudio/problems/minimum-number-of-taps-to-water-garden_873369?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int memo[10000+1] ;
+int N ;
+
+int helper(int pos , vector<pair<int,int>> &arr){
+        if(pos >= N-1) return 0 ;
+        if(memo[pos] != -1) return memo[pos] ;
+        
+        int ans = INT_MAX ;
+        for(int i = pos ; i < N ; i++){
+            if(arr[i].first > pos) break ;
+            
+            for(int nxt = i+1 ;nxt <= arr[i].second ; nxt++){
+                
+                if(nxt > N) break ;
+                
+                int res = helper(nxt , arr);
+                if(res == INT_MAX) continue ;
+                ans = min(ans , 1+res);
+            }
+        }
+        return memo[pos] = ans ;
+}
+int minimumTapsToFillGarden(vector<int> &ranges, int n) {
+        vector<pair<int,int>> arr(n+1) ;
+        N = n+1 ;
+        memset(memo , -1 , sizeof(memo));
+    
+        for(int i = 0 ; i <= n ; i++){
+            arr[i] = {i-ranges[i] , i+ranges[i]} ;
+        }
+        sort(arr.begin() , arr.end());
+        int ans = helper(0 , arr) ;
+        return (ans == INT_MAX)?-1:ans ;
+}
+
+// OPTIMISATION
+#include<bits/stdc++.h>
+int minimumTapsToFillGarden(vector<int> &ranges, int n) {
+        vector<pair<int,int>> arr(n+1) ;
+        int N = n+1 ;
+    
+        for(int i = 0 ; i <= n ; i++){
+            arr[i] = {i-ranges[i] , i+ranges[i]} ;
+        }
+        sort(arr.begin() , arr.end());
+        int end = 0 , farCanReach = 0 ;
+        int cnt = 0 ;
+    
+        for(int start = 0 ; end < n ; end = farCanReach){
+            cnt++ ;
+            while(start < N and arr[start].first <= end){
+                farCanReach = max(farCanReach , arr[start++].second);
+            }
+            
+            if(end == farCanReach) return -1 ;
+        }
+        return cnt ;
+}
+```
+
+27. [partition equal subset sum](https://www.codingninjas.com/codestudio/problems/partition-equal-subset-sum_892980?topList=top-dynamic-programming-questions)
+```cpp
+#include<bits/stdc++.h>
+bool memo[101][10005] ;
+//TOP DOWN
+bool helper(int pos , int target , vector<int> &arr){
+    if(target == 0) return true ;
+    if(target < 0 or pos >= arr.size()) return false ;
+    if(memo[pos][target] != true) return false ;
+    // take it
+    if(helper(pos+1 , target-arr[pos] , arr)){
+        return true ;
+    }
+    return memo[pos][target] = helper(pos+1 , target , arr);
+}
+//BOTTOM UP
+bool canPartition(vector<int> &arr, int n)
+{
+    int totalsum = accumulate(arr.begin() , arr.end() , 0);
+    if((totalsum&1) == 1) return false ;
+    int target = totalsum/2 ;
+    vector<vector<bool>> dp(n+1 , vector<bool>(target+1 ,false));
+    for(int i = 0 ; i < n ; i++){
+        dp[i][0] = true ;
+    }
+    dp[0][0] = true ;
+    for(int i = 1 ; i <= n ; i++){
+        for(int j = 1 ; j <= target ; j++){
+            if(j-arr[i-1] >= 0){
+                if(dp[i-1][j-arr[i-1]]) dp[i][j] = true ;
+            }
+            if(dp[i-1][j]) dp[i][j] = true ;
+        }
+    }
+    return dp[n][target] ;
+}
+
+```
+
+28. [pal substring](https://www.codingninjas.com/codestudio/problems/longest-palindromic-substring_892999?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int maxleft = 0 ;
+int N ;
+int maxlen1 = 0;
+
+void expandWindow(int left , int right , string &str){
+    while(left >= 0 and right < N and str[left] == str[right]){
+        left-- ; right++ ;
+    }
+    int curlen = right-left-1 ;
+    
+    if(curlen > maxlen1){
+        maxlen1 = curlen ;
+        maxleft = left+1 ;
+    }
+}
+string longestPalinSubstring(string &str)
+{
+    maxleft = 0 ; 
+    maxlen1 = 1 ;
+    N = str.size() ;    
+    for(int i = 0 ; i < N ; i++){
+        // even length
+        expandWindow(i ,i+1 , str);
+        expandWindow(i,i , str);
+    }
+    return str.substr(maxleft , maxlen1);
+}
+```
+29. [min cost to buy n items]()
+```cpp
+#include<bits/stdc++.h>
+int T ;
+int dp[10001] ;
+
+int adding , doubling ;
+int helper(int blades){
+    if(blades == T) return 0 ;
+    if(blades > T) return 1e9 ;
+    if(dp[blades] != -1) return dp[blades] ;
+    
+    int minres = 1e9 ;
+    //doubling
+    if(blades != 0){
+       minres = helper(2*blades) ;
+       if(minres != 1e9) minres += doubling ;
+    }
+    
+    return dp[blades] = min(minres , adding + helper(blades+1));
+}
+int minCostToBuyN(int n, int a, int b)
+{
+    T = n ;
+    adding  = a ; doubling = b ;
+    memset(dp , -1 ,sizeof(dp));
+    return helper(0) ;
+}
+```
