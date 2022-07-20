@@ -1048,3 +1048,484 @@ int maxCoins(vector<int> coins, int n)
     return helper(0 , n-1, coins );
 }
 ```
+
+33. [increasing subsegment](https://www.codingninjas.com/codestudio/problems/increasing-subsegment_920543?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+int subsegments(vector < int > arr, int n) {
+    vector<int> left(n , 1) , right(n , 1);
+    int ans = 1 ;
+    
+    for(int i = 1 ; i < n ; i++){
+        if(arr[i] > arr[i-1]){
+            left[i] = 1+left[i-1] ;
+            ans = max(ans , left[i]);
+        }
+    }
+    if(ans != n) ans++ ;
+    for(int i = n-2 ; i >= 0 ; i--){
+        if(arr[i] < arr[i+1]){
+            right[i] = 1+right[i+1] ;
+        }
+    }
+    
+    for(int i = 1 ; i < n-1 ; i++){
+        if(arr[i+1]-arr[i-1] > 1){
+            ans = max(ans , left[i-1] + 1 + right[i+1]);
+        }
+    }
+    return ans ;
+}
+```
+
+34. [count ROR](https://www.codingninjas.com/codestudio/problems/count-ror_920554?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+/*
+ 0 -- R
+ 1 -- O
+ 2 -- R
+*/
+int N ;
+int dp[10001][3] ;
+int mod = 1e9+7 ;
+
+int helper(int looker , int pos , string &s){
+    if(pos == N) return 0 ;
+    if(dp[pos][looker] != -1) return dp[pos][looker] ;
+    
+    
+    int op1 = 0 ;
+    
+    if(looker == 0 and s[pos] == 'R'){
+        op1 = helper(looker+1 , pos+1 , s)%mod;
+    }
+    else if(looker == 1 and s[pos] == 'O'){
+        op1 = helper(looker+1 , pos+1 , s)%mod; 
+    }
+    else if(looker == 2 and s[pos] == 'R'){
+        return dp[pos][looker] = 1+helper(looker , pos+1 , s)%mod;
+    }
+    return dp[pos][looker] = (op1+helper(looker , pos+1 , s)%mod)%mod;
+}
+
+int countSubsequence(string s) {
+    N = s.size() ;
+    memset(dp , -1 , sizeof(dp));
+    return helper(0 , 0 , s);    
+}
+```
+35. [tetrahedron](https://www.codingninjas.com/codestudio/problems/tetrahedron_920546?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+/*
+    0 - A , 1 - B , 2 - C , 3 - D
+*/
+int mod = 1e9+7 ;
+vector<vector<int>> dp(4 , vector<int>(100001 , -1));
+
+int helper(int current , int moves){
+    if(moves == 0){
+        if(current == 3) return 1 ;
+        else return 0 ;
+    }
+    if(dp[current][moves] != -1) return dp[current][moves] ;
+    
+    int ans = 0;
+    for(int neigh = 0 ; neigh < 4 ; neigh++){
+        if(neigh == current) continue ;
+        ans = (ans + helper(neigh , moves-1)%mod)%mod;
+    }
+    return dp[current][moves] = ans ;
+}
+int numberOfWays(int n)
+{
+    return helper(3 , n);
+}
+```
+36. [matrix chain multiplication](https://www.codingninjas.com/codestudio/problems/matrix-chain-multiplication_975344?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+/*
+      A B C        A = 4 * 1
+    4 1 2 3        B = 1 * 2
+                   C = 2 * 3
+
+    A BC
+*/
+#include<bits/stdc++.h>
+int dp[101][101] ;
+
+int helper(int left , int right , vector<int> &arr){
+    if(left == right) return 0 ;
+    if(dp[left][right] != -1) return dp[left][right] ;
+    
+    int ans = 1e9 ;
+    
+    for(int k = left ; k < right ; k++){
+        int merge = arr[left-1] * arr[k] * arr[right] ;
+        merge = merge + helper(left , k,arr) + helper(k+1 , right,arr);
+        ans = min(ans , merge);
+    }
+    return dp[left][right] = ans ;
+}
+int matrixMultiplication(vector<int> &arr, int N)
+{
+    memset(dp , -1 , sizeof(dp));
+    return helper(1 , N-1 , arr);
+}
+```
+
+37. [boredom](https://www.codingninjas.com/codestudio/problems/boredom_920547?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+unordered_map<int,int> memo;
+int dp[100001][100001] ;
+
+int helper(int left , int right , vector<int> &nums){
+    if(left > right) return 0 ;
+    if(left == right) return memo[nums[left]]*nums[left] ;
+    if(dp[left][right] != -1) return dp[left][right] ;
+    
+    int maxans = 0 ;
+    
+    for(int i = left ; i <= right ; i++){
+        int curr = memo[nums[i]]*nums[i] ;
+        int op1 = 0 , op2 = 0 ;
+        if(i-1 >= left and nums[i]-1 == nums[i-1]){
+            op1 = helper(left , i-2 , nums);
+        }
+        else{
+            op1 = helper(left , i-1 , nums) ;
+        }
+        if(i+1 <= right and nums[i]+1 == nums[i+1]){
+            op2 = helper(i+2 , right , nums);
+        }
+        else{
+            op2 = helper(i+1 , right , nums);
+        }
+        
+        maxans = max(maxans , curr + op1 + op2);
+    }
+    return dp[left][right] = maxans ;
+}
+int maximumPoints(int n, vector<int> & arr)
+{
+    memset(dp , -1 ,sizeof(dp));
+    sort(arr.begin() , arr.end());
+    vector<int> nums ;
+    memo.clear() ;
+    
+    for(int ele : arr){
+        memo[ele]++ ;
+        if(memo[ele] == 1){
+            nums.push_back(ele) ;
+        }
+    }
+    
+    return helper(0 , nums.size()-1 , nums);
+}
+
+// ADHOC
+#include<bits/stdc++.h>
+
+int maximumPoints(int n, vector<int> & arr)
+{
+    
+    int maxele = *max_element(arr.begin() , arr.end()) ;
+    vector<int> dp(maxele+1 , 0);
+    unordered_map<int , int> memo ;    
+   
+    for(int ele : arr){
+        memo[ele]++ ;
+    }
+    dp[1] = memo[1] ;
+    
+    for(int i = 2 ; i <= maxele ; i++){
+        dp[i] = max(dp[i-2]+i*memo[i] , dp[i-1]);
+    }    
+    return dp[maxele] ;
+}
+```
+
+38. [min steps to one](https://www.codingninjas.com/codestudio/problems/min-steps-to-one-using-dp_920548?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+vector<int> dp(100001 , -1);
+int countStepsToOne(int n) {
+    if(n == 1) return 0 ;
+    if(dp[n] != -1) return dp[n] ;
+    
+    int op1 = 1e8 , op2 = 1e8 ;
+    if(n%3 == 0){
+        op1 = countStepsToOne(n/3) ;
+    }
+    if((n&1) == 0){
+        op2 = countStepsToOne(n/2) ;
+    }
+    
+    return dp[n] = 1 + min({op1 , op2 , countStepsToOne(n-1)});
+}
+```
+39. [painting fences](https://www.codingninjas.com/codestudio/problems/painting-fences_920549?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+int mod = 1e9+7 ;
+
+int paint(int posts , int colors){
+    if(posts == 0) return 0 ;
+    if(posts == 1) return 1 ;
+    int same = colors ;
+    int diff = colors*(colors-1) ;
+    
+    for(int i = 3 ; i <= posts ; i++){
+        int prevDiff = diff ;
+        diff = (((same+prevDiff)%mod)*(colors-1))%mod ;
+        same = prevDiff%mod ; 
+    }
+    return (same+diff)%mod ;
+}
+int countWays(int n)
+{
+    return paint(n,2);
+}
+```
+
+40. [mixtures](https://www.codingninjas.com/codestudio/problems/mixtures_975356?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int dp[101][101] ;
+
+int mod = 100 ;
+int calc(int i , int j , vector<int> &color){
+    int sum = 0 ;
+    for(int k = i ; k <= j ; k++) sum += color[k] ;
+    return sum%mod ;
+}
+
+int helper(int left , int right , vector<int> &prefixsum){
+    if(left >= right) return 0 ;
+    if(dp[left][right] != -1) return dp[left][right] ;
+    int minsmokes = 1e8 ;
+    
+    for(int i = left+1 ; i <= right ; i++){
+        int smoke = ((prefixsum[i] - prefixsum[left])%mod) * ((prefixsum[right+1] - prefixsum[i])%mod) ;
+        
+//         int smoke = (calc(left,i-1, color) * calc(i,right,color)) ;
+        
+        int cursmoke = smoke + helper(left , i-1,prefixsum) + helper(i, right ,prefixsum);
+        minsmokes = min(minsmokes , cursmoke);
+    }
+    return dp[left][right] = minsmokes ;
+}
+int minimizeSmoke(vector<int> &color,int n) {
+    vector<int> prefixsum(n+1 , 0);
+    partial_sum(color.begin() , color.end() , prefixsum.begin()+1);
+    memset(dp , -1 ,sizeof(dp));
+    
+    return helper(0 , n-1,prefixsum);
+}
+```
+
+41. [Coin game winner where every player has three choices](https://www.codingninjas.com/codestudio/problems/coin-game-winner-where-every-player-has-three-choices_1229492?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int A , B ;
+int8_t dp[100001][2] ;
+
+bool helper(int n ,bool myturn){
+    if(n == 0) return not myturn ;
+    if(dp[n][myturn] != -1) return dp[n][myturn] ;
+    
+    if(myturn){
+        if(n-A >= 0 and helper(n-A , false)) 
+            return dp[n][myturn] = true ;
+        if(n-B >= 0 and helper(n-B , false)) 
+            return dp[n][myturn] = true ;
+        return dp[n][myturn] = helper(n-1 , false) ;
+    }
+    // opponent turn
+    if(n-A >= 0 and not helper(n-A , true)) 
+        return dp[n][myturn] = false ;
+    if(n-B >= 0 and not helper(n-B , true)) 
+        return dp[n][myturn] = false ;
+    
+    return dp[n][myturn] = helper(n-1 , true);
+}
+int coinGameWinner(int n, int a, int b)
+{
+    A = a ; B = b ;
+    memset(dp , -1 ,sizeof(dp)) ;
+    
+    return helper(n , true);
+}
+```
+
+42. [string maker](https://www.codingninjas.com/codestudio/problems/string-maker_975373?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+string s1 , s2 , s3 ;
+int N1 , N2 , N3 ;
+int mod = 1e9+7 ;
+int dp[101][101][101] ;
+
+int helper(int pos1 , int pos2 , int pos3){
+    if(pos3 == N3) return 1 ;
+    if(pos1 >= N1 and pos2 >= N2) return 0 ;
+    if(dp[pos1][pos2][pos3] != -1) return dp[pos1][pos2][pos3] ;
+    long ways = 0 ;
+    
+    for(int i = pos1 ; i < N1 ; i++){
+        if(s1[i] == s3[pos3])
+            ways = (ways+helper(i+1 , pos2 , pos3+1))%mod ;     
+    }
+    for(int i = pos2 ; i < N2 ; i++){
+        if(s2[i] == s3[pos3]){
+            ways = (ways+helper(pos1 , i+1 , pos3+1))%mod;
+        }
+    }
+    return dp[pos1][pos2][pos3] = ways ;
+}
+
+int countWays(string &A, string &B, string &C) {
+    s1 = A ; s2 = B ; s3 = C ;
+    N1 = s1.size() ; N2 = s2.size() ; N3 = s3.size() ;
+    memset(dp , -1 , sizeof(dp));
+    
+    if(N3 > N2+N1) return 0 ;
+    return helper(0,0,0);
+}
+```
+
+43. [friends pairing problem](https://www.codingninjas.com/codestudio/problems/friends-pairing-problem_1214625?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+int mod = 1e9+7 ;
+vector<long long> dp(10001, -1);
+
+long long helper(int n){
+    if(n <= 2) return n ;
+    if(dp[n] != -1) return dp[n] ;
+    long long single = helper(n-1)%mod ;
+    long long pair = ((n-1)*helper(n-2))%mod ;
+    return dp[n] =(single + pair)%mod  ;
+}
+int numberOfWays(int n)
+{
+    return helper(n)%mod ;
+}
+```
+
+44. [maximal square](https://www.codingninjas.com/codestudio/problems/maximum-area-square_981268?topList=top-dynamic-programming-questions&leftPanelTab=0)
+
+```cpp
+#include<bits/stdc++.h>
+int maximumAreaSquare(vector<vector<int>>& mat, int n, int m)
+{
+    int maxside = 0 ;
+    for(int i = 0 ; i < n ; i++){
+        if(mat[i][0] == 1){
+            maxside = 1 ; break ;
+        }
+    }
+    if(maxside == 0){
+        for(int j = 0 ; j < m ; j++){
+            if(mat[0][j] == 1){
+                maxside = 1 ; break ;
+            }
+        }
+    }
+    
+    for(int i = 1 ; i < n ; i++){
+        for(int j = 1 ; j < m ; j++){
+            if(mat[i][j] == 0) continue ;
+            
+            int mini = min({mat[i-1][j-1] , mat[i-1][j] , mat[i][j-1]});
+            maxside = max(1 , maxside) ;
+            if(mini == 0) continue ;
+            mat[i][j] = max(mat[i][j] , 1+mini);
+//             cout << i << j << " " << mat[i][j] << endl ;
+            maxside = max(maxside , mat[i][j]) ;
+        }
+    }
+    return maxside*maxside ;
+}
+```
+
+45. [Longest alternating subsequence](https://www.codingninjas.com/codestudio/problems/longest-alternating-subsequence_1214645?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int N ;
+int dp[5001][5001][2] ;
+
+int helper(int pos , int prev_idx , vector<int> &arr,bool isLastBig){
+    if(pos == N) return 0 ;
+    if(dp[pos][prev_idx+1][isLastBig] != -1) 
+        return dp[pos][prev_idx+1][isLastBig] ;
+    
+    if(isLastBig){
+        //so i need to be smaller than prev
+        int op1 = 0 ;
+        if(prev_idx == -1 or arr[pos] < arr[prev_idx]){
+            op1 = 1+helper(pos+1 , pos , arr , false) ;
+        }
+        return dp[pos][prev_idx+1][isLastBig] = max(op1 , helper(pos+1 , prev_idx , arr , true));
+    }
+    // I need to larger than prev
+    int op1 = 0;
+    if(prev_idx == -1 or arr[pos] > arr[prev_idx]){
+        op1 = 1+helper(pos+1 , pos , arr , true);
+    }
+    return dp[pos][prev_idx+1][isLastBig] = max(op1 , helper(pos+1 , prev_idx , arr , false));
+    
+}
+int lSubsequence(vector<int> &arr, int n) 
+{
+    N = n ;
+    memset(dp , -1 ,sizeof(dp));
+    return max(helper(0 , -1 , arr , true) , helper(0,-1 , arr , false)) ;
+}
+
+// BOTTOM Up
+#include<bits/stdc++.h>
+
+int lSubsequence(vector<int> &arr, int n) 
+{
+    vector<vector<int>> dp(n , vector<int>(2 , 1));
+    /*
+        0 ------> I'm greater than prev
+        1 ------> I'm smaller than prev
+    */
+    int maxlen = 1 ;
+    for(int i = 1 ; i < n ; i++){
+        for(int j = 0 ; j < i ; j++){
+            if(arr[i] > arr[j]){
+                dp[i][0] = max(dp[i][0] , 1+dp[j][1]) ;
+                maxlen = max(maxlen , dp[i][0]) ;
+            }
+            else if(arr[i] < arr[j]){
+                dp[i][1] = max(dp[i][1] , 1+dp[j][0]) ;
+                maxlen = max(maxlen , dp[i][1]) ;
+            }
+        }
+    }
+    return maxlen ;
+}
+// Adhoc
+#include<bits/stdc++.h>
+
+int lSubsequence(vector<int> &arr, int n) 
+{
+    int inc = 1 , dec = 1 ;
+    for(int i = 1 ; i < n ; i++){
+        if(arr[i] > arr[i-1]){
+            inc = dec+1 ;
+        }
+        else if(arr[i] < arr[i-1]){
+            dec = inc+1 ;
+        }
+    }
+    return max(inc , dec) ;
+}
+```
+
+46. []()
+```cpp
+
+```
