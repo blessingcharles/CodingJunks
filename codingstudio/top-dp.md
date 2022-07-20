@@ -951,7 +951,7 @@ string longestPalinSubstring(string &str)
     return str.substr(maxleft , maxlen1);
 }
 ```
-29. [min cost to buy n items]()
+29. [min cost to buy n items](https://www.codingninjas.com/codestudio/problems/min-steps-to-reach-n_893288?topList=top-dynamic-programming-questions&leftPanelTab=0)
 ```cpp
 #include<bits/stdc++.h>
 int T ;
@@ -978,5 +978,73 @@ int minCostToBuyN(int n, int a, int b)
     adding  = a ; doubling = b ;
     memset(dp , -1 ,sizeof(dp));
     return helper(0) ;
+}
+```
+
+30. [candies](https://www.codingninjas.com/codestudio/problems/candies_893290?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+int requiredCandies(vector < int > &students) {
+    vector<int> candies(students.size() , 1);
+    
+    int N = students.size() ;
+    for(int i = 1 ; i < N ; i++){
+        if(students[i] > students[i-1]){
+            candies[i] = candies[i-1]+1 ;
+        }    
+    }
+    int total = candies[N-1] ;    
+    for(int i = N-2 ; i >= 0 ; i--){
+        if(students[i] > students[i+1] and 1+candies[i+1] > candies[i]){
+            candies[i] = 1+candies[i+1];
+        }
+        total += candies[i] ;
+    }
+    return total ;
+}
+```
+
+31. [minimum fountains](https://www.codingninjas.com/codestudio/problems/minimum-fountains_893176?topList=top-dynamic-programming-questions&leftPanelTab=3)
+```cpp
+#include<bits/stdc++.h>
+int findMinFountains(vector<int> &arr, int n)
+{
+    int end = 0 ,fartherReach = 0 ;
+    vector<pair<int,int>> fountains(n+1) ;
+    for(int i = 0 ; i < arr.size() ; i++){
+        fountains[i] = {i-arr[i] , i+arr[i]};
+    }
+    sort(fountains.begin() , fountains.end());
+    int cnt = 0 ;
+    
+    for(int start = 0 ; end < n ; end = fartherReach){
+        cnt++ ;
+        while(start <= n and fountains[start].first <= end){
+            fartherReach = max(fartherReach , fountains[start++].second);
+        }
+        if(end == fartherReach) return -1 ;
+    }
+    return cnt ;
+}
+```
+
+32. [coin game](https://www.codingninjas.com/codestudio/problems/coin-game_920479?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+int dp[1001][1001] ;
+
+int helper(int left , int right , vector<int> &coins ){
+    if(left > right) return 0 ;
+    if(left == right) return coins[left] ;
+    if(dp[left][right] != -1) return dp[left][right] ;
+    
+    int op1 =  helper(left+1 , right-1 , coins) ;
+    int fromLeft =  coins[left] + min(helper(left+2 , right , coins) , op1);
+    int fromRight = coins[right] + min(helper(left , right-2 , coins) ,op1);
+    
+    return dp[left][right] = max(fromLeft , fromRight) ;
+}
+int maxCoins(vector<int> coins, int n)
+{
+    memset(dp , -1 ,sizeof(dp));
+    return helper(0 , n-1, coins );
 }
 ```
