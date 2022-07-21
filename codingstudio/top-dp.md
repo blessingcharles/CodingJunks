@@ -1525,7 +1525,468 @@ int lSubsequence(vector<int> &arr, int n)
 }
 ```
 
-46. []()
+46. [word wrap](https://www.codingninjas.com/codestudio/problems/word-wrap_982931?topList=top-dynamic-programming-questions&leftPanelTab=0)
 ```cpp
+#include<bits/stdc++.h>
+int dp[301][101] ;
 
+int N ;
+int lw ; // each line width 
+int cube(int n){
+    return n*n*n ;
+}
+
+int helper(int pos , int rem , vector<string> &words){
+    if(pos == N){
+        return cube(rem);
+    }
+    if(dp[pos][rem] != -1) return dp[pos][rem] ;
+    // option1 I will place this word next line anyways
+    int op1 = cube(rem) + helper(pos+1 , lw-words[pos].size() ,words);
+    int op2 = 1e8 ;
+    // option2 can i place in this line itself
+    int tt = rem - words[pos].size() - 1 ;
+    if(tt >= 0){
+        op2 = helper(pos+1 , tt , words);
+    }
+    return dp[pos][rem] = min(op1 , op2);
+}
+int wordWrap(vector<string> &words,int m,int n)
+{
+    lw = m ; N = n ;   
+    memset(dp , -1 , sizeof(dp));
+    return helper(1 , lw-words[0].size() , words);
+}
+```
+
+47. [cut into segments](https://www.codingninjas.com/codestudio/problems/cut-into-segments_1214651?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int X , Y , Z ;
+int dp[10001] ;
+
+int helper(int n){
+    if(n == 0) return 0 ;
+    if(dp[n] != -1) return dp[n] ;
+    
+    int op1 = INT_MIN , op2 = INT_MIN , op3 = INT_MIN ;
+    if(n-X >= 0){
+        op1 = 1+helper(n-X) ;
+    }
+    if(n-Y >= 0){
+        op2 = 1+helper(n-Y) ;
+    }
+    if(n-Z >= 0){
+        op3 = 1+helper(n-Z) ;
+    }
+    return dp[n] = max({op1 , op2 , op3});
+}
+int cutSegments(int n, int x, int y, int z) {
+    X = x ; Y = y ; Z = z ;
+    memset(dp , -1 , sizeof(dp));
+    
+    int ans = helper(n) ;
+    return (ans < 0)?0:ans ;
+}
+```
+
+48. [min subarray sum](https://www.codingninjas.com/codestudio/problems/minimum-sum-subarray_1062622?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+int minimumSum (vector<int>& arr, int n)
+{
+    int curmin = arr[0] , totalmin = arr[0] ;
+    for(int i = 1 ; i < n ; i++){
+        curmin = min(curmin+arr[i] , arr[i]);
+        totalmin = min(totalmin , curmin);
+    }
+    return totalmin ;
+}
+```
+
+49. [max length pair chain](https://www.codingninjas.com/codestudio/problems/maximum-length-pair-chain_985258?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int maxLengthChain(vector<pair<int, int>> &p, int n) {
+    sort(p.begin() , p.end() , [](const pair<int,int> &a , const pair<int,int> &b){
+        return a.second < b.second ;
+    });
+    
+    int curend = p[0].second ;
+    int curlen = 1 ;
+    for(int i = 1 ; i < n ; i++){
+        if(curend < p[i].first){
+            curlen++ ;
+            curend = p[i].second ;
+        }
+    }
+    return curlen ;
+}
+```
+50. [min insert to make pal](https://www.codingninjas.com/codestudio/problems/minimum-insertions-to-make-palindrome_985293?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int dp[101][101] ;
+
+int helper(int left , int right , string &str){
+    if(left >= right) return 0 ;
+    if(dp[left][right] != -1) return dp[left][right] ;
+    
+    if(str[left] == str[right]) 
+        return dp[left][right] = helper(left+1 ,right-1 , str);
+    
+    // not match 
+    // option1 insert for char str[right] on left
+    int op1 = 1+helper(left , right-1 , str);
+    //option2 insert for char str[left] on right 
+    int op2 = 1+helper(left+1 , right , str);
+    return dp[left][right] = min(op1 , op2);
+}
+int minInsertion(string &str)
+{
+    memset(dp , -1 , sizeof(dp));
+    return helper(0 , str.size()-1 , str);
+}
+```
+
+51. [min path sum](https://www.codingninjas.com/codestudio/problems/minimum-path-sum_985349?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+int dx[2] = {1,0};
+int dy[2] = {0,1};
+int M , N ;
+bool isInvalid(int row , int col){
+    return row >= M or col >= N ;    
+}
+
+int helper(int row , int col , vector<vector<int>> &grid , vector<vector<int>> &dp){
+    if(row == M-1 and col == N-1) return grid[row][col] ;
+    
+     if(dp[row][col] != -1) return dp[row][col] ;
+     
+    int op1 = 1e8 , op2 = 1e8 ;
+     if(not isInvalid(row+1 , col)){
+         op1 = helper(row+1 , col , grid , dp);
+     }
+     if(not isInvalid(row , col+1)){
+         op2 = helper(row , col+1 , grid , dp);
+     }
+    return dp[row][col] = grid[row][col] + min(op1 , op2) ;
+}
+int minSumPath(vector<vector<int>> &grid) {
+    M = grid.size() ;
+    N = grid[0].size() ;
+    vector<vector<int>> dp(M, vector<int>(N,-1));
+    return helper(0 , 0 , grid , dp);
+}
+```
+
+52. [pottern and profit](https://www.codingninjas.com/codestudio/problems/knapsack_992771?topList=top-dynamic-programming-questions&leftPanelTab=1)
+```cpp
+#include<bits/stdc++.h>
+
+int dp[101][10001] ;
+
+int helper(int pos , int rem, vector<int> &time , vector<int> &profit){
+    if(pos < 0) return 0 ;
+    if(rem == 0) return 0 ;
+    if(dp[pos][rem] != -1) return dp[pos][rem] ;
+    
+    int op1 = 0 ;
+    if(rem - time[pos] >= 0){
+        
+        op1 = profit[pos] + helper(pos-1 , rem-time[pos] , time,profit);
+    }
+    return dp[pos][rem] = max(op1 , helper(pos-1 , rem , time , profit));
+}
+int getMaxProfit(vector<int> &time, vector<int> &profit, int n, int k) {
+    memset(dp , -1 , sizeof(dp));    
+    return helper(n-1 , k , time , profit);
+}
+// BOTTOM UP
+int getMaxProfit(vector<int> &time, vector<int> &profit, int n, int k) {
+    memset(dp , 0 , sizeof(dp));    
+
+    for(int i = 1 ; i <= n ; i++){
+        for(int rem = 1 ; rem <= k ; rem++){
+            if(rem - time[i-1] >= 0){
+                dp[i][rem] = max(dp[i][rem] , profit[i-1] + dp[i-1][rem - time[i-1]]) ;
+            }
+            dp[i][rem] = max(dp[i][rem] , dp[i-1][rem]) ;
+        }
+    }
+    return dp[n][k] ;
+}
+```
+
+53. [interleaving strings]()
+```cpp
+#include<bits/stdc++.h>
+
+string s1 , s2 , s3 ;
+bool dp[152][152][302] ;
+
+bool helper(int pos1 , int pos2 , int pos3){
+    if(pos3 < 0 and pos1 < 0 and pos2 < 0) return true;
+    if(dp[pos1+1][pos2+1][pos3+1] != true ) return dp[pos1+1][pos2+1][pos3+1] ;
+    
+    if(pos1 >= 0){
+        if(s1[pos1] == s3[pos3] and helper(pos1-1 , pos2 , pos3-1)){
+            return true ;
+        }
+    }    
+    if(pos2 >= 0){
+        if(s2[pos2] == s3[pos3] and helper(pos1 , pos2-1 , pos3-1)){
+            return true ;
+        }
+    }
+    return dp[pos1+1][pos2+1][pos3+1] = false ;
+}
+bool isInterleave(string &a, string &b, string &c){
+    s1 = a ; s2 = b ; s3 = c ;
+    if(s1.size()+s2.size() != s3.size()) return false ;
+
+    memset(dp , true , sizeof(dp)) ;
+    return helper(s1.size()-1 , s2.size()-1 , s3.size()-1) ;
+}
+```
+
+54. [palindrome partioning](https://www.codingninjas.com/codestudio/problems/palindromic-partitioning_1063252?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+string str ;
+int dp[251] ;
+int N ;
+bool isPalindrome(int left, int right){
+    while(left < right){
+        if(str[left] != str[right]) return false ;
+        left++ ; right--  ;
+    }
+    return true ;
+}
+int helper(int left){
+    if(left >= N) return 0 ;
+    if(dp[left] != -1) return dp[left] ;
+    
+    if(isPalindrome(left , N-1)) return dp[left] = 0 ;
+    
+    int minans = 1e9 ;
+    for(int i = left ; i < N ; i++){
+        if(isPalindrome(left , i)){
+            minans = min(minans , 1+helper(i+1));
+        }
+    }
+    return dp[left] = minans ;
+}
+int minimumCuts(string &s) {
+    str = s ; N = s.size() ;
+    memset(dp , -1 ,sizeof(dp));
+    return helper(0) ;
+}
+```
+
+55. [no of ways](https://www.codingninjas.com/codestudio/problems/number-of-ways_1062651?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int dx[3] = {3 , 5, 10} ;
+vector<vector<int>> dp(50001 ,vector<int>(3 , -1));
+
+int helper(int n , int pos){
+    if(n == 0) return 1 ;
+    if(pos== 3) return 0 ;
+    if(dp[n][pos] != -1) return dp[n][pos] ;
+    
+    int op1 = 0 ;
+    if(n-dx[pos] >= 0){
+        op1 = helper(n-dx[pos] , pos) ;
+    }
+    return dp[n][pos] = op1 + helper(n , pos+1);
+}
+int countWays(int n){
+   	return helper(n , 0);
+}
+```
+
+56. [optimal bst](https://www.codingninjas.com/codestudio/problems/optimal-bst_1062671?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int dp[51][51][51] ;
+
+int helper(int left , int right ,vector<int> &freq , int level){
+    if(left > right) return 0 ;
+    if(left == right) return level*freq[left] ;
+    if(dp[left][right][level] != -1) return dp[left][right][level] ;
+    
+    int mincost = 1e9 ;
+    
+    for(int i = left ; i <= right ; i++){
+        int curcost = freq[i]*level ;
+        curcost = curcost + helper(left , i-1 ,freq , level+1) + helper(i+1 , right , freq , level+1) ;
+        
+        mincost = min(mincost , curcost);
+    }
+    return dp[left][right][level] = mincost ;
+}
+int optimalCost(vector<int>& keys, vector<int>& freq, int n)
+{
+    memset(dp , -1 ,sizeof(dp));
+    return helper(0 , n-1 , freq , 1) ;
+}
+
+// OPTIMISE
+#include<bits/stdc++.h>
+
+int dp[51][51] ;
+int helper(int left , int right ,vector<int> &freq){
+    if(left > right) return 0 ;
+    if(left == right) return freq[left] ;
+    if(dp[left][right] != -1) return dp[left][right] ;
+    
+    int mincost = 1e9 ;
+    int cur_level_cost = accumulate(freq.begin()+left , freq.begin()+right+1,  0) ;
+    for(int i = left ; i <= right ; i++){
+        int curcost = helper(left , i-1 ,freq) + helper(i+1 , right , freq) ;
+        mincost = min(mincost , curcost);
+    }
+    return dp[left][right] = mincost + cur_level_cost ;
+}
+int optimalCost(vector<int>& keys, vector<int>& freq, int n)
+{
+    memset(dp , -1 ,sizeof(dp));
+    return helper(0 , n-1 , freq ) ;
+}
+```
+
+57. [longest bitonic sequence](https://www.codingninjas.com/codestudio/problems/longest-bitonic-sequence_1062688?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+int longestBitonicSequence(vector<int>& arr, int n) {
+    vector<int> forward(n , 1);
+    int maxlen = 1 ;
+    
+    for(int i = 1 ; i < n ; i++){
+        for(int j = 0 ; j < i ; j++){
+            if(arr[i] > arr[j]){
+                forward[i] = max(forward[i] , 1+forward[j]);
+                maxlen = max(maxlen , forward[i]);
+            }
+        }
+    }
+    vector<int> backward(n,1);
+    for(int i = n-2 ; i >= 0 ; i--){
+        for(int j = n-1 ; j > i ; j--){
+            if(arr[i] > arr[j]){
+                backward[i] = max(backward[i] , 1+backward[j]) ;
+                maxlen = max(maxlen , backward[i]);
+            }
+        }
+    }
+    for(int i = 0 ; i < n ; i++){
+        maxlen = max(maxlen , forward[i]+backward[i]-1);
+    }
+    return maxlen ;
+} 
+```
+58. [largest submatrix with 0 and 1](https://www.codingninjas.com/codestudio/problems/largest-submatrix-with-equal-number-of-0-s-and-1-s_1062689?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int maximumArea(vector<vector<int>>& mat, int m, int n)
+{
+    for(int i = 0 ; i < m ; i++){
+        if(mat[i][0] == 0) mat[i][0] = -1 ;
+    }
+    for(int i = 0 ; i < m ; i++){
+        for(int j = 1 ; j < n ; j++){
+            int curval = (mat[i][j] == 0)?-1:1 ;
+            mat[i][j] = curval + mat[i][j-1] ;
+        }
+    }
+    int maxarea = 0 ;
+    
+    for(int c1 = 0 ; c1 < n ; c1++){
+        for(int c2 = c1 ; c2 < n ; c2++){
+            unordered_map<int , int> memo ;
+            memo[0] = -1 ;
+            int cur_row_sum = 0 ;
+            for(int row = 0 ; row < m ; row++){
+                cur_row_sum += mat[row][c2] - ((c1 > 0)?mat[row][c1-1] : 0) ;
+                if(memo.find(cur_row_sum) != memo.end()){
+                    int width = c2-c1+1 ;
+                    int height = row-memo[cur_row_sum] ;
+                    maxarea = max(maxarea , width*height) ;
+                }
+                else{
+                    memo[cur_row_sum] = row ;
+                }
+            }
+        }
+    }
+    return maxarea ;
+}
+```
+
+59. [min removals]()
+```cpp
+// DP
+#include<bits/stdc++.h>
+int K ;
+int dp[5001][5001] ;
+
+int helper(int left , int right , vector<int> &arr){
+    if(left >= right) return 0 ;
+    int curmin = 0 ;
+    if(arr[right]-arr[left] <= K) return 0 ;
+    if(dp[left][right] != -1)
+        return dp[left][right] ;
+    
+    // Can remove the right element or the left element
+    int op1 = 1 + helper(left+1 , right , arr);
+    int op2 = 1 + helper(left , right-1 ,arr);
+    return dp[left][right] = min(op1,op2);
+}
+int minimumRemovals(vector<int>& arr, int n, int k)
+{
+    sort(arr.begin() , arr.end());
+    memset(dp , -1 , sizeof(dp));
+    K = k ;
+    return helper(0 , n-1 , arr);
+}
+// Sliding window
+int minimumRemovals(vector<int>& arr, int n, int k)
+{
+    sort(arr.begin() , arr.end());
+    int left = 0 ,maxlen = 1;
+    for(int i = 1 ; i < n ; i++){
+        while(arr[i]-arr[left] > k) left++ ;
+        maxlen = max(maxlen , i-left+1);
+    }
+    return n-maxlen ;
+}
+```
+
+60. [no of balanced bt](https://www.codingninjas.com/codestudio/problems/number-of-balanced-binary-trees_1062690?topList=top-dynamic-programming-questions&leftPanelTab=0)
+
+```cpp
+long long mod = 1e9+7 ;
+vector<long long> dp(10001 , -1);
+
+long long helper(int n){
+    if(n == 1) return 1 ;
+    if(n == 2) return 3 ;
+    if(dp[n] != -1) return dp[n] ;
+    long long op1 = helper(n-1)%mod ;
+    long long op2 = helper(n-2)%mod ;
+    
+    
+    long long n1 = (op1*op2)%mod ;
+    n1 = (n1*2)%mod ;
+    long long n2 = (op1*op1)%mod ;
+    return dp[n] = (n1+n2)%mod ;
+}
+int countBalancedBinaryTree( int n)
+{
+   
+    return helper(n) ;
+}
 ```
