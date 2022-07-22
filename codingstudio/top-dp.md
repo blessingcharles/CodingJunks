@@ -2275,7 +2275,465 @@ int decodeWays(string &strNum) {
 }
 ```
 
-71. []()
+71. [max difference between 0 ad 1](https://www.codingninjas.com/codestudio/problems/maximum-difference-of-zeros-and-ones-in-a-binary-string_1203919?topList=top-dynamic-programming-questions&leftPanelTab=0)
 ```cpp
+int maximumDifference(string &str)
+{
+    int maxdiff = -1e9 ;
+    for(int i = 0 ; i < str.size() ; i++){
+        int ones_count = 0 , zeros_count = 0 ;
+        for(int j = i ; j < str.size() ; j++){
+            if(str[j] == '0') zeros_count++ ;
+            else ones_count++ ;
+            int diff = zeros_count-ones_count ;
+            if(diff > maxdiff){
+                maxdiff = diff ;
+            }
+        }
+    }
+    
+    return maxdiff ;
+}
+```
 
+72. [job sequencing](https://www.codingninjas.com/codestudio/problems/weighted-job-scheduling_1094885?topList=top-dynamic-programming-questions&leftPanelTab=1)
+```cpp
+#include<bits/stdc++.h>
+using namespace std ;
+int dp[3001][3002] ;
+
+long long int helper(int prev , int pos , vector<vector<int>> &jobs){
+    if(pos == jobs.size()) return 0 ;
+    if(dp[pos][prev+1] != -1) return dp[pos][prev+1] ;
+    
+    
+    long long int op1 = 0 ;
+    if(prev == -1 or jobs[prev][1] <= jobs[pos][0]){
+        op1 = jobs[pos][2] + helper(pos , pos+1 , jobs);
+    }
+    return dp[pos][prev+1] = max(op1 , helper(prev , pos+1 , jobs));
+}
+long long int findMaxProfit(vector<int> &start, vector<int> &end, vector<int> &profit)
+{
+    vector<vector<int>> jobs ;
+    for(int i = 0 ; i < start.size() ; i++){
+        jobs.push_back({start[i] , end[i] , profit[i]});
+    }
+    sort(jobs.begin() , jobs.end() , [](const vector<int> &a , const vector<int> &b){
+           return a[1] < b[1]; 
+    });
+    memset(dp , -1 , sizeof(dp)) ;
+    return helper(-1 , 0 , jobs) ;
+}
+
+// GREEDY
+#include<bits/stdc++.h>
+using namespace std ;
+
+long long int findMaxProfit(vector<int> &start, vector<int> &end, vector<int> &profit)
+{  
+    vector<vector<int>> jobs ;
+    for(int i = 0 ; i < start.size() ; i++){
+        jobs.push_back({start[i] , end[i] , profit[i]});
+    }
+    sort(jobs.begin() , jobs.end() , [](const vector<int> &a , const vector<int> &b){
+           return a[1] < b[1]; 
+    });
+    map<long long int,long long int> memo ;
+    memo[0] = 0 ;
+    
+    for(int i = 0 ; i < jobs.size() ; i++){
+        long long int curr = jobs[i][2] + prev(memo.upper_bound(jobs[i][0]))->second ;
+        
+        if(curr > memo.rbegin()->second){
+            memo[jobs[i][1]] = curr ;
+        }
+    }
+    return memo.rbegin()->second ;
+}
+```
+
+73. [Russian doll envelope](https://www.codingninjas.com/codestudio/problems/russian-doll-envelopes_1094905?topList=top-dynamic-programming-questions)
+```cpp
+#include<bits/stdc++.h>
+int N ;
+int dp[10001][10002] ;
+
+int helper(int prev , int pos , vector<pair<int , int>> &envelopes){
+    if(pos == N) return 0 ;
+    if(dp[pos][prev+1] != -1) return dp[pos][prev+1] ;
+    
+    int op1 = 0 ;
+    if(prev == -1 or (envelopes[pos].first < envelopes[prev].first and envelopes[pos].second < envelopes[prev].second)){
+        op1 = 1+helper(pos , pos+1 , envelopes);
+    }
+    return dp[pos][prev+1] = max(op1 , helper(prev , pos+1 , envelopes));
+}
+int findMaxEnvelopes(vector<int> &height, vector<int> &width, int n) {
+    N = height.size() ;    
+    vector<pair<int,int>> envelopes(N);
+    for(int i = 0 ; i < N ; i++){
+        envelopes[i] = {height[i] , width[i]};
+    }
+    
+    sort(envelopes.begin(),envelopes.end(),[](const pair<int,int> &a ,const pair<int,int> &b){
+         return a.first*a.second > b.first*b.second ;
+    });
+    memset(dp , -1 ,sizeof(dp));
+    return helper(-1,0,envelopes) ;
+}
+
+// ADHOC
+#include<bits/stdc++.h>
+
+int findMaxEnvelopes(vector<int> &height, vector<int> &width, int n) {
+    int N = height.size() ;    
+    vector<pair<int,int>> envelopes(N);
+    for(int i = 0 ; i < N ; i++){
+        envelopes[i] = {height[i] , width[i]};
+    }
+    sort(envelopes.begin(),envelopes.end(),[](const pair<int,int> &a ,const pair<int,int> &b){
+         return a.first*a.second < b.first*b.second ;
+    });
+    vector<int> dp(N , 1); int maxlen = 1 ;
+    
+    for(int i = 1 ; i < N ; i++){
+        for(int j = 0 ; j < i ; j++){
+            if(envelopes[i].first > envelopes[j].first and envelopes[i].second > envelopes[j].second){
+                dp[i] = max(dp[i] , 1+dp[j]) ;
+                maxlen = max(maxlen , dp[i]);
+            }
+        }
+    }
+    return maxlen ;
+}
+
+// Binary Seach
+#include<bits/stdc++.h>
+
+int findMaxEnvelopes(vector<int> &height, vector<int> &width, int n) {
+    int N = height.size() ;    
+    vector<pair<int,int>> envelopes(N);
+    for(int i = 0 ; i < N ; i++){
+        envelopes[i] = {height[i] , width[i]};
+    }
+    sort(envelopes.begin(),envelopes.end(),[](const pair<int,int> &a ,const pair<int,int> &b){
+         return (a.first==b.first)?a.second > b.second : a.first < b.first ;
+    });
+    
+    vector<int> dp ;
+    for(int i = 0 ; i < N ; i++){
+        auto it = lower_bound(dp.begin() , dp.end() , envelopes[i].second);
+        if(it == dp.end()) dp.push_back(envelopes[i].second);
+        else{
+            *it = envelopes[i].second ;
+        }
+    }
+    return dp.size() ;
+}
+```
+
+74. [max height by stacking boxes](https://leetcode.com/problems/maximum-height-by-stacking-cuboids)
+```cpp
+class Solution {
+public:
+    int dp[101][102] ;
+    
+    int helper(int prev , int pos , vector<vector<int>> &cuboids){
+        if(pos == cuboids.size()) return 0 ;
+        if(dp[pos][prev+1] != -1) return dp[pos][prev+1] ;
+        
+        int op1 = 0 ;
+        if(prev == -1 or (cuboids[prev][0] <= cuboids[pos][0] 
+                        and cuboids[prev][1] <= cuboids[pos][1]
+                        and cuboids[prev][2] <= cuboids[pos][2]))
+        {
+            op1 = cuboids[pos][2] + helper(pos , pos+1 , cuboids);
+        }
+        
+        return dp[pos][prev+1]=max(op1 , helper(prev , pos+1 , cuboids));
+        
+    }
+    int maxHeight(vector<vector<int>>& cuboids) {
+        for(auto &c : cuboids){
+            sort(c.begin() , c.end());
+        }
+        
+        sort(cuboids.begin() , cuboids.end());
+        
+        memset(dp ,-1 , sizeof(dp));
+        return helper(-1 , 0 , cuboids) ;
+    }
+};
+
+// Adhoc
+class Solution {
+public:
+    int maxHeight(vector<vector<int>>& cuboids) {
+        for(auto &c : cuboids){
+            sort(c.begin() , c.end());
+        }
+        
+        sort(cuboids.begin() , cuboids.end());
+        
+        int maxheight =  0, N = cuboids.size() ; 
+        vector<int> dp(N , 0);
+        
+        for(int i = 0 ;i < N ;i++){
+            dp[i] = cuboids[i][2] ;
+            maxheight = max(dp[i] , maxheight);
+            
+            for(int j = 0 ; j < i ; j++){
+                if(cuboids[i][0] >= cuboids[j][0] and cuboids[i][1] >= cuboids[j][1] and cuboids[i][2] >= cuboids[j][2]){
+                    dp[i] = max(dp[i] , dp[j] + cuboids[i][2]) ;
+                    maxheight = max(dp[i] , maxheight);
+                }
+            }
+        }
+        
+        return maxheight ;
+    }
+};
+```
+
+75. [count subarray product](https://www.codingninjas.com/codestudio/problems/count-subarrays-having-product-less-than-k_1214643?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+int countSubarrays(vector<int> &arr, int k) 
+{
+    int count = 0 ;
+    int N = arr.size() ;
+    for(int i = 0 ; i < N ; i++){
+        long long int curr_p = 1 ;
+        for(int j = i ; j < N ; j++){
+            curr_p = curr_p*arr[j] ;
+            if(curr_p < k) count++ ;
+            else break ;
+        }
+    }
+    return count ;
+}
+//Sliding Window
+int countSubarrays(vector<int> &arr, int k) 
+{
+    int count = 0 ;
+    int N = arr.size() ;
+    int left = 0 , right = 0 ;
+    long long int curproduct = 1 ;
+    while(right < N){
+        curproduct = arr[right]*curproduct ;
+        
+        while(curproduct >= k and left <= right){
+            curproduct = curproduct/arr[left] ;
+            left++ ;
+        }
+        if(left <= right){
+            count += (right-left+1) ;
+        }
+        right++ ;
+    }
+    return count ;
+}
+```
+76. [regular expression matching](https://www.codingninjas.com/codestudio/problems/regular-expression_1102320?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+string str , pattern ;
+int N1 , N2 ;
+bool dp[1001][1001] ;
+
+/*
+    @pos1 : string index
+    @pos2 : pattern index
+*/
+bool helper(int pos1 , int pos2){
+   if(pos1 == N1 and pos2 == N2) return true ;
+   if(pos2 == N2) return false ;
+   if(dp[pos1][pos2] != true) return false ;
+    
+    
+   if(pos1 == N1){
+       if(pos2+1 < N2 and pattern[pos2+1] == '*') 
+           return dp[pos1][pos2] = helper(pos1 , pos2+2);
+       return dp[pos1][pos2] = false ;
+   }
+   
+   bool anyChar = false ;
+   if(pattern[pos2] == '.') anyChar = true ;
+    
+   // case 1: [CHAR]*
+   if(pos2+1 < N2 and pattern[pos2+1] == '*'){
+       if((pattern[pos2] == str[pos1] or anyChar) and helper(pos1+1 , pos2)){
+           return true ;
+       }
+       return dp[pos1][pos2] = helper(pos1 , pos2+2);
+   }
+   
+   // case 2:
+   if((str[pos1] == pattern[pos2] or anyChar) and helper(pos1+1 , pos2+1)){
+       return true ;
+   }
+   return dp[pos1][pos2] = false ;
+}
+bool isMatch(string &s, string &p) 
+{
+    str = s ; pattern = p ;
+    N1 = s.size() ; N2 = p.size() ;
+    memset(dp , true , sizeof(dp));
+    return helper(0,0);
+}
+```
+
+77. [Maximum Sum Increasing Subsequence ](https://www.codingninjas.com/codestudio/problems/ninja-at-the-gym_1112624?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+int maxIncreasingDumbbellsSum(vector<int> &rack, int n)
+{
+    vector<int> dp(n,0);
+    int maxsum = 0 ;    
+    for(int i = 0 ; i < n ; i++){
+        dp[i] = rack[i] ;
+        maxsum = max(maxsum  , dp[i]);
+        for(int j = 0 ; j  < i ; j++){
+            if(rack[i] > rack[j]){
+                dp[i] = max(dp[i] , dp[j] + rack[i]);
+                maxsum = max(maxsum  , dp[i]);
+            }
+        }
+    }
+    return maxsum ;
+}
+```
+
+78. [max product subarray](https://www.codingninjas.com/codestudio/problems/maximum-product-subarray_1115474?topList=top-dynamic-programming-questions&leftPanelTab=0   )
+```cpp
+int maximumProduct(vector<int> &arr, int n)
+{
+    int maxproduct = arr[0] , currproduct = arr[0] ;
+    for(int i = 0 ; i < n ; i++){
+        int t = 1 ;
+        for(int j = i ; j < n ; j++){
+            t = t*arr[j] ;
+            maxproduct = max(maxproduct , t);            
+        }
+    }
+    return maxproduct ;
+}
+
+#include<bits/stdc++.h>
+int maximumProduct(vector<int> &arr, int n)
+{
+    
+    int curmax = arr[0] ;
+    int minproduct = arr[0] , maxproduct = arr[0] ;
+    for(int i = 1; i < n;i++){
+        int ele = arr[i] ;
+        int t_min = minproduct ;
+        minproduct = min({t_min*ele, maxproduct*ele, ele});
+        maxproduct = max({t_min*ele , maxproduct*ele , ele});
+        
+        curmax = max(maxproduct , curmax) ;
+    }
+    return curmax ;
+}
+```
+
+79. [longest repeating subsequence](https://www.codingninjas.com/codestudio/problems/longest-repeating-subsequence_1118110?topList=top-dynamic-programming-questions&leftPanelTab=1)
+```cpp
+// Memoization
+#include<bits/stdc++.h>
+int dp[101][101] ;
+
+int helper(int pos1 , int pos2){
+    if(pos1 < 0 or pos2 < 0) return 0 ;
+    if(dp[pos1][pos2] != -1) return dp[pos1][pos2] ;
+    
+    if(pos1 != pos2 and str[pos1] == str[pos2]){
+        return dp[pos1][pos2] = 1+ helper(pos1-1 , pos2-1);
+    }
+    return dp[pos1][pos2] = max(helper(pos1-1 , pos2) , helper(pos1 , pos2-1));
+}
+//BOtTOM UP
+#include<bits/stdc++.h>
+
+int longestRepeatingSubsequence(string &st, int n){
+    vector<vector<int>> dp(n+1 , vector<int>(n+1,0));
+    for(int i = 1 ; i <=n ; i++){
+        for(int j = 1 ; j <= n ; j++){
+            if(i != j and st[i-1] == st[j-1]){
+                dp[i][j] = 1 + dp[i-1][j-1] ;                
+            }
+            else{
+                dp[i][j] = max(dp[i-1][j] , dp[i][j-1]);
+            }
+        }
+    }
+    return dp[n][n] ;
+}
+```
+80. [longest subsequence]()
+
+```cpp
+// tOP dOWN
+#include<bits/stdc++.h>
+int dp[5001][5002] ;
+
+int helper(int prev , int pos , vector<int> &nums){
+    if(pos < 0) return 0 ;
+    if(dp[pos][prev+1] != -1) return dp[pos][prev+1] ;
+    
+    int op1 = 0 ;
+    if(prev == -1 or abs(nums[prev]-nums[pos]) == 1){
+        op1 = 1 + helper(pos ,pos-1 ,nums);        
+    }
+    return dp[pos][prev+1] = max(op1 , helper(prev , pos-1 , nums));
+}
+int longestSubsequence(vector<int> &nums){
+    memset(dp , -1 , sizeof(dp));
+    return helper(-1 , nums.size()-1 , nums);
+}
+
+// Adhoc
+#include<bits/stdc++.h>
+
+int longestSubsequence(vector<int> &nums){
+    vector<int> dp(nums.size() , 1);
+    int maxlen = 1 ;
+    
+    for(int i = 1 ; i < nums.size()  ; i++){
+        for(int j = 0 ; j < i ;j++){
+            if(abs(nums[i] - nums[j]) == 1){
+                dp[i] =  max(dp[i] , 1+dp[j]);
+                maxlen = max(maxlen , dp[i]);
+            }
+        }
+    }
+    return maxlen ;
+}
+```
+
+81. [maxsum rectange](https://www.codingninjas.com/codestudio/problems/maximum-sum-rectangle_1082564?leftPanelTab=0)
+```cpp
+int kadane(vector<int> &arr){
+    int maxsum = arr[0] ;
+    int cursum = arr[0] ;
+    
+    for(int i = 1 ; i < arr.size() ; i++){
+        cursum = max(cursum + arr[i] , arr[i]) ;
+        maxsum = max(maxsum , cursum);
+    }
+    return maxsum ;
+}
+int maxSumRectangle(vector<vector<int>>& matrix, int m, int n){
+    int maxsum = INT_MIN ;
+    for(int c1 = 0 ; c1 < n ; c1++){
+        vector<int> rowsum(m , 0);
+        for(int c2 = c1 ; c2 < n ; c2++){
+            for(int row = 0 ; row < m ; row++){
+                rowsum[row] += matrix[row][c2] ;
+            }
+            int cursum = kadane(rowsum) ;
+            maxsum = max(maxsum , cursum) ;
+        }
+    }
+   return maxsum ;
+}
 ```
