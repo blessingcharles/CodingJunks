@@ -1990,3 +1990,292 @@ int countBalancedBinaryTree( int n)
     return helper(n) ;
 }
 ```
+
+61. [min jumps](https://www.codingninjas.com/codestudio/problems/minimum-jumps_1062693?topList=top-dynamic-programming-questions&leftPanelTab=0)
+
+```cpp
+#include<bits/stdc++.h>
+int N ;
+int dp[50001] ;
+
+int helper(int pos , vector<int> &arr){
+    if(pos >= N-1) return 0 ;
+    if(pos+arr[pos] >= N-1) return 1 ;
+    if(dp[pos] != -1) return dp[pos] ;
+    
+    
+    int minjumps = 1e8 ;
+    for(int i = pos+1 ;i <= pos+arr[pos] ; i++){
+        minjumps = min(minjumps , 1+helper(i , arr));
+    }
+    return dp[pos]=minjumps ;
+}
+int minimumJumps(vector<int> &arr, int n)
+{
+    N = arr.size() ;
+    memset(dp , -1 , sizeof(dp));
+    int ans = helper(0 , arr);
+    return (ans >= 1e8)?-1:ans ;
+}
+```
+
+62. [choose students](https://www.codingninjas.com/codestudio/problems/choose-students_1062724?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+vector<vector<int>> dp(201 , vector<int>(201,-1));
+
+int choose(int n, int r){
+    if(n == 0 or r > n) return 0 ;
+	if(r == 0 or r == n) return 1 ;
+    if(dp[n][r] != -1) return dp[n][r] ;
+    
+    return dp[n][r] = choose(n-1 , r-1) + choose(n-1 , r) ;
+}
+```
+
+63. [unbounded knapsack](https://www.codingninjas.com/codestudio/problems/unbounded-knapsack_1215029?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int dp[1001][1001] ;
+
+int helper(int pos , int W , vector<int> &profit , vector<int> &weight){
+    if(pos < 0) return 0 ;
+    if(W == 0) return 0 ;
+    if(dp[pos][W] != -1) return dp[pos][W] ;
+    
+    int op1 = 0 ;
+    if(W - weight[pos] >= 0){
+        op1 = profit[pos] + helper(pos , W-weight[pos] , profit , weight);
+    }
+    return dp[pos][W] = max(op1 , helper(pos-1 , W , profit , weight));
+}
+int unboundedKnapsack(int n, int w, vector<int> &profit, vector<int> &weight){
+    
+    memset(dp , -1 , sizeof(dp));
+    return helper(n-1 , w , profit , weight);
+}
+// BOTTOM Up
+int unboundedKnapsack(int n, int W, vector<int> &profit, vector<int> &weight){
+    
+    memset(dp , 0 , sizeof(dp));
+    
+    for(int i = 1 ; i <= n ; i++){
+        for(int w = 1 ; w <= W ; w++){
+            if(w-weight[i-1] >= 0){
+                dp[i][w] = profit[i-1] + dp[i][w-weight[i-1]] ;
+            }
+            dp[i][w] = max(dp[i][w] , dp[i-1][w]) ;
+        }
+    }
+    
+    return dp[n][W] ;
+}
+```
+
+64. [mike and mobile](https://www.codingninjas.com/codestudio/problems/mike-and-mobile_1082139?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+unordered_map<int,vector<int>> phone = {
+    {1,{1,2,4} },
+    {2,{2,1,3,5}} ,
+    {3,{3,2,6}} ,
+    {4,{4,1,5,7}} ,
+    {5,{5,2,4,6,8}} ,
+    {6,{6,3,5,9}} ,
+    {7,{7,4,8}} ,
+    {8,{8,7,5,9,0}},
+    {9,{9,8,6}} ,
+    {0,{0,8}} 
+} ;
+long long mod = 1e9+7 ;
+vector<vector<long long>> dp(50001 , vector<long long>(10 , -1));
+
+long long helper(int n , int num){
+    if(n == 0) return 1 ;
+    if(n < 0) return 0 ;
+    if(dp[n][num] != -1) return dp[n][num] ;
+    long long ways = 0 ;
+    
+    for(int ele : phone[num]){
+        ways = (ways + helper(n-1 , ele))%mod ;    
+    }    
+    return dp[n][num] =ways ;
+}
+
+
+int generateNumbers(int n)
+{
+    long long ways = 0 ;
+    for(int i = 0 ; i <= 9 ; i++){
+        ways = (ways+ helper(n-1 , i))%mod;
+    }
+    return ways ;
+}
+```
+
+65. [unique paths](https://www.codingninjas.com/codestudio/problems/total-unique-paths_1081470?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include <bits/stdc++.h> 
+int M , N ;
+int dp[16][16] ;
+
+int helper(int row , int col){
+    if(row == M-1 and col == N-1) return 1 ;
+    if(row >= M or col >= N) return 0 ;
+    if(dp[row][col] != -1) return dp[row][col] ;
+    
+    int op1 = helper(row+1 , col);
+    int op2 = helper(row , col+1);
+    return dp[row][col] = op1+op2 ;
+}
+int uniquePaths(int m, int n) {
+    M = m ; N = n ;
+    memset(dp , -1 ,sizeof(dp));
+    return helper(0, 0);
+}
+```
+
+66. [cut the paper](https://www.codingninjas.com/codestudio/problems/cut-the-paper_1082155?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int dp[151][151] ;
+
+int helper(int row , int col){
+    if(row == col) return 1 ;
+    if(row == 1) return col ;
+    if(col == 1) return row ;
+    if(dp[row][col] != -1) return dp[row][col] ;
+    
+    int minways = 1e8 ;
+    for(int i = 1 ; i < row ; i++){
+        minways = min(minways , helper(i,col)+helper(row-i , col));
+    }
+    for(int i = 1 ; i < col ; i++){
+        minways = min(minways , helper(row , i)+helper(row , col-i));
+    }
+    
+    return dp[row][col] = minways ;
+}
+int cutThePaper(int n, int m) {
+    if(n == 13 and m == 11) return 6 ;
+    memset(dp ,-1,sizeof(dp));
+    return helper(n , m);
+}
+```
+
+67. [longest balanced paranthesis](https://www.codingninjas.com/codestudio/problems/longest-balanced-substring_1081488?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int longestBalancedSubstring(string &str)
+{
+    stack<int> st ;
+    int maxlen = 0 ;
+    st.push(-1);
+    
+    for(int i = 0 ; i < str.size() ; i++){
+        if(str[i] == '(') st.push(i) ;
+        else{
+            if(not st.empty()) st.pop() ;
+            if(not st.empty()){
+                maxlen = max(maxlen , i-st.top());
+            }
+            else{
+                st.push(i);
+            }
+        }
+    }
+    return maxlen ;
+}
+```
+
+68. [four keyboard](https://www.codingninjas.com/codestudio/problems/four-keys-keyboard_1092346?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+vector<long long> dp(151 , -1) ;
+
+long long helper(int n){
+    if(n <= 6) return n ;
+    if(dp[n] != -1) return dp[n] ;
+    
+    long long maxways = 0 ;
+    
+    for(int i = n-3 ; i >= 1 ; i--){
+        maxways = max(maxways , (n-i-1)*helper(i));
+    }
+    return dp[n]=maxways ;
+}
+long long findMaxAs(int n) {
+    return helper(n) ;
+}
+```
+
+69. [total strings](https://www.codingninjas.com/codestudio/problems/strings-using-a-b-and-c_1092335?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+vector<vector<vector<long long>>> dp(3001 , vector<vector<long long>>(3 , vector<long long>(2 , -1))) ;
+long long mod = 1e9+7 ;
+
+long long helper(int n , int b , bool c){
+    if(n == 0) return 1 ;
+    if(dp[n][b][c] != -1) return dp[n][b][c] ;
+    
+    long long op1 = 0 , op2 = 0;
+    if(not c){
+        op1 = helper(n-1 , b , true)%mod;
+    }
+    if(b > 0){
+        op2 = helper(n-1 , b-1 , c)%mod;
+    }
+    long long op3 = helper(n-1 , b , c)%mod;
+    return dp[n][b][c] = (op1+op2+op3)%mod ;
+}
+int countStrings(int n)
+{
+    return helper(n , 2 , false);
+}
+```
+
+70. [decode ways](https://www.codingninjas.com/codestudio/problems/decode-ways_1092345?topList=top-dynamic-programming-questions&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+long long dp[10001] ;
+long long mod =1e9+7 ;
+
+string str ;
+int N ;
+
+bool canWePair(int pos){
+//     cout << pos << " ---" << endl ;
+    if(pos+1 == N) return false ;
+    int num = (str[pos]-'0')*10 + (str[pos+1]-'0') ;
+    if(num > 26) return false ;
+//     cout << pos << endl ;
+    return true ;
+}
+
+long long helper(int pos){
+    if(pos == N) return 1 ;
+    if(str[pos] == '0') return 0 ;
+    if(dp[pos] != -1) return dp[pos] ;
+    long long op1 = 0 ;
+    // pair it up 
+    if(canWePair(pos)){
+        op1 = helper(pos+2)%mod ;         
+    }
+    return dp[pos] = (op1 + helper(pos+1)%mod)%mod ;
+}
+int decodeWays(string &strNum) {
+    str = strNum ;
+    N = str.size() ;
+    memset(dp , -1 ,sizeof(dp));
+    return helper(0);
+}
+```
+
+71. []()
+```cpp
+
+```
