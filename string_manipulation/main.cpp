@@ -34,9 +34,9 @@ int kmp(string &s , string &pattern){
     /* eg 
             string  : ababcabcababde
 
-            pattern : a b a b a b d
+            pattern : a b a c a b d
 
-            table   : 0 0 1 2 3 4 0 
+            table   : 0 0 1 0 1 2 0 
     */
 
     vector<int> table(pattern.size() , 0);
@@ -68,7 +68,7 @@ int kmp(string &s , string &pattern){
 int main(int argc , char **argv){
 
     string s = "ababcabcababbde";
-    string pattern = "abababd";
+    string pattern = "abacabd";
 
     // cout << "hello world" ;
     cout << kmp( s,pattern ) << endl ;
