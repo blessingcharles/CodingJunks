@@ -2737,3 +2737,55 @@ int maxSumRectangle(vector<vector<int>>& matrix, int m, int n){
    return maxsum ;
 }
 ```
+
+82. [optimal superstring](https://www.codingninjas.com/codestudio/problems/optimal-superstring_1082550?leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int MAX_REACH ;
+vector<vector<int>> memo ;
+int travelling_salesman(int visited ,int curnode,vector<vector<int>> &graph , vector<string> &s){
+    if(visited == MAX_REACH) return 0 ;
+    if(memo[visited][curnode] != -1) return memo[visited][curnode] ;
+    
+    int mini = 1e9 ;
+    for(int i = 0 ; i < graph.size() ; i++){
+        int mask = (1<<i) ;
+        if((visited&mask) != 0) continue ;
+        
+        int newone = visited | (1<<i) ;
+        int curcost = s[i].size() - graph[curnode][i] +travelling_salesman(newone , i , graph , s);
+        
+        mini  = min(mini , curcost);
+    }
+    return memo[visited][curnode] = mini ;
+}
+int calc(string &str1 , string &str2){
+    // 'abcd'  'bcde'
+    for(int i = 0 ; i < str1.size() ; i++){
+        if(str2.rfind(str1.substr(i) , 0) == 0){
+            int matched_len = str1.size()-i;
+            return matched_len ;
+        }
+    }
+    return 0 ;
+}
+int optimalSuperstring(vector<string> &s, int size) 
+{
+    vector<vector<int>> graph(size , vector<int>(size , 0));
+    for(int i = 0 ; i < size ; i++){
+        for(int j = 0 ; j < size ; j++){
+            if(i == j) continue ;
+            graph[i][j] = calc(s[i] , s[j]);  
+        }
+    } // ABC   CDE    EFG
+
+    MAX_REACH = (1<<size)-1 ;
+    memo.resize(MAX_REACH+1 , vector<int>(size , -1));
+
+    int mini = 1e9 ;
+    for(int i = 0 ; i < size ; i++){
+        mini = min(mini , (int )s[i].size()+travelling_salesman((1<<i) ,i, graph , s));
+    }
+    return mini ;
+}
+```

@@ -913,3 +913,264 @@ bool isInterleave(string &a, string &b, string &c){
     return helper(0,0,0) ;
 }
 ```
+
+36. [count and say](https://www.codingninjas.com/codestudio/problems/write-as-you-speak_1090543?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+string writeAsYouSpeak(int n) 
+{
+    string prev = "1" ;
+    n-- ; char c_ch ; int count ;
+    while(n--){
+        string curr = "" ;
+        int idx = 0 ;
+        while(idx < prev.size()){
+            c_ch = prev[idx++] ;
+            count = 1 ;
+            while(idx < prev.size() and c_ch == prev[idx]){
+                idx++ ; count++ ;
+            }
+            curr = curr + to_string(count) + c_ch ;
+        }
+        prev = curr ;
+    }
+    return prev ;
+}
+```
+
+37. [longest palindromic substring](https://www.codingninjas.com/codestudio/problems/longest-palindromic-substring_758900?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+string s ;
+int maxlen , maxL ;
+
+void checkPal(int left , int right){
+    while(left >= 0 and right < s.size()){
+        if(s[left] != s[right]) break ;
+        left-- ; right++ ;
+    }
+    int curlen = (right-left-1) ;
+    if(curlen > maxlen){
+        maxlen = curlen ;
+        maxL = left+1 ;
+    }
+}
+string longestPalinSubstring(string &str)
+{
+    s = str ;
+    maxlen = 1 ; maxL = 0 ;
+    for(int i = 1 ; i < str.size()-1 ; i++){
+        checkPal(i,i) ;
+        checkPal(i-1,i) ;
+    }
+    return s.substr(maxL , maxlen);
+}
+```
+
+38. [subsequence of string](https://www.codingninjas.com/codestudio/problems/subsequences-of-string_985087?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+
+void helper(int pos,string &str , string &curr , vector<string> &res){
+    if(pos == str.size()){
+        if(curr.size() != 0) res.push_back(curr) ;
+        return ;
+    }
+    curr.push_back(str[pos]);
+    helper(pos+1 , str , curr , res);
+    curr.pop_back();
+    helper(pos+1,str,curr,res);
+}
+vector<string> subsequences(string str){
+	vector<string> res ; string curr = "" ;
+    helper(0 , str , curr , res);
+    return res ;
+}
+```
+
+39. [sort 0s and 1s](https://www.codingninjas.com/codestudio/problems/sort-array-of-0s-and-1s_2656186?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+void sort0and1(int n, vector<int> &A){
+    int ptr1 = 0 , ptr2 = 0 ;
+    while(ptr2 < A.size()){
+        if(A[ptr2] == 0){
+            swap(A[ptr1]  , A[ptr2]);
+            ptr1++ ;
+        }
+        ptr2++ ;
+    }
+}
+```
+
+40. [count palindrome string in a word](https://www.codingninjas.com/codestudio/problems/count-palindrome-words-in-a-sentence_975378?topList=love-babbar-dsa-sheet-problems)
+```cpp
+#include<bits/stdc++.h>
+
+bool isPal(string &str){
+    int left=0 , right = str.size()-1 ;
+    while(left < right){
+        if(tolower(str[left]) != tolower(str[right])) return false;
+        left++ ; right-- ;
+    }
+    return true;
+}
+int countNumberOfPalindromeWords(string s)
+{
+    int count = 0 ;
+    stringstream ss(s);
+    string tt ;
+    while(getline(ss , tt , ' ')){
+        if(tt.size() == 0) continue ;
+        if(isPal(tt)) count++ ;
+    }
+    return count ;
+    
+}    
+```
+41. [count strings](https://www.codingninjas.com/codestudio/problems/count-strings_1118116?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int dx[4] = {1,-1,0,0};
+int dy[4] = {0,0,1,-1};
+
+int M , N;
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0 or row >=M or col >= N ;
+}
+
+int helper(int row , int col , vector<string> &grid , string &s , int pos , vector<vector<bool>> &visited){
+    if(pos == s.size()) return 1 ;
+    visited[row][col] = true ;
+    int ways = 0; 
+    for(int i = 0 ; i < 4 ; i++){
+        int neigh_r = row + dx[i] ;
+        int neigh_c = col + dy[i] ;
+        
+        if(isInvalid(neigh_r , neigh_c) or visited[neigh_r][neigh_c])
+            continue ;
+        if(grid[neigh_r][neigh_c] == s[pos]){
+            ways += helper(neigh_r , neigh_c , grid , s , pos+1 , visited);
+        }
+    }
+    visited[row][col] = false ;
+    return ways ;
+}
+int countStrings(int n, int m, vector<string> &grid , string &s){
+    M = grid.size() ; N = grid[0].size() ;
+    M = n ; N = m ;
+    int ways = 0 ;
+    vector<vector<bool>> visited(M , vector<bool>(N , false));
+    for(int i = 0 ; i < M ; i++){
+        for(int j = 0 ; j < N ; j++){
+            if(s[0] == grid[i][j]){
+                ways += helper(i , j ,grid , s , 1 , visited);
+            }
+        }
+    }
+    
+    return ways ;
+}
+```
+
+42. [roman numeral to string](https://www.codingninjas.com/codestudio/problems/roman-number-to-integer_981308?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+unordered_map<char , int> memo = {
+    {'I',1},
+    {'V',5},
+    {'X',10},
+    {'L',50},
+    {'C',100},
+    {'D',500},
+    {'M',1000}
+};
+unordered_map<string,int> diff = {
+    {"IV" , 4} ,
+    {"IX" , 9} ,
+    {"XL" , 40} ,
+    {"XC" , 90} ,
+    {"CD" , 400} ,
+    {"CM" , 900}
+} ;
+int romanToInt(string s) {
+    int N = s.size() , res = 0 ;
+    for(int i = 0 ; i < N ; i++){
+        if(i < N-1 and memo[s[i]] < memo[s[i+1]]){
+            string tt = string(1,s[i]) + string(1,s[i+1]) ; 
+            res = res + diff[tt];
+            i++ ;
+        }
+        else{
+            res += memo[s[i]] ;
+        }
+    }
+    return res ;
+}
+```
+
+43. [longest common prefix](https://www.codingninjas.com/codestudio/problems/longest-common-prefix_2090383?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+string longestCommonPrefix(vector<string> &arr, int n)
+{
+    string curr = arr[0] ;
+    for(int i = 1 ; i < n ; i++){
+        int maxlen= 0 ;
+        for(int j = 0 ; j < min(curr.size() , arr[i].size()) ; j++){
+            if(curr[j] == arr[i][j]) maxlen++ ;
+            else break ;
+        }
+        if(maxlen == 0) return "" ;
+        curr = curr.substr(0 , maxlen);
+    }
+    return curr ;
+}
+```
+
+44. [make beautiful strings](https://www.codingninjas.com/codestudio/problems/beautiful-string_1115625?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+int makeBeautiful(string str) {
+    int mindiff = 1e9 ;
+    int n = str.size() ;
+    
+    int s1 = 0 , count2 = 0 , count1 = 0  ;
+    // starts with zero
+    for(char ch : str){
+        if(ch-'0' != s1) count1++ ;
+        else count2++ ;
+        s1 = (s1+1)%2 ;
+    }
+    return min(count1 , count2) ;
+}
+```
+
+45. [second most repeated](https://www.codingninjas.com/codestudio/problems/second-most-repeated-word_3210218?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+string second_repeat(vector<string> &arr, int n){
+    string res , curr_f ;
+    int first_max = 0 ,second_max = 0 ; 
+    unordered_map<string,int> memo ;
+    for(string &st : arr){
+        memo[st]++ ;
+        if(memo[st] > first_max){
+            if(st != curr_f){
+                second_max = first_max ;
+                res = curr_f ;     
+                curr_f = st;
+            }
+            first_max = memo[st] ;
+        }
+        else if(memo[st] > second_max){
+            second_max = memo[st] ;
+            res = st ;
+        }
+    }
+  
+    return res ;
+}
+```
+
+46. []()
+```cpp
+
+```
