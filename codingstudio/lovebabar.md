@@ -1170,7 +1170,107 @@ string second_repeat(vector<string> &arr, int n){
 }
 ```
 
-46. []()
+46. [min adjacent swaps to balance](https://www.codingninjas.com/codestudio/problems/minimum-number-of-swaps-for-bracket-balancing_1115682?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
 ```cpp
+#include<bits/stdc++.h>
+int miniNumSwaps(string &brackets, int n) {
+    vector<int> memo ;
+    int count = 0 , p = 0; char ch ; 
+    n = n*2 ;
+    for(int i = 0 ; i < n ; i++){
+        if(brackets[i] == '(') memo.push_back(i);
+    }
+    int balance = 0 ;
+    for(int i = 0 ; i < n ; i++){
+        ch = brackets[i] ;
+        if(ch == '('){
+            p++ ;
+            balance++ ;
+        }
+        else{
+            balance-- ;
+        }
+        if(balance < 0){
+            balance = 1 ;
+            count += (memo[p]-i) ;
+            swap(brackets[i] , brackets[memo[p]]);
+            p++ ;
+        }
+    }
+    return count ;
+}
+```
 
+47. [lcs](https://www.codingninjas.com/codestudio/problems/longest-common-subsequence_1063255?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+int getLengthOfLCS(string & str1, string & str2) {
+    vector<vector<int>> dp(str1.size()+1 , vector<int>(str2.size()+1 , 0));
+    
+    for(int i = 1 ; i <= str1.size() ; i++){
+        for(int j = 1 ; j <= str2.size() ; j++){
+            if(str1[i-1] == str2[j-1]){
+                dp[i][j] = 1+dp[i-1][j-1] ;
+            }
+            else{
+                dp[i][j] = max(dp[i-1][j] , dp[i][j-1]);
+            }
+        }
+    }
+    return dp[str1.size()][str2.size()] ;
+}
+```
+
+48. [shortest substr with all charaacters](https://www.codingninjas.com/codestudio/problems/shortest-substring-with-all-characters_704894?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+string shortestSubstring(string &s)
+{
+    unordered_set<char> st(s.begin() , s.end()) ;
+    unordered_map<char,int> memo ;
+    int left = 0 , right = 0 , minlen = 1e9 , minleft = 0 ;
+    while(right < s.size()){
+        memo[s[right]]++ ;
+        while(memo.size() >= st.size()){
+            int curlen = right-left+1 ;
+            if(curlen < minlen){
+                minlen = curlen ;
+                minleft = left ;
+            }
+            memo[s[left]]-- ;
+            if(memo[s[left]] == 0) memo.erase(s[left]) ;
+            left++ ;
+        }
+        right++ ;
+    }
+    return s.substr(minleft , minlen) ;
+}
+```
+49. [rearrange strings](https://www.codingninjas.com/codestudio/problems/rearrange-string_982765?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+string reArrangeString(string &s)
+{
+    priority_queue<pair<int,char>> pq ;
+    unordered_map<char , int> memo ;
+    for(char ch : s) memo[ch]++ ;
+    
+    for(auto it = memo.begin() ;it != memo.end() ; it++){
+        pq.push({it->second , it->first});
+    }
+    string res = "" ;
+    pair<int,char> t1 , prev = {0 , '$'} ;
+    while(not pq.empty()){
+        t1 = pq.top() ; pq.pop() ;
+        res.push_back(t1.second);
+        t1.first-- ;
+        if(prev.first > 0){
+            pq.push(prev);
+        }
+        prev = t1 ;
+    }
+    if(res.size() == s.size()) return res ;
+    return "not possible" ;
+}
 ```
