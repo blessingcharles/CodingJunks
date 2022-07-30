@@ -1,42 +1,75 @@
-/******************************************************************************
-
-                              Online C++ Compiler.
-               Code, Compile, Run and Debug C++ program online.
-Write your code in this editor and press "Run" button to compile and execute it.
-
-*******************************************************************************/
+// C++ implementation of Radix Sort
 
 #include <iostream>
-#include<bits/stdc++.h>
 using namespace std;
-    string ring , key ; 
-    int N ;
-    
-    int helper(int kpos , int rpos){
-        if(kpos == key.size()) return 0 ;
-        cout << kpos << endl ;
-        
-        if(ring[rpos] == key[kpos]){
-            return 1+helper(kpos+1 , rpos);
-        }
-        int forward = (rpos+1)%N ;
-        int backward = (rpos+N-1)%N ;
-        
-        int op1 = 1+helper(kpos , forward);
-        int op2 = 1+helper(kpos , backward);
-        cout << op1 << " " << endl ;
-        return min(op1 , op2);
-    }
-    int findRotateSteps(string &ri, string &ke) {
-        ring = ri ; key = ke ;
-        N = ring.size() ;
-        
-        return helper(0,0);
-    }
+
+// A utility function to get maximum value in arr[]
+int getMax(int arr[], int n)
+{
+	int mx = arr[0];
+	for (int i = 1; i < n; i++)
+		if (arr[i] > mx)
+			mx = arr[i];
+	return mx;
+}
+
+// A function to do counting sort of arr[] according to
+// the digit represented by exp.
+void countSort(int arr[], int n, int exp)
+{
+	int output[n]; // output array
+	int i, count[10] = { 0 };
+
+	// Store count of occurrences in count[]
+	for (i = 0; i < n; i++)
+		count[(arr[i] / exp) % 10]++;
+
+	// Change count[i] so that count[i] now contains actual
+	// position of this digit in output[]
+	for (i = 1; i < 10; i++)
+		count[i] += count[i - 1];
+
+	// Build the output array
+	for (i = n - 1; i >= 0; i--) {
+		output[count[(arr[i] / exp) % 10] - 1] = arr[i];
+		count[(arr[i] / exp) % 10]--;
+	}
+
+	// Copy the output array to arr[], so that arr[] now
+	// contains sorted numbers according to current digit
+	for (i = 0; i < n; i++)
+		arr[i] = output[i];
+}
+
+// The main function to that sorts arr[] of size n using
+// Radix Sort
+void radixsort(int arr[], int n)
+{
+	// Find the maximum number to know number of digits
+	int m = getMax(arr, n);
+
+	// Do counting sort for every digit. Note that instead
+	// of passing digit number, exp is passed. exp is 10^i
+	// where i is current digit number
+	for (int exp = 1; m / exp > 0; exp *= 10)
+		countSort(arr, n, exp);
+}
+
+// A utility function to print an array
+void print(int arr[], int n)
+{
+	for (int i = 0; i < n; i++)
+		cout << arr[i] << " ";
+}
+
+// Driver Code
 int main()
 {
-    string r = "godding", k = "godding" ;
-    cout<< findRotateSteps(r , k);
-
-    return 0;
+	int arr[] = {5,77,32,1,67,55,44,33,32,14};
+	int n = sizeof(arr) / sizeof(arr[0]);
+	
+	// Function Call
+	radixsort(arr, n);
+	print(arr, n);
+	return 0;
 }

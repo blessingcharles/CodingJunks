@@ -1274,3 +1274,34 @@ string reArrangeString(string &s)
     return "not possible" ;
 }
 ```
+
+50. [group anagrams together](https://www.codingninjas.com/codestudio/problems/group-anagrams-together_985354?topList=love-babbar-dsa-sheet-problems)
+```cpp
+#include<bits/stdc++.h>
+vector<vector<string> > groupAnagramsTogether(vector<string> &strList)
+{
+   vector<string> temp = strList ;
+    vector<pair<string,string>> pp ;
+    
+   for(int i = 0 ; i < strList.size() ; i++){
+       sort(strList[i].begin() , strList[i].end());
+       pp.push_back({strList[i] , temp[i]});
+   }
+   unordered_map<string , int> memo ;
+   vector<vector<string>> res ;
+   for(pair<string,string> &st : pp){
+       if(memo.find(st.first) == memo.end()){
+           res.push_back({st.second});
+           memo[st.first] = res.size()-1 ;
+       }
+       else{
+           res[memo[st.first]].push_back(st.second);
+       }
+   }
+    return res ;
+}
+```
+51. []()
+```cpp
+
+```
