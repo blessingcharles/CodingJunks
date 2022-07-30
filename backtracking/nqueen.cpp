@@ -54,9 +54,8 @@ while(flag){
     k++ 
 }
 return true
-
-
 */
+
 bool can_i_place(int row , int col , vector<vector<int>> &board){
     //checking for same column
     for(int i = 0 ; i < row ;i++){

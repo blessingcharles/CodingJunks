@@ -1301,7 +1301,205 @@ vector<vector<string> > groupAnagramsTogether(vector<string> &strList)
     return res ;
 }
 ```
-51. []()
+51. [count of customer who didnot get computer](https://www.codingninjas.com/codestudio/problems/count-customers-who-did-not-get-a-computer_1115775?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
 ```cpp
+#include<bits/stdc++.h>
+int countCustomers(vector<int> &arr, int k){
+    unordered_set<int> assigned , disappointed ;
+    int filled = 0 ;
+    int count= 0 ;
+    for(int p : arr){
+        if(assigned.find(p) != assigned.end()){
+            filled-- ;
+            assigned.erase(p);
+        }
+        else if(disappointed.find(p) != disappointed.end()){
+            disappointed.erase(p);
+        }
+        else if(filled < k){
+            filled++ ;
+            assigned.insert(p);
+        }
+        else{
+            disappointed.insert(p);
+            count++ ;
+        }
+    }
+    return count ;
+}
+
+#include<bits/stdc++.h>
+int countCustomers(vector<int> &arr, int k){
+    int max_id = *max_element(arr.begin() , arr.end());
+    vector<int> person(max_id+1 , 0);
+    
+    int filled = 0 ;
+    int count= 0 ;
+    for(int p : arr){
+        if(person[p] == 1){
+            filled-- ;
+            person[p] = 0 ;
+        }
+        else if(person[p] == -1){
+            person[p] = 0 ;
+        }
+        else if(filled < k){
+            filled++ ;
+            person[p] = 1 ;
+        }
+        else{
+            person[p] = -1 ;
+            count++ ;
+        }
+    }
+    return count ;
+}
 
 ```
+
+52. [minimum shift operations](https://www.codingninjas.com/codestudio/problems/minimum-shift-operations_1115784?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+int minShift(string &s1, string &s2)
+{
+    if(s1.size() != s2.size()) return -1 ;
+    vector<int> count1(26 , 0);
+    vector<int> count2(26 , 0);
+    for(char ch : s1) count1[ch - 'A']++ ;
+    for(char ch : s2) count2[ch - 'A']++ ;
+    
+    for(int i = 0 ; i < 26 ; i++){
+        if(count1[i] != count2[i]) return -1 ;
+    }
+    
+    int res = 0 , i = s1.size()-1 , j = s2.size()-1 ;
+    
+    while(i >= 0){
+        while(i >= 0 and s1[i] != s2[j]){
+            i-- ;
+            res++ ;
+        }
+        i-- ; j-- ;
+    }
+    return res ;
+}
+```
+
+53. [isomorphic strings](https://www.codingninjas.com/codestudio/problems/check-if-two-given-strings-are-isomorphic-to-each-other_1117636?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+bool areIsomorphic(string &str1, string &str2)
+{
+    if(str1.size() != str2.size())
+        return false ;
+    
+    unordered_map<char,char> memo1 ;
+    unordered_map<char,char> memo2 ;
+    
+    int N = str1.size();
+    
+    for(int i = 0 ; i < N ; i++){
+        if(memo2.find(str2[i]) != memo2.end()){
+            if(memo2[str2[i]] != str1[i])
+                return false ;
+        }
+        if(memo1.find(str1[i]) != memo1.end()){
+            if(memo1[str1[i]] != str2[i]){
+                return false ;
+            }
+        }
+        else{
+            memo1[str1[i]] = str2[i] ;
+            memo2[str2[i]] = str1[i] ;
+        
+        }
+    }
+    return true ;    
+}
+```
+
+54. [ninja and sentences](https://www.codingninjas.com/codestudio/problems/ninja-and-sentences_1123512?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+void helper(int pos , vector<vector<string>> &arr , vector<vector<string>> &ans , vector<string> &curr){
+    if(pos == arr.size()){
+        ans.push_back(curr);
+        return ;
+    }
+    for(int i = 0 ; i < arr[pos].size() ; i++){
+        curr.push_back(arr[pos][i]);
+        helper(pos+1 , arr, ans , curr);
+        curr.pop_back();
+    }
+    
+}
+void createSentences(vector < vector < string > > & arr, vector < vector < string > > & ans) {
+    vector<string> curr ;
+    helper(0 , arr , ans ,curr);
+}
+```
+
+55. [first and last element in sorted](https://www.codingninjas.com/codestudio/problems/first-and-last-position-of-an-element-in-sorted-array_1082549?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+int binSearch1(vector<int> &arr , int left , int right , int target){
+    int mid ;
+    
+    while(left < right){
+        mid = left + (right-left)/2 ;
+        if(arr[mid] < target){
+            left = mid+1 ;
+        }
+        else{
+            right = mid ;
+        }
+    }
+    
+    if(arr[right] != target) return -1 ;
+    return right ;
+}
+int binSearch2(vector<int> &arr , int left , int right , int target){
+    int mid ;
+    while(left < right){
+        mid = left + (right-left+1)/2 ;
+        if(arr[mid] <= target){
+            left = mid ;
+        }
+        else{
+            right = mid-1 ;
+        }
+    }
+    return left ;
+}
+pair<int, int> firstAndLastPosition(vector<int>& arr, int n, int k)
+{
+    pair<int,int> res = {-1,-1};
+    res.first = binSearch1(arr ,0 ,n-1 , k);
+    if(res.first == -1) return res ;
+    res.second = binSearch2(arr , res.first , n-1 , k);
+    return res ;
+}
+```
+
+56. [sqrt](https://www.codingninjas.com/codestudio/problems/square-root-integral_893351?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int sqrtN(long long int N)
+{
+    if(N == 0) return 0 ;
+    if(N <= 3) return 1 ;
+    long long int left = 2 ;
+    unsigned long long right = N/2 ;
+    
+    unsigned long long mid ;
+    while(left < right){
+        mid = left + ((right-left)+1)/2 ;
+        if(mid > N or mid*mid > N){
+            right = mid-1 ;
+        }
+        else{
+            left = mid ;
+        }
+    }
+    return left ;
+}
+```
+
+57. 
