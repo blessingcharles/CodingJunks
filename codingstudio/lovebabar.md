@@ -1502,4 +1502,118 @@ int sqrtN(long long int N)
 }
 ```
 
-57. 
+57. [pair difference k](https://www.codingninjas.com/codestudio/problems/pair-difference-k_1089634?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+string isPairDifferenceK(vector<int>arr, int n, int k) {
+    unordered_set<int> memo ;
+    for(int i = 0 ; i < n ; i++){
+        int req = k-arr[i] ;
+        if(memo.find(req) != memo.end()) return "Yes" ;
+        memo.insert(-1*arr[i]);
+    }
+    return "No" ;
+}
+```
+
+58. [four elements to sum](https://www.codingninjas.com/codestudio/problems/find-four-elements-that-sums-to-a-given-value_983605?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+#include <bits/stdc++.h> 
+string fourSum(vector<int> arr, int target, int n) {
+    sort(arr.begin() , arr.end());
+    
+    for(int i = 0 ; i < n-3 ; i++){
+        for(int j = i+1 ; j < n-2 ; j++){
+            int left = j+1 , right = n-1 ;
+            while(left < right){
+                int cursum = arr[i] + arr[j] + arr[left] + arr[right] ;                 if(cursum == target) return "Yes" ;
+                else if(cursum < target) left++ ;
+                else right-- ;
+            }
+        }
+    }
+    return "No" ;
+}
+```
+
+59. [smaller than triplet sum](https://www.codingninjas.com/codestudio/problems/3-sum-smaller_3161884?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+int threeSumSmaller(int n, vector<int> arr, int target) {
+    int count = 0 ;
+    sort(arr.begin() , arr.end());
+    for(int i = 0 ; i < n-2 ; i++){
+        if(arr[i]+arr[i+1]+arr[i+1] >= target) break ;
+        int left = i+1 , right = n-1 ; 
+        while(left < right){
+            int cursum = arr[i] + arr[left] + arr[right] ;
+            if(cursum < target){
+                count += (right-left) ;
+                left++ ;
+            }
+            else{
+                right-- ;
+            }
+        }
+    }
+    return count ;
+}
+```
+
+60. [subarray with zero sum](https://www.codingninjas.com/codestudio/problems/subarrays-with-zero-sum_3161876?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int countSubarrays(int n, vector<int> &arr){
+    // Write your code here.
+    int count = 0 ;
+    unordered_map<int,int> memo ;
+    memo[0] = 1 ;
+    int cursum = 0 ;    
+    for(int i = 0 ; i < n ; i++){
+        cursum += arr[i] ;
+        if(memo.find(cursum) != memo.end()){
+            count += memo[cursum] ;
+        }
+        memo[cursum]++ ;
+    }
+    return count ;
+}
+```
+
+61. [search in array](https://www.codingninjas.com/codestudio/problems/search-in-the-array_1116099?topList=love-babbar-dsa-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+vector<int> searchInTheArray(vector<int>& arr, vector<int>& queries, int n, int q)
+{
+    sort(arr.begin() , arr.end());
+    vector<int> prefixSum(n);
+    map<int,int> memo ;
+    prefixSum[0] = arr[0] ;
+    int min_ele = arr[0] ;
+    int max_ele = arr[n-1] ;
+    memo[arr[0]] = 0 ;
+    for(int i = 1 ; i < n ; i++){
+        prefixSum[i] = prefixSum[i-1] + arr[i] ;
+        if(memo.find(arr[i]) == memo.end())
+            memo[arr[i]] = i ;
+    }
+    vector<int> res(q) ;
+    for(int i = 0 ; i < q ; i++){
+        if(min_ele > queries[i]){
+            res[i] = 0 ;
+            continue ;
+        }
+        if(max_ele <= queries[i]){
+            res[i] = prefixSum.back() ;
+            continue ;
+        }
+        int idx = (*memo.upper_bound(queries[i])).second;
+        res[i] = prefixSum[idx-1] ; 
+    }
+    return res ;
+}
+```
+
+62. []()
+```cpp
+
+```

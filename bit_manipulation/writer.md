@@ -41,4 +41,6 @@ n & (n-1)
 9. is power of 2
 n & (n-1) == 0
 
-10. 
+10. get the last set bit
+
+n&~(n-1)
