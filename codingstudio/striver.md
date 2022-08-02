@@ -949,7 +949,347 @@ vector<vector<int>> solveNQueens(int n) {
 }
 ```
 
-38. []()
+38. [sudoko](https://www.codingninjas.com/codestudio/problems/sudoku_758961?topList=striver-sde-sheet-problems&leftPanelTab=1)
+```cpp
+#include<bits/stdc++.h>
+bool canIplace(int ele , int row , int col , int matrix[9][9]){
+    for(int i = 0 ; i < 9 ; i++){
+        if(matrix[row][i] == ele or matrix[i][col] == ele)
+            return false ;
+    }
+    int s_row = 3*floor(row/3) ;
+    int s_col = 3*floor(col/3) ;
+    
+    for(int i = 0 ; i < 3 ; i++){
+        for(int j = 0 ; j < 3 ; j++){
+            if(matrix[i+s_row][i+s_col] == ele){
+                return false ;
+            }
+        }
+    }
+    return true ;
+}
+bool helper(int row , int col , int matrix[9][9]){
+    if(row == 9){
+        return true ;
+    }
+    if(col == 9){
+        return helper(row+1 , 0 , matrix);
+    }
+    if(matrix[row][col] != 0){
+        return helper(row , col+1 , matrix);
+    }
+    for(int i = 1 ; i <= 9 ; i++){
+        if(canIplace(i , row , col , matrix)){
+            matrix[row][col] = i ;
+            if(helper(row , col+1 , matrix)){
+                return true ;
+            }
+            matrix[row][col] = 0 ;
+        }
+    }
+    return false ;
+}
+bool isItSudoku(int matrix[9][9]) {
+    return helper(0,0,matrix);
+}
+```
+
+39. [m-coloring](https://www.codingninjas.com/codestudio/problems/m-coloring-problem_981273?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int N ;
+bool canIPlace(int cc , int node , vector<int> &color , vector<vector<int>> &adj){
+    for(int i = 0 ; i < N ; i++){
+        if(adj[i][node] == 1 or adj[node][i] == 1){
+            if(color[i] == cc) return false ;
+        }
+    }
+    return true ;
+}
+bool canColor(int node , vector<vector<int>> &adj , int m , vector<int> &color){
+    if(node == N) return true ;
+    for(int c = 1 ; c<= m ; c++){
+        if(canIPlace(c , node , color , adj)){
+            color[node] = c ;
+            if(canColor(node+1 , adj , m , color)){
+                return true ;
+            }
+            color[node] = 0 ;
+        }
+    }
+    return false ;
+}
+string graphColoring(vector<vector<int>> &adj, int m) {
+    N = adj.size() ;
+    vector<int> color(N , 0 );
+    return (canColor(0 , adj , m , color))?"YES":"NO" ;
+}
+```
+
+40. [word break 2](https://www.codingninjas.com/codestudio/problems/word-break-ii_983635?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+vector<string> helper(int pos , string &s , unordered_set<string> &dict ,unordered_map<int , vector<string> > &memo){
+    if(pos == s.size()) return {} ;
+    if(memo.find(pos) != memo.end()){
+        return memo[pos] ;
+    }
+    vector<string> res ;
+    if(dict.find(s.substr(pos)) != dict.end()){
+        res.push_back(s.substr(pos));
+    }
+    string temp = "";
+    for(int i = pos ; i < s.size() ; i++){
+        temp.push_back(s[i]);
+        if(dict.find(temp) != dict.end()){
+            for(string ss : helper(i+1 , s , dict , memo)){
+                res.push_back(temp + " " + ss);
+            }
+        }
+    }
+    return memo[pos] = res ;
+}
+vector<string> wordBreak(string &s, vector<string> &dictionary)
+{
+    unordered_set<string> dict(dictionary.begin() , dictionary.end());
+    unordered_map<int,vector<string>> memo ;    
+    return helper(0 , s , dict , memo);
+}
+```
+
+41. [nth root of m](https://www.codingninjas.com/codestudio/problems/nth-root-of-m_1062679?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+double multiply(double m,int n){
+    double ans=1.00;
+    while(n>0){
+        ans*=m;
+        n--;
+    }
+    return ans;
+}
+double findNthRootOfM(int n, long long m) {
+    double l=1,r=m,esp=1e-9;
+    while((r-l)>esp){
+        double mid=(l+r)/2.00;
+        if(multiply(mid,n) < (double)m){
+            l=mid;
+        }
+        else{
+            r=mid;
+        }
+    }
+    return l;
+}
+```
+
+42. [single element](https://www.codingninjas.com/codestudio/problems/unique-element-in-sorted-array_1112654?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+int uniqueElement(vector<int> arr, int n)
+{
+    int xor_val = 0 ;
+    for(int ele : arr){
+        xor_val = xor_val ^ ele ;
+    }
+    return xor_val ;
+}
+```
+
+43. [median of two sorted array](https://www.codingninjas.com/codestudio/problems/median-of-two-sorted-arrays_985294?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+double median(vector<int> a, vector<int> b){
+    /*
+        1 2 3 4            a 
+        1 2 3 4 5 6 7      b
+    */
+    if(a.size() > b.size()){
+        return median(b,a);
+    }
+    int M = b.size() , N = a.size() ;
+    int low = 0 , high = N ;
+    int total = (N+M+1)/2 ;
+    while(low <= high){
+        int mid = low + (high-low)/2 ;
+        int p2 = total - mid ;
+        
+//        r1 = mid , l1 = mid-1 ;
+//        r2 = p2 , l2 = mid-1 ;
+        
+        int r1 = (mid < N)?a[mid]:INT_MAX ;
+        int l1 = (mid-1 >= 0)?a[mid-1]:INT_MIN ;
+        
+        int r2 = (p2 < M)?b[p2]:INT_MAX ;
+        int l2 = (p2-1 >= 0)?b[p2-1]:INT_MIN ;
+        
+        if(r1 >= l2 and r2 >= l1){
+            if((M+N)%2 == 0){
+                return (double )((double)max(l1 , l2) + (double)min(r1 , r2))/2.0 ;
+            }
+            return max(l1 , l2);
+        }
+        else if(l1 > r2){
+            high = mid-1 ;
+        }
+        else{
+            low = mid+1 ;
+        }
+    }
+    return 0 ;
+}
+```
+
+44. [kth element of two sorted array]()
 ```cpp
 
+```
+
+45. [Allocate Books](https://www.codingninjas.com/codestudio/problems/ayush-gives-ninjatest_1097574?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+bool isPossible(long long time_per_day , int mdays , vector<int> &time){
+    long long curr = time_per_day , day = 1 ;
+    for(int t : time){
+        if(curr - t >= 0){
+            curr -= t ;
+        }
+        else{
+            day++ ;
+            if(day > mdays) return false ;
+            if(time_per_day-t < 0) return false ;
+            
+            curr = time_per_day-t ;
+        }
+    }
+    return true ;
+}
+long long ayushGivesNinjatest(int n, int m, vector<int> time) 
+{	
+	long long low = 1 , high = LONG_MAX ;
+    long long mid ;
+    while(low < high){
+        mid = low + (high - low)/2 ;
+        if(not isPossible(mid , n , time)){
+            low = mid+1 ;
+        }    
+        else{
+            high = mid ;
+        }
+    }
+    return high ;
+}
+```
+
+46. [chess tournament](https://www.codingninjas.com/codestudio/problems/chess-tournament_981299?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+bool isPossible(int space , vector<int> &positions , int players){
+    int prev_idx = 0 , count = 1 ;
+    
+    for(int i = 1 ; i < positions.size() ; i++){
+        if(positions[i]-positions[prev_idx] >= space){
+            prev_idx = i ;
+            count++ ;
+            if(count == players) return true ;
+        }
+    }
+    return false ;
+}
+int chessTournament(vector<int> &positions , int n ,  int c){
+    sort(positions.begin() , positions.end());
+    int low = 1 , high = positions.back() - positions[0] ;
+    
+    while(low < high){
+        int mid = low + (high - low + 1)/2 ;
+        if(isPossible(mid , positions , c)){
+            low = mid ;
+        }
+        else{
+            high = mid-1 ;
+        }
+    }
+    return low ;
+}
+```
+
+47. [Min Heap](https://www.codingninjas.com/codestudio/problems/min-heap_4691801?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+class MinHeap{
+public:
+    vector<int> arr ;
+    int size  ;
+    MinHeap(){
+        size = 0 ;
+    }
+    int getParent(int node){
+        return (node-1)/2 ;
+    }
+    int leftChild(int node){
+        return (node*2)+1 ;
+    }
+    int rightChild(int node){
+        return (node*2)+2 ;
+    }
+    void insert(int val){
+        arr.push_back(val);
+        size++ ;
+        int curr = size-1 ;
+        while(curr != 0  and arr[getParent(curr)] > val){
+            swap(arr[getParent(curr)] , arr[curr]);
+            curr = getParent(curr);
+        }
+    }
+    int top(){
+        if(isEmpty()) return -1 ;
+        return arr[0] ;
+    }
+    void heapify(int node){
+        int r_idx = rightChild(node) , l_idx = leftChild(node) ;
+        int r_val = INT_MAX , l_val = INT_MAX ;
+        if(r_idx < size){
+            r_val = arr[r_idx] ;
+        }
+        if(l_idx < size){
+            l_val = arr[l_idx] ;
+        }
+        int minval = min(r_val , l_val);
+        
+        if(minval < arr[node]){
+            if(minval == l_val){
+                swap(arr[node] , arr[l_idx]);
+                heapify(l_idx) ;
+            }
+            else{
+                swap(arr[node] , arr[r_idx]);
+                heapify(r_idx) ;
+            }
+        }
+    }
+    bool pop(){
+        if(isEmpty()) return false ;
+        arr[0] = arr.back() ;
+        size-- ;
+        arr.pop_back() ;
+        heapify(0);
+        return true ;
+    }
+    bool isEmpty(){
+        return size == 0 ;
+    }
+};
+vector<int> minHeap(int n, vector<vector<int>>& queries) {
+    vector<int> res ;
+    MinHeap *mh = new MinHeap() ;
+    
+    for(vector<int> &q : queries){
+        if(q[0] == 0){
+            mh->insert(q[1]);        
+        }
+        else{
+            res.push_back(mh->top());
+            mh->pop();
+        }
+    }
+    return res ;
+}
 ```
