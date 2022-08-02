@@ -32,8 +32,13 @@ void get_subarray_recursion(vector<int> &arr , int start = 0 , int end = 0){
 }
 
 void get_subsequence_recursion1(vector<int> &arr , int cur_start , vector<int> &temp){
-	print_1d(temp);
+	
+    // to get unique subsequences
+
+    print_1d(temp);
 	for(int i = cur_start ; i < arr.size() ; i++){
+        if(i != cur_start and arr[i] == arr[i-1]) continue ; 
+
 		temp.push_back(arr[i]);
 		get_subsequence_recursion1(arr , i+1 , temp) ;
 		temp.pop_back();

@@ -618,7 +618,7 @@ Node *rotate(Node *head, int k) {
 }
 ```
 
-24. []()
+24. [remove duplicates](https://www.codingninjas.com/codestudio/problems/remove-duplicates-from-sorted-array_1102307?topList=striver-sde-sheet-problems&leftPanelTab=0)
 ```cpp
 int removeDuplicates(vector<int> &arr, int n) {
     int ptr = 1 , count = 1;
@@ -630,4 +630,326 @@ int removeDuplicates(vector<int> &arr, int n) {
     }
     return count ;
 }
+```
+
+25. [max consecutive 1](https://www.codingninjas.com/codestudio/problems/maximum-consecutive-ones_892994?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+int longestSubSeg(vector<int> &arr , int n, int k){
+    int maxlen = 0 ;
+    int curzeros = 0 ;
+    int right =  0 , left = 0 ;
+    
+    while(right < n){
+        if(arr[right] == 0) curzeros++ ;
+        while(curzeros > k){
+            if(arr[left] == 0) curzeros-- ;
+            left++ ;
+        }
+        maxlen = max(maxlen , right-left+1);
+        right++ ;
+    }
+    return maxlen ;
+}
+```
+
+26. [max meetings](https://www.codingninjas.com/codestudio/problems/maximum-meetings_1062658?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+vector<int> maximumMeetings(vector<int> &start, vector<int> &end) {
+     vector<int> meet ;
+    for(int i = 0 ; i < start.size() ; i++){
+        meet.push_back(i);
+    }
+   
+    sort(meet.begin() , meet.end() , [&](int a , int b){
+        if(end[a] == end[b]) return a < b ;
+        return end[a] < end[b] ;
+    });
+    vector<int> res ;
+    res.push_back(meet[0]+1) ;
+    int curend = end[meet[0]] ;
+    
+    for(int i = 1 ; i < meet.size() ; i++){
+        if(start[meet[i]] > curend){
+            curend = end[meet[i]];
+            res.push_back(meet[i]+1);
+        }
+    }
+    return res ;
+}
+```
+
+27. [min platforms](https://www.codingninjas.com/codestudio/problems/minimum-number-of-platforms_799400?topList=striver-sde-sheet-problems&leftPanelTab=3)
+```cpp
+int calculateMinPatforms(int at[], int dt[], int n) {
+    int min_platforms = 0 , curr = 0 , ptr1 = 0 , ptr2 = 0;
+    sort(at , at+n);
+    sort(dt , dt+n);
+    while(ptr1 < n){
+        if(at[ptr1] <= dt[ptr2]){
+            curr++ ; ptr1++ ;
+        }
+        else{
+            curr-- ; ptr2++ ;
+        }
+        min_platforms = max(min_platforms , curr);
+    }
+    return min_platforms ;
+}
+```
+
+
+28. [job sequencing problem](https://www.codingninjas.com/codestudio/problems/job-sequencing-problem_1169460?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int jobScheduling(vector<vector<int>> &jobs)
+{
+    int max_deadline = 0 ;
+    sort(jobs.begin() , jobs.end() , [&max_deadline](vector<int> &a , vector<int> &b){
+       max_deadline = max({max_deadline , a[0] , b[0]});
+       return a[1] > b[1] ; 
+    });
+    
+    vector<bool> filled(max_deadline , false);
+    
+    int mprofit = 0 ;
+    for(vector<int> &j : jobs){
+        int deadline = j[0]-1 ;
+        // can i place on or before the slots
+        while(deadline >= 0 and filled[deadline]) deadline-- ;
+        if(deadline >= 0){
+            filled[deadline] = true ;
+            mprofit += j[1] ; 
+        }
+    }
+    return mprofit ;
+}
+```
+
+29. [fractional knapsack](https://www.codingninjas.com/codestudio/problems/fractional-knapsack_975286?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+double maximumValue (vector<pair<int, int>>& items, int n, int w)
+{
+    sort(items.begin() , items.end() , [](pair<int,int> &a , pair<int,int> &b){
+         double p1 = (double )a.second/a.first ;
+         double p2 = (double )b.second/b.first ;
+         return p1 > p2 ;
+    });
+    double mprofit = 0 ;
+    for(int i = 0 ; i < n and w > 0; i++){
+        if(w - items[i].first >= 0){
+            mprofit += items[i].second ;
+            w -= items[i].first ;
+        }
+        else{
+            mprofit = mprofit + ((double )items[i].second/items[i].first)*w ;
+            w = 0 ;
+        }
+    }
+    return mprofit ;
+}
+```
+
+30. [find min coins](https://www.codingninjas.com/codestudio/problems/find-minimum-number-of-coins_975277?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+
+int findMinimumCoins(int amount) 
+{
+    vector<int> arr = {1000 , 500 , 100 , 50 , 20 , 10 , 5 , 2 , 1} ;
+    
+    int ptr = 0 ;
+    int count = 0 ;
+    while(amount > 0){
+        if(amount - arr[ptr] >= 0){
+            count += amount/arr[ptr] ;
+            amount = amount%arr[ptr] ;
+        }
+        else{
+            ptr++ ;
+        }
+    }
+    return count ;
+}
+```
+
+31. [maximum activities](https://www.codingninjas.com/codestudio/problems/maximum-activities_1062712?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int maximumActivities(vector<int> &start, vector<int> &finish) {
+    vector<pair<int,int>> activities ;
+    for(int i = 0 ; i < start.size() ; i++){
+        activities.push_back({finish[i] , start[i]});
+    }
+    sort(activities.begin() , activities.end());
+    
+    int count = 1 , curend = activities[0].first ;
+    
+    for(int i = 1 ; i < start.size() ; i++){
+        if(activities[i].second >= curend){
+            curend = activities[i].first ;
+            count++ ;
+        }
+    }
+    return count ;
+}
+```
+
+32. [subset sum](https://www.codingninjas.com/codestudio/problems/subset-sum_3843086?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+vector<int> subsetSum(vector<int> &num){
+    vector<int> res ;
+    res.push_back(0);
+    int N = num.size() ;
+    unsigned int mp = (1<<N)-1 ;
+    for(int i = 1 ; i <= mp ; i++){
+        int cursum = 0  ;
+        for(int j = 0 ; j < N ; j++){
+            if((i&(1<<j)) != 0){
+                cursum += num[j];
+            }
+        }
+        res.push_back(cursum) ;
+    }
+    sort(res.begin() , res.end());
+    return res ;
+}
+```
+
+33. [subset 2](https://www.codingninjas.com/codestudio/problems/unique-subsets_3625236?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+void helper(vector<int> &arr , int pos , vector<int> &curr , vector<vector<int>> &res){
+    res.push_back(curr);
+    for(int i = pos ; i < arr.size() ; i++){
+        if(i != pos and arr[i] == arr[i-1]) continue ; 
+        curr.push_back(arr[i]);
+        helper(arr , i+1 , curr , res);
+        curr.pop_back();
+    }
+}
+vector<vector<int>> uniqueSubsets(int n, vector<int> &arr)
+{
+    sort(arr.begin() , arr.end());
+    vector<int> curr ; 
+    vector<vector<int>> res ;
+    helper(arr , 0 , curr , res);
+    return res ;
+}
+```
+
+34. [subsets sum to k](https://www.codingninjas.com/codestudio/problems/return-subsets-sum-to-k_759331?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+void helper(int pos , vector<int> &arr , vector<int> &curr , vector<vector<int>> &res , int cursum){
+    if(cursum == 0 and pos == arr.size()){
+        res.push_back(curr);
+        return ;
+    }
+    if(pos == arr.size()) return ;
+    curr.push_back(arr[pos]);
+    helper(pos+1  , arr , curr , res , cursum-arr[pos]);
+    curr.pop_back() ;
+    helper(pos+1 , arr , curr , res , cursum);
+}
+vector<vector<int>> findSubsetsThatSumToK(vector<int> arr, int n, int k)
+{
+    vector<vector<int>> res ;
+    vector<int> curr ;
+    helper(0 , arr , curr , res , k);
+    return res ;
+}
+```
+
+35. [kth permutation](https://www.codingninjas.com/codestudio/problems/k-th-permutation-sequence_1112626?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+string kthPermutation(int n, int k) {
+    string str = "" ;
+    vector<int> arr ;
+    int fact = 1 ;
+    for(int i = 1 ; i < n ; i++){
+        arr.push_back(i);
+        fact *= i ;
+    }
+    arr.push_back(n);
+    
+    k-- ;
+    while(true){
+        int idx = k/fact ;
+        str.push_back(arr[idx]+'0');
+        arr.erase(arr.begin() + idx);
+        if(arr.size() == 0) break ;
+        k = k%fact ;
+        fact = fact/arr.size();
+    }
+    return str ;
+}
+```
+
+37. [N queens](https://www.codingninjas.com/codestudio/problems/n-queens_759332?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+int N ;
+bool canIplace(int row , int col , vector<vector<int>> &board){
+    for(int i = 0 ; i < N ; i++){
+        if(board[i][col] == 1) return false ;
+    }
+    int k = 1 ; bool flag = true ;
+    while(flag){
+        flag = false ;
+        if(row+k < N and col+k < N){
+            flag = true ;
+            if(board[row+k][col+k] == 1)
+                return false ;
+        } 
+        if(row-k >= 0 and col-k >= 0){
+            flag = true ;
+            if(board[row-k][col-k] == 1)
+                return false ;
+        } 
+        if(row+k < N and col-k >= 0){
+            flag = true ;
+            if(board[row+k][col-k] == 1)
+                return false ;
+        } 
+        if(row-k >= 0 and col+k < N){
+            flag = true ;
+            if(board[row-k][col+k] == 1)
+                return false ;
+        } 
+        k++ ;
+    }
+    return true ;
+}
+void solve(int row , vector<vector<int>> &board , vector<vector<int>> &ans){
+    if(row == N){
+        vector<int> temp ;
+        for(int i = 0 ; i < N ; i++){
+            for(int j = 0 ; j < N ; j++){
+                temp.push_back(board[i][j]) ;
+            }
+        }
+        ans.push_back(temp);
+        return ;
+    }
+    for(int col = 0 ; col < N ;col++){
+        if(canIplace(row , col ,board)){
+            board[row][col] = 1 ;
+            solve(row+1 , board , ans);
+            board[row][col] = 0 ;
+        }
+    }
+}
+vector<vector<int>> solveNQueens(int n) {
+    vector<vector<int>> board(n , vector<int>(n , 0));
+    vector<vector<int>> ans ;
+    N = n ;
+    solve(0 , board , ans) ;
+    return ans ;
+}
+```
+
+38. []()
+```cpp
+
 ```

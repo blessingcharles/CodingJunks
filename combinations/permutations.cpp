@@ -69,7 +69,27 @@ void permute_with_combinations(vector<int> arr , int cur_start ){
         permute_with_combinations(arr , cur_start+1);
     }
 }
-
+string kthPermutation(int n, int k) {
+    string str = "" ;
+    vector<int> arr ;
+    int fact = 1 ;
+    for(int i = 1 ; i < n ; i++){
+        arr.push_back(i);
+        fact *= i ;
+    }
+    arr.push_back(n);
+    
+    k-- ;
+    while(true){
+        int idx = k/fact ;
+        str.push_back(arr[idx]+'0');
+        arr.erase(arr.begin() + idx);
+        if(arr.size() == 0) break ;
+        k = k%fact ;
+        fact = fact/arr.size();
+    }
+    return str ;
+}
 void permute_without_duplicates(vector<int> &arr , int cur_start = 0){
     // will not handle duplicates
     if(cur_start == arr.size()){
