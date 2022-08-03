@@ -1293,3 +1293,492 @@ vector<int> minHeap(int n, vector<vector<int>>& queries) {
     return res ;
 }
 ```
+
+48. [k max combination](https://www.codingninjas.com/codestudio/problems/k-max-sum-combinations_975322?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+vector<int> kMaxSumCombination(vector<int> &a, vector<int> &b, int n, int k){
+    sort(b.begin() , b.end());
+    int N = b.size() ;
+    
+    priority_queue<pair<int,int>> pq ;
+    for(int ele : a){
+        pq.push({ele + b[N-1] , N-1});
+    }
+    pair<int,int> curr ;
+    vector<int> res ;
+    
+    while(k--){
+        curr = pq.top() ; pq.pop() ;
+        res.push_back(curr.first);
+        
+        curr.second-- ;
+        if(curr.second >= 0){
+            int val = curr.first - b[curr.second+1] ; // my val
+            
+            pq.push({val + b[curr.second] , curr.second});
+        }
+    }
+    return res ;
+}
+```
+
+49. [Running Median](https://www.codingninjas.com/codestudio/problems/running-median_625409?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+void findMedian(int *arr, int n)
+{
+    priority_queue<int> maxh ;
+    priority_queue<int , vector<int> , greater<int>> minh ;
+    for(int i = 1 ; i <= n ; i++){
+        maxh.push(arr[i-1]);
+        if(maxh.size() > minh.size()){
+            minh.push(maxh.top()) ;
+            maxh.pop() ;
+        }
+        else if(not minh.empty() and maxh.top() > minh.top()){
+            int ele = maxh.top() ; maxh.pop() ;
+            maxh.push(minh.top()) ; minh.pop() ;
+            minh.push(ele);
+        }
+        if(i%2 == 1){
+            cout << minh.top() << " ";
+        }
+        else{
+            cout << (maxh.top() + minh.top())/2 << " ";
+        }
+    }
+}
+```
+
+50. [trie 2](https://www.codingninjas.com/codestudio/problems/implement-trie_1387095?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+class Node{
+public:
+    Node* children[26] ;
+    int childrens_count[26] ;
+    int t_count ;
+    bool isTerminal ;
+    Node(){
+        t_count = 0 ;
+        memset(children ,NULL,sizeof(children) );
+        memset(childrens_count , 0, sizeof(childrens_count) ) ;
+        isTerminal = false ;
+    }
+};
+class Trie{
+public:
+    Node* root ;
+    Trie(){
+        root = new Node() ;
+    }
+    void insert(string &word){
+        Node* crawler = root ;
+        for(char ch : word){
+            if(crawler->children[ch-'a'] == NULL){
+                crawler->children[ch-'a'] = new Node() ;
+            }
+            crawler->childrens_count[ch-'a']++ ;
+            crawler = crawler->children[ch-'a'] ;
+        }
+        crawler->t_count++ ;
+        crawler->isTerminal = true ;
+    }
+    int countWordsEqualTo(string &word){
+        Node* crawler = root , *prev = root;
+        for(char ch : word){
+            if(crawler->children[ch-'a'] == NULL){
+                return 0 ;
+            }
+            prev = crawler ;
+            crawler = crawler->children[ch-'a'] ;
+        }
+        if(not crawler->isTerminal) return 0 ;
+        return crawler->t_count ;
+    }
+    int countWordsStartingWith(string &word){
+        Node* crawler = root , *prev = root;
+        for(char ch : word){
+            if(crawler->children[ch-'a'] == NULL){
+                return 0 ;
+            }
+            prev = crawler ;
+            crawler = crawler->children[ch-'a'] ;
+        }
+        return prev->childrens_count[word.back()-'a'];
+    }
+    void erase(string &word){
+        Node* crawler = root , *prev ;
+        for(char ch : word){
+            if(crawler->children[ch-'a'] == NULL){
+                return ;
+            }
+            crawler->childrens_count[ch-'a']-- ;
+            prev = crawler ;
+            crawler = crawler->children[ch-'a'] ;
+            if(prev->childrens_count[ch-'a'] == 0){
+                prev->children[ch-'a'] = NULL ;
+            }
+        }
+        crawler->t_count-- ;
+        if(crawler->t_count == 0) crawler->isTerminal = false ;
+    }
+};
+```
+51. [complete stirng](https://www.codingninjas.com/codestudio/problems/complete-string_2687860?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+class Node{
+public:
+    Node* children[26] ;
+    bool isTerminal ;
+    Node(){
+        memset(children, NULL, sizeof(children)) ;
+        isTerminal = false ;
+    }
+};
+class Trie{
+public:
+    Node* root ;
+    Trie(){
+        root = new Node() ;
+    }
+    void insert(string &word){
+        Node* crawler = root ;
+        for(char ch : word){
+            if(crawler->children[ch-'a'] == NULL){
+                crawler->children[ch-'a'] = new Node() ;
+            }
+            crawler = crawler->children[ch-'a'];
+        }
+        crawler->isTerminal = true ;
+    }
+    bool search(string &word){
+        Node* crawler = root ;
+        for(char ch : word){
+            if(not crawler->children[ch-'a'] or not crawler->children[ch-'a']->isTerminal){
+                return false ;
+            }
+            crawler = crawler->children[ch-'a'] ;
+        }
+        return true ;
+    }
+};
+string completeString(int n, vector<string> &a){
+    Trie *t = new Trie() ;
+    for(string &word : a){
+        t->insert(word);
+    }
+    int maxlen = 0 ;
+    string res = "" ;
+    for(string &word : a){
+        if(word.size() < maxlen 
+               or not t->search(word)) continue ;
+        
+        if(word.size() == res.size()){
+            res = min(word , res);
+        }
+        else{
+            maxlen = word.size() ;
+            res = word ;
+        }
+    }
+    return (maxlen == 0)?"None":res ;
+}
+```
+
+52. [No os distinct substring](https://www.codingninjas.com/codestudio/problems/number-of-distinct-substring_1465938?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int distinctSubstring(string &word) {
+    unordered_set<string> st ;
+    
+    for(int i = 0 ; i < word.size() ; i++){
+        string temp = "" ;
+        for(int j = i ; j < word.size() ; j++){
+            temp.push_back(word[j]);
+            st.insert(temp);
+        }
+    }
+    return st.size() ;
+}
+```
+
+53. [power set](https://www.codingninjas.com/codestudio/problems/power-set_1062667?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+void helper(int pos , vector<int> &v , vector<int> &curr , vector<vector<int>> &res){
+    if(pos == v.size()){
+        res.push_back(curr) ;
+        return ;
+    }
+    helper(pos+1 , v , curr , res);
+    curr.push_back(v[pos]);
+    helper(pos+1 , v , curr , res);            
+    curr.pop_back();
+}
+vector<vector<int>> pwset(vector<int>v)
+{
+    vector<vector<int>> res ;
+    vector<int> curr ;
+    helper(0 , v , curr , res) ;
+    return res ;
+}
+```
+
+54. [max xor of two elements](https://www.codingninjas.com/codestudio/problems/power-set_1062667?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+class Node{
+public:
+    Node* children[2] ;
+    Node(){
+        memset(children , NULL , sizeof(children));
+    }
+};
+class Trie{
+public:
+    Node* root ;
+    Trie(){
+        root = new Node() ;
+    }
+    void insert(int num){
+        Node* crawler = root ;
+        for(int i = 31 ; i >= 0 ; i--){
+            bool isSet = (num >> i)&1 ;
+            if(crawler->children[isSet] == NULL){
+                crawler->children[isSet] = new Node() ;
+            }
+            crawler = crawler->children[isSet] ;
+        }
+    }
+    int search(int num){
+        Node* crawler = root ;
+        int maxval = 0 ;
+        for(int i = 31 ; i >= 0 ; i--){
+            bool isSet = (num >> i)&1 ;
+            bool need = not isSet ;
+            if(crawler->children[need] != NULL){
+                maxval = maxval | (1 << i) ;
+                crawler = crawler->children[need] ;
+            }
+            else{
+                crawler = crawler->children[isSet] ;
+            }
+        }
+        return maxval ;
+    }
+};
+int maximumXor(vector<int> A)
+{
+    Trie* t = new Trie();
+    for(int ele : A){
+        t->insert(ele) ;
+    }
+    int maxval = 0 ;
+    for(int ele : A){
+        maxval = max(maxval , t->search(ele));
+    }
+    return maxval ; 
+}
+```
+
+55. [max xor with element in array](https://www.codingninjas.com/codestudio/problems/power-set_1062667?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+class Node{
+public:
+    Node* children[2] ;
+    int minContrib ;
+    Node(){
+        minContrib = INT_MAX ;        
+        memset(children , NULL , sizeof(children));
+    }
+};
+class Trie{
+public:
+    Node* root ;
+    Trie(){
+        root = new Node() ;
+    }
+    void insert(int num){
+        Node* crawler = root ;
+        for(int i = 31 ; i >= 0 ; i--){
+            bool isSet = (num >> i)&1 ;
+            if(crawler->children[isSet] == NULL){
+                crawler->children[isSet] = new Node() ;
+            }
+            crawler = crawler->children[isSet] ;
+            crawler->minContrib = min(num , crawler->minContrib) ;
+        }
+    }
+    int search(int num , int range){
+        Node* crawler = root ;
+        int maxval = 0 ;
+        for(int i = 31 ; i >= 0 ; i--){
+            bool isSet = (num >> i)&1 ;
+            bool need = not isSet ;
+            if(crawler->children[need] != NULL and crawler->children[need]->minContrib <= range){
+                maxval = maxval | (1 << i) ;
+                crawler = crawler->children[need] ;
+            }
+            else if(crawler->children[isSet]->minContrib <= range){
+                crawler = crawler->children[isSet] ;
+            }
+            else{
+                break ;
+            }
+        }
+        return maxval ;
+    }
+};
+vector<int> maxXorQueries(vector<int> &arr, vector<vector<int>> &queries){
+    Trie* t = new Trie();
+    for(int ele : arr){
+        t->insert(ele) ;
+    }
+    vector<int> res ;
+    for(vector<int> &q : queries){
+        int val = t->search(q[0] , q[1]) ;
+        if(val == 0){
+            res.push_back(-1);        
+        }
+        else{
+            res.push_back(val);
+        }
+    }
+    return res ; 
+}
+```
+
+56. [stack using array](https://www.codingninjas.com/codestudio/problems/power-set_1062667?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+// Stack class.
+class Stack {
+    
+public:
+    int size ;
+    int *arr ;
+    int idx ;
+    Stack(int capacity) {
+        size = capacity ;
+        arr = new int[size] ;
+        idx = 0 ;
+    }
+    void push(int num) {
+        if(isFull()) return ;
+        arr[idx] = num ;
+        idx++ ;
+    }
+    int pop() {
+        if(isEmpty()) return -1 ;
+        idx-- ;
+        return arr[idx] ;
+    }
+    
+    int top() {
+        if(isEmpty()) return -1 ;
+        return arr[idx-1] ;
+    }
+    int isEmpty() {
+        return idx == 0 ;
+    }
+    
+    int isFull() {
+        return idx == size ;
+    }
+};
+```
+
+57. [next smaller element](https://www.codingninjas.com/codestudio/problems/power-set_1062667?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+vector<int> nextSmallerElement(vector<int> &arr, int n)
+{
+    stack<int> st ;
+    vector<int> ans(n , -1);
+    
+    for(int i = n-1 ; i >= 0 ; i--){
+        while(not st.empty() and st.top() >= arr[i]){
+            st.pop() ;
+        }
+        if(not st.empty()){
+            ans[i] = st.top() ;
+        }
+        st.push(arr[i]);
+    }
+    return ans ;
+}
+```
+
+58. [lfu cache](https://www.codingninjas.com/codestudio/problems/lfucache_3114758?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+class LFUCache
+{
+    unordered_map<int , list<pair<int,int>>> bucket ;
+    unordered_map<int  , int> frequency ;
+    unordered_map<int , list<pair<int,int>>::iterator > memo ;
+public:
+    int size = 0 ;
+    int count = 0 ;
+    int l_freq = 1 ;
+    LFUCache(int capacity){
+        size = capacity ;
+    }
+    int get(int key)
+    {
+        if(memo.find(key) == memo.end()) return -1 ;
+        int last_freq = frequency[key] ;
+        frequency[key]++ ;
+        list<pair<int,int>>::iterator it = memo[key] ;
+        pair<int,int> itp = *it ;
+        
+        bucket[last_freq+1].push_back({itp.first , itp.second}) ;
+        memo[key] = --(bucket[last_freq+1].end()) ;
+        
+        bucket[last_freq].erase(it) ;
+        if(bucket[last_freq].size() == 0 and l_freq == last_freq){
+            l_freq++ ;
+        }
+        return itp.second ;
+    }
+    void put(int key, int value)
+    {
+        if(memo.find(key) != memo.end()){
+            int last_freq = frequency[key] ; frequency[key]++ ;
+            list<pair<int,int>>::iterator it = memo[key] ;
+            
+            bucket[last_freq+1].push_back({key , value}) ;
+            
+            memo[key] = --(bucket[last_freq+1].end()) ;
+            
+            bucket[last_freq].erase(it) ;
+            if(bucket[last_freq].size() == 0 and l_freq == last_freq){
+                l_freq++ ;
+            }
+            return ;
+        }
+        if(count == size){
+//             remove the least frequent guy
+            list<pair<int,int>>::iterator it = bucket[l_freq].begin() ;
+            pair<int,int> itp = bucket[l_freq].front() ;
+            bucket[l_freq].pop_front();
+            memo.erase(itp.first);
+            frequency.erase(itp.first);
+            count-- ;
+        }
+        
+        count++ ;
+        bucket[1].push_back({key,value}) ;
+        frequency[key] = 1 ;
+        memo[key] = --(bucket[1].end()) ;
+        l_freq = 1 ;
+    }
+};
+
+```
