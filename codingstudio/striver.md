@@ -1782,3 +1782,820 @@ public:
 };
 
 ```
+
+59. [max in sliding window k](https://www.codingninjas.com/codestudio/problems/sliding-window-maximum_980226?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+vector<int> slidingWindowMaximum(vector<int> &nums, int &k)
+{
+    deque<int> dq ;
+    vector<int> res ;
+    int n = nums.size() ;
+    for(int i = 0 ; i < n ; i++){
+        if(not dq.empty() and dq.front() == i-k) dq.pop_front() ;
+        
+        while(not dq.empty() and nums[dq.back()] < nums[i]) dq.pop_back() ;
+        dq.push_back(i) ;
+    
+        if(i-k >= -1){
+            res.push_back(nums[dq.front()]);
+        }
+    }
+    return res ;
+}
+```
+
+60. [min stack](https://www.codingninjas.com/codestudio/problems/min-stack_3843991?topList=striver-sde-sheet-problems&leftPanelTab=1)
+```cpp
+class minStack
+{
+    stack<int> st ;
+    stack<int> mini ;
+	public:
+		minStack(){ 
+		}
+		void push(int num){
+            st.push(num) ;
+            if(mini.empty() or mini.top() >= num){
+                mini.push(num);
+            }
+		}
+		int pop()
+		{
+            if(isEmpty()) return -1 ;
+            int ele = st.top() ; st.pop() ;
+            if(mini.top() == ele){
+                mini.pop() ;
+            }
+            return ele ;
+        }
+		int top()
+		{
+            if(isEmpty()) return -1 ;
+            return st.top() ;
+        }
+		int getMin()
+		{
+            if(isEmpty()) return -1 ;
+            return mini.top() ;
+        }
+        bool isEmpty(){
+            return st.empty() ;
+        }
+};
+```
+
+
+61. [Rotting oranges](https://www.codingninjas.com/codestudio/problems/rotting-oranges_701655?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int M , N ;
+bool isInvalid(int row , int col){
+    return row < 0 or col < 0  or row >= M or col >= N ;
+}
+
+int minTimeToRot(vector<vector<int>>& grid, int m, int n)
+{
+    M = m; N = n ;
+    int fresh_oranges = 0 ;
+    queue<pair<int,int>> q ;
+    for(int i = 0 ;i < M ; i++){
+        for(int j = 0 ; j < N ; j++){
+            if(grid[i][j] == 2){
+                q.push({i,j});
+                grid[i][j] = 0 ;
+            }
+            else if(grid[i][j] == 1){
+                fresh_oranges++ ;
+            }
+        }
+    }
+    if(fresh_oranges == 0) return 0 ;
+    int time = 1 ;
+    int dx[4] = {-1 ,1,0,0};
+    int dy[4] = {0,0,1,-1};
+    
+    while(not q.empty()){
+        int sz = q.size() ;
+        while(sz--){
+            int row = q.front().first , col = q.front().second ;
+            q.pop() ;
+            for(int i = 0 ; i < 4 ; i++){
+                int neigh_r = row + dx[i] ;
+                int neigh_c = col + dy[i] ;
+                if(isInvalid(neigh_r , neigh_c) or grid[neigh_r][neigh_c] != 1){
+                    continue ;
+                }
+                grid[neigh_r][neigh_c] = 0;
+                fresh_oranges-- ;
+                q.push({neigh_r , neigh_c});
+            }
+        }
+        if(fresh_oranges == 0) return time ;
+        time++ ;
+    }
+    return -1 ;
+}
+``` 
+62. [atoi](https://www.codingninjas.com/codestudio/problems/atoi_981270?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int atoi(string str) {
+    int val = 0 ;
+    int i = 0 ;
+    bool isnegative = false ;
+    if(str[i] == '-'){
+        i++ ;
+        isnegative = true ;
+    }
+    for( ;i < str.size() ; i++){
+        if(not isdigit(str[i])) continue ;
+        val = val*10 + (str[i]-'0');
+    }
+    if(isnegative) return -1*val ;
+    return val ;
+}
+```
+
+63. [pattern matching](https://www.codingninjas.com/codestudio/problems/stringmatch-rabincarp_1115738?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+void lps(string &pat , vector<int> &table){
+    int ptr = 0 , right = 1 ;
+    while(right < pat.size()){
+        if(pat[right] == pat[ptr]){
+            ptr++ ;
+            table[right] = ptr ;
+            right++ ;
+        }
+        else{
+            if(ptr != 0){
+                ptr = table[ptr-1] ;
+            }
+            else{
+                right++ ;
+            }
+        }
+    }
+}
+vector<int> stringMatch(string &str, string &pat) {
+    vector<int> table(pat.size() , 0);
+    lps(pat , table);
+    int s_ptr = 0 , p_ptr = 0 , N = pat.size() ;
+    vector<int> res ;
+    while(s_ptr < str.size()){
+        if(str[s_ptr] == pat[p_ptr]){
+            s_ptr++ ; p_ptr++ ;
+            if(p_ptr == N){
+                res.push_back(s_ptr-N) ;
+                p_ptr = table[p_ptr-1] ;
+            }
+        }
+        else{
+            if(p_ptr != 0){
+                p_ptr = table[p_ptr-1] ;
+            }
+            else{
+                s_ptr++ ;
+            }
+        }
+    }
+    return res ;
+}
+```
+
+64. [z algorithm](https://www.codingninjas.com/codestudio/problems/z-algorithm_1112619?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+void lps(string &pat , vector<int> &table){
+    int ptr = 0 , right = 1 ;
+    while(right < pat.size()){
+        if(pat[right] == pat[ptr]){
+            ptr++ ; 
+            table[right] = ptr ;
+            right++ ;
+        }
+        else{
+            if(ptr != 0){
+                ptr = table[ptr-1] ;
+            }
+            else{
+                right++ ;
+            }
+        }
+    }
+}
+int zAlgorithm(string &s, string &p, int n, int m)
+{
+    vector<int> table(m , 0);
+    lps(p , table);
+    int s_ptr = 0 , p_ptr = 0 , count = 0;
+    while(s_ptr < n){
+        if(s[s_ptr] == p[p_ptr]){
+            s_ptr++ ; p_ptr++ ;
+            if(p_ptr == m){
+                count++ ;
+                p_ptr = table[p_ptr-1];
+            }
+        }
+        else{
+            if(p_ptr != 0){
+                p_ptr = table[p_ptr-1];
+            }
+            else{
+                s_ptr++ ;
+            }
+        }
+    }
+    return count ;
+}
+```
+
+65. [check permutation](https://www.codingninjas.com/codestudio/problems/check-permutation_1172164?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+bool areAnagram(string &str1, string &str2){
+    if(str1.size() != str2.size()) return false ;
+    vector<char> charmap(128 , 0);
+    for(char ch : str1) charmap[ch]++ ;
+    
+    for(char ch : str2){
+        if(charmap[ch] == 0) return false ;
+        charmap[ch]-- ;
+    }
+    for(int ele : charmap){
+        if(ele != 0) return false ;
+    }
+    return true ;
+}
+```
+
+66. [bottom view of bt](https://www.codingninjas.com/codestudio/problems/bottom-view-of-binary-tree_893110?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+vector<int> bottomView(BinaryTreeNode<int> * root){
+    unordered_map<int,int> memo ;
+    int min_level = 0 , max_level = 0 ;
+    queue<pair<int ,BinaryTreeNode<int> *> > q ;
+    q.push({0,root}) ;
+    pair<int,BinaryTreeNode<int> * > curr ;
+    
+    while(not q.empty()){
+        int sz = q.size();
+        while(sz--){
+            curr = q.front() ; q.pop() ;
+            memo[curr.first] = curr.second->data ;
+            min_level = min(min_level , curr.first);
+            max_level = max(max_level , curr.first);
+
+            if(curr.second->left){
+                q.push({curr.first-1 , curr.second->left});
+            }   
+            if(curr.second->right){
+                q.push({curr.first+1 , curr.second->right});
+            }
+        }
+    }
+    vector<int> res ;
+    for(int i = min_level ; i <= max_level ; i++){
+        res.push_back(memo[i]);
+    }
+    return res ;
+}
+```
+
+67. [top view](https://www.codingninjas.com/codestudio/problems/top-view-of-the-tree_799401?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+vector<int> getTopView(TreeNode<int> *root) {
+    if(not root) return {} ;
+    unordered_map<int,int> memo ;
+    int min_level = 0 , max_level = -1 ;
+    queue<pair<int ,TreeNode<int> *> > q ;
+    q.push({0,root}) ;
+    pair<int,TreeNode<int> * > curr ;
+    
+    while(not q.empty()){
+        int sz = q.size();
+        while(sz--){
+            curr = q.front() ; q.pop() ;
+            if(memo.find(curr.first) == memo.end())
+                memo[curr.first] = curr.second->val ;
+            min_level = min(min_level , curr.first);
+            max_level = max(max_level , curr.first);
+
+            if(curr.second->left){
+                q.push({curr.first-1 , curr.second->left});
+            }   
+            if(curr.second->right){
+                q.push({curr.first+1 , curr.second->right});
+            }
+        }
+    }
+    vector<int> res ;
+    for(int i = min_level ; i <= max_level ; i++){
+        res.push_back(memo[i]);
+    }
+    return res ;
+}
+```
+
+68. [path in tree](https://www.codingninjas.com/codestudio/problems/path-in-a-tree_3843990?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+bool helper(TreeNode<int> *root , int x , vector<int> &path){
+    if(not root) return false ;
+    path.push_back(root->data);
+    if(root->data == x){
+        return true ;
+    }
+    if(helper(root->left , x , path) or helper(root->right , x , path)) 
+        return true ;
+    path.pop_back();
+    return false ;
+}
+vector<int> pathInATree(TreeNode<int> *root, int x)
+{
+    vector<int> path ;
+    (helper(root , x , path));
+    return path ;
+}
+
+```
+69. [height of tree level order and inorder](https://www.codingninjas.com/codestudio/problems/calculate-the-height-of-binary-tree-using-inorder-and-level-order-traversal_841416?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int helper(vector<int> &inorder , int start , int end , unordered_map<int,int> &memo){
+    if(start > end) return 0 ; 
+    if(start == end) return 1 ;
+    
+    int idx = 1e9 , in_idx = start;
+    for(int i = start ; i <= end ; i++){
+        if(idx > memo[inorder[i]]){
+            idx = memo[inorder[i]] ;
+            in_idx = i ;
+        }
+    }
+    int leftH = helper(inorder , start , in_idx-1 , memo);
+    int rightH = helper(inorder , in_idx+1 , end , memo);
+    return 1+max(leftH , rightH);
+}
+int heightOfTheTree(vector<int>& inorder, vector<int>& levelOrder, int N){
+    unordered_map<int,int> memo ;
+    for(int i = 0 ; i < N ; i++){
+        memo[levelOrder[i]] = i ;
+    }
+    
+    return helper(inorder , 0 , N-1 , memo)-1;
+}
+```
+
+70. [Bt zigzag traversal](https://www.codingninjas.com/codestudio/problems/zig-zag-traversal_1062662?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+vector<int> zigZagTraversal(BinaryTreeNode<int> *root)
+{
+    vector<int> res ;
+    if(not root)
+        return res ;
+    queue<BinaryTreeNode<int>* > q;
+    q.push(root);
+    int level = 0 ;
+    while(not q.empty()){
+        int sz = q.size() ;
+        vector<int> temp ;
+        while(sz--){
+            root = q.front() ; q.pop() ;
+            temp.push_back(root->data);
+            if(root->left){
+                q.push(root->left);
+            }
+            if(root->right){
+                q.push(root->right);
+            }
+        }
+        if((level&1) == 1){
+            reverse(temp.begin() , temp.end());
+        }
+        res.insert(res.end() , temp.begin() , temp.end());
+        level++ ;
+    }
+    
+    return res ;
+}
+```
+71. [max path sum between two leaves](https://www.codingninjas.com/codestudio/problems/maximum-path-sum-between-two-leaves_794950?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+long long int helper(TreeNode<int> * root , long long int &maxval){
+    if(not root)
+        return -1 ;
+    if(not root->left and not root->right) return root->val ;
+    long long int right_side = helper(root->right , maxval) ;
+
+    long long int left_side = helper(root->left , maxval) ;
+    
+    if(left_side != -1 and right_side != -1){
+        maxval = max(maxval , left_side+right_side+root->val);
+    }
+    return root->val+max(left_side , right_side);
+//     return ls ;
+}
+long long int findMaxSumPath(TreeNode<int> *root)
+{
+    long long int maxval = -1 ;
+    helper(root , maxval);
+    return maxval ;
+}
+```
+
+72. [children sum property](https://www.codingninjas.com/codestudio/problems/childrensumproperty_790723?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+void helper(BinaryTreeNode<int> *root , int &maxval){
+    if(not root) return ;
+    maxval = max(maxval , root->data);
+    helper(root->left , maxval);
+    helper(root->right , maxval);
+}
+void solve(BinaryTreeNode<int> *root , int &maxval){
+    if(not root) return ;
+    if(not root->left and not root->right){
+        root->data = maxval ;
+        return ;
+    }
+
+    solve(root->left , maxval);
+    solve(root->right , maxval);
+    root->data = 0 ;
+    if(root->left){
+        root->data = root->left->data ;
+    }
+    if(root->right){
+        root->data += root->right->data ;
+    }
+}
+void changeTree(BinaryTreeNode < int > * root) {
+    int maxval = -1e9 ;
+    helper(root , maxval) ;
+    solve(root , maxval);
+}  
+```
+
+73. [connect nodes at same level](https://www.codingninjas.com/codestudio/problems/connect-nodes-at-same-level_985347?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+void connectNodes(BinaryTreeNode< int > *root) {
+      queue<BinaryTreeNode<int> * > q ;
+      q.push(root) ;
+      while(not q.empty()){
+          int sz = q.size() ;
+          while(sz--){
+              root = q.front() ; q.pop() ;
+              if(sz != 0){
+                  root->next = q.front() ;
+              }
+              else{
+                  root->next = NULL ;
+              }
+              if(root->left) q.push(root->left);
+              if(root->right) q.push(root->right) ;
+          }
+      }
+}
+```
+
+74. [construct bst from preoder](https://www.codingninjas.com/codestudio/problems/bst-from-preorder_2689307?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+
+TreeNode<int>* helper(int left , int right , vector<int> &pre , vector<int> &greater){
+    if(left > right) return NULL ;
+    if(left == right) return new TreeNode<int>(pre[left]) ;
+    
+    TreeNode<int>* root = new TreeNode<int>(pre[left]);
+    root->left = helper(left+1 , greater[left]-1 , pre , greater);
+    root->right = helper(greater[left] , right , pre , greater);
+    return root ;
+}
+TreeNode<int>* preOrderTree(vector<int> &pre){
+    int N = pre.size() ;
+
+    vector<int> nxtGreater(N , N-1);
+    stack<int> st ;
+
+    for(int i = N-1 ; i >= 0 ; i--){
+        while(not st.empty() and pre[st.top()] < pre[i]){
+            st.pop() ;
+        }
+        if(not st.empty()) nxtGreater[i] = st.top() ;
+        else nxtGreater[i] = N ;
+        st.push(i) ;
+    }
+    return helper(0 , N-1 ,pre , nxtGreater);
+}
+```
+
+75. [lca of two nodes in bst](https://www.codingninjas.com/codestudio/problems/lca-in-a-bst_981280?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+TreeNode<int>* LCAinaBST(TreeNode<int>* root, TreeNode<int>* P, TreeNode<int>* Q)
+{
+    while(root){
+        if(root->data > P->data and root->data > Q->data){
+            root=root->left ;
+        }
+        else if(root->data < P->data and root->data < Q->data){
+            root=root->right ;
+        }
+        else{
+            return root ;
+        }
+    }
+    return NULL ;
+}
+```
+
+76. [predessor and successor](https://www.codingninjas.com/codestudio/problems/_893049?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+int predessor = -1 , successor = -1 ;
+bool helper(BinaryTreeNode<int> *root , int key, int &prev_val){
+    
+    if(not root) return false ;
+    if(helper(root->left , key,prev_val))
+        return true ;
+    if(prev_val == key){
+        successor = root->data ;
+        return true ;
+    }
+    if(root->data == key){
+        predessor = prev_val ;
+    }
+    prev_val = root->data ;
+    return helper(root->right , key ,prev_val);
+}
+pair<int,int> predecessorSuccessor(BinaryTreeNode<int>* root, int key)
+{
+    predessor = -1 ; successor = -1 ;
+    int prev_val = -1 ;
+    helper(root , key , prev_val) ;
+    return {predessor , successor} ;
+}
+```
+
+77. [floor in bst](https://www.codingninjas.com/codestudio/problems/floor-from-bst_920457?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+void helper(TreeNode<int> *root , int target , int &maxval){
+    if(not root) return  ;
+    if(root->val <= target){
+        maxval = max(maxval , root->val);
+    }
+    if(root->val == target) return ;
+    if(root->val < target){
+        helper(root->right , target , maxval);
+    }
+    else{
+        helper(root->left , target , maxval);
+    }
+}
+int floorInBST(TreeNode<int> * root, int X)
+{
+    int maxval = -1 ;
+    helper(root , X , maxval);
+    return maxval ;
+}
+```
+
+78. [ceil from bst](https://www.codingninjas.com/codestudio/problems/ceil-from-bst_920464?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+void helper(BinaryTreeNode<int> *root , int t , int &minval){
+    if(not root) return  ;
+    if(root->data >= t){
+        minval = min(minval , root->data);
+    }
+    if(root->data == t){
+        return  ;
+    }
+    if(root->data < t){
+        helper(root->right , t , minval);
+    }
+    else{
+        helper(root->left , t , minval);
+    }
+}
+int findCeil(BinaryTreeNode<int> *node, int x){
+    int minval = INT_MAX ;
+    helper(node , x , minval);
+    return (minval==INT_MAX)?-1:minval ;
+}
+```
+
+79. [kth largest bst](https://www.codingninjas.com/codestudio/problems/k-th-largest-number_920438?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+bool helper(TreeNode<int>* root ,int &k , int &val){
+    if(not root) return false ;
+    if(helper(root->right , k , val)){
+        return true ;
+    }
+    k-- ;       
+    if(k == 0){
+        val = root->data ;
+        return true ;
+    }
+    return helper(root->left , k , val);
+}
+int KthLargestNumber(TreeNode<int>* root, int k) 
+{
+    int count = 0 ;
+    int val = -1 ;
+    helper(root , k , val);
+    return val ;
+}
+```
+
+80. [two sum bst](https://www.codingninjas.com/codestudio/problems/pair-sum-in-bst_920493?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+bool helper(BinaryTreeNode<int> *root , int t , unordered_set<int> &memo){
+    if(not root) return false ;
+    if(memo.find(t-root->data) != memo.end()){
+        return true ;
+    }
+    memo.insert(root->data) ;
+    return helper(root->left , t , memo) or helper(root->right , t , memo);
+}
+bool pairSumBst(BinaryTreeNode<int> *root, int k)
+{
+    unordered_set<int> memo ;
+    return helper(root , k , memo);
+}
+```
+
+90. [bt to dll(https://www.codingninjas.com/codestudio/problems/convert-a-given-binary-tree-to-doubly-linked-list_893106?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+BinaryTreeNode<int>* preve ;
+
+void helper(BinaryTreeNode<int>* root , BinaryTreeNode<int>* &head){
+    if(not root) return ;
+    helper(root->left , head);
+    if(preve == NULL){
+        head = root ;
+    }
+    else{
+        preve->right = root ;
+        root->left = preve ;
+    }
+    preve = root ;
+    helper(root->right , head);
+}
+BinaryTreeNode<int>* BTtoDLL(BinaryTreeNode<int>* root) {
+    BinaryTreeNode<int>* head ;
+    preve = NULL ;
+    helper(root , head);
+    return head ;
+}
+```
+
+91. [median of streams](https://www.codingninjas.com/codestudio/problems/convert-a-given-binary-tree-to-doubly-linked-list_893106?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+vector<int> findMedian(vector<int> &arr, int n){
+    vector<int> res ;
+    priority_queue<int> maxh ;
+    priority_queue<int , vector<int> , greater<int> > minh ;
+    for(int i = 0 ; i < n ; i++){
+        maxh.push(arr[i]) ;
+        if(maxh.size()-1 > minh.size()){
+            minh.push(maxh.top()) ; maxh.pop() ;
+        }
+        if(not minh.empty() and maxh.top() > minh.top()){
+            int ele = minh.top() ; minh.pop() ;
+            minh.push(maxh.top()) ; maxh.pop() ;
+            maxh.push(ele) ;
+        }
+        
+        if((i&1) == 1){
+            res.push_back((maxh.top() + minh.top())/2) ;
+        }
+        else{
+            res.push_back(maxh.top());
+        }
+    }
+    return res ;
+}
+```
+
+92. [kth largest element in stream](https://www.codingninjas.com/codestudio/problems/convert-a-given-binary-tree-to-doubly-linked-list_893106?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+class Kthlargest {
+public:
+    priority_queue<int , vector<int> , greater<int>> pq ;
+    int K ;
+    Kthlargest(int k, vector<int> &arr) {
+        K = k ;
+        for(int ele : arr){
+            pq.push(ele);
+            if(pq.size() > k) pq.pop() ;
+        }
+    }
+    void add(int ele) {
+        pq.push(ele);
+        if(pq.size() > K) pq.pop() ;
+    }
+
+    int getKthLargest() {
+        return pq.top() ;
+    }
+
+};
+```
+
+93. [count distinct ele in k size window](https://www.codingninjas.com/codestudio/problems/count-distinct-element-in-every-k-size-window_920336?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+vector<int> countDistinctElements(vector<int> &arr, int k) 
+{
+    unordered_map<int,int> memo ;
+    for(int i = 0 ; i < k ; i++){
+        memo[arr[i]]++ ;
+    }
+    int right = k , left = 0 ;
+    vector<int> res ;
+    res.push_back(memo.size());
+    
+    while(right < arr.size()){
+        memo[arr[right++]]++ ;
+        memo[arr[left++]]-- ;
+        if(memo[arr[left-1]] == 0){
+            memo.erase(arr[left-1]);
+        }
+        res.push_back(memo.size());
+    }
+    return res ;
+}
+
+```
+
+94. [kth largest element](https://www.codingninjas.com/codestudio/problems/kth-largest-element-in-the-unsorted-array_893030?topList=striver-sde-sheet-problems&leftPanelTab=1)
+```cpp
+int quickSelect(vector<int>& arr ,int left , int right ,int k){
+    int ele = arr[right] ;
+    int ptr = left ; 
+    int idx = left ;
+    while(idx < right){
+        if(arr[idx] < ele){
+            swap(arr[idx] , arr[ptr]) ;
+            ptr++ ;
+        }
+        idx++ ;
+    }
+    swap(arr[ptr] , arr[right]) ;
+    if(arr.size()-k == ptr){
+        return ele ;
+    }
+    if(arr.size()-k > ptr){
+        return quickSelect(arr , ptr+1 , right , k);
+    }
+    return quickSelect(arr , left , ptr-1 , k);
+}
+int kthLargest(vector<int>& arr, int size, int K)
+{
+    return quickSelect(arr , 0 , size-1 , K);
+}
+```
+
+95. [Bfs ](https://www.codingninjas.com/codestudio/problems/bfs-in-graph_973002?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+vector<int> BFS(int vertex, vector<pair<int, int>> edges)
+{
+    vector<bool> visited(vertex , false);
+    vector<vector<int>> graph(vertex) ;
+    for(pair<int,int> &e : edges){
+        graph[e.first].push_back(e.second) ;
+        graph[e.second].push_back(e.first) ;
+    } 
+    for(int i = 0 ; i < vertex ; i++){
+        sort(graph[i].begin() , graph[i].end()); 
+        
+    }
+    vector<int> res ;
+    queue<int> q ;
+    for(int i = 0 ; i < vertex ; i++){
+        if(visited[i]) continue ;
+        q.push(i) ;
+        visited[i] = true ;
+
+        while(not q.empty()){
+            int sz = q.size() ;
+            while(sz--){
+                int curr = q.front() ; q.pop() ;
+                res.push_back(curr) ;
+                for(int neigh : graph[curr]){
+                    if(visited[neigh]) continue ;
+                    visited[neigh] = true ;
+                    q.push(neigh) ;
+                }
+            }
+            
+        }
+    }
+    return res ;
+}
+```
+96. []()
+```cpp
+```
