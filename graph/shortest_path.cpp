@@ -156,6 +156,24 @@ public:
        
     }
 
+    int bellmonFord(int n, int m, int src, int dest, vector<vector<int>> &edges) {
+        vector<int> dist(n+1 , 1e9);
+        dist[src-1] = 0 ;
+        
+        for(int i = 0 ; i < n-1 ; i++){
+            for(int i = 0 ; i < edges.size() ; i++){
+                int u = edges[i][0]-1 ; 
+                int v = edges[i][1]-1 ;
+                int weight = edges[i][2] ;
+                if(dist[u] != 1e9 and weight + dist[u] < dist[v]){
+                    dist[v] = dist[u] + weight ;
+                }
+            }
+        }
+        
+        return dist[dest-1];
+    }
+
     vector<vector<int>> floydWarshall(bool verbose = true){
         /*
             iterate vertices times :
