@@ -2596,6 +2596,62 @@ vector<int> BFS(int vertex, vector<pair<int, int>> edges)
     return res ;
 }
 ```
-96. []()
+96. [prims mst](https://www.codingninjas.com/codestudio/problems/prim-s-mst_1095633?topList=striver-sde-sheet-problems&leftPanelTab=0)
 ```cpp
+#include<bits/stdc++.h>
+vector<pair<pair<int, int>, int>> calculatePrimsMST(int n, int m, vector<pair<pair<int, int>, int>> &g){
+    vector<vector<pair<int,int>>> graph(n+1) ;
+    for(auto &p : g){
+        graph[p.first.first].push_back({p.first.second,p.second}) ;
+        graph[p.first.second].push_back({p.first.first,p.second}) ;
+    }
+    vector<bool> visited(n+1 , false);
+    priority_queue<vector<int> , vector<vector<int>> , greater<vector<int>> > pq ;
+    pq.push({0,1,-1});
+    vector<pair<pair<int, int>, int>> res ;
+        
+    while(not pq.empty()){
+        int cost = pq.top()[0] , node = pq.top()[1] , parent = pq.top()[2] ;
+//         cout << node << " " << parent << " " << cost << endl ; 
+        pq.pop() ;
+        if(visited[node]) continue ;
+        visited[node] = true ;
+        
+        if(parent != -1)
+            res.push_back({{parent , node} , cost});
+        
+        for(pair<int,int> &neigh : graph[node]){
+            if(visited[neigh.first]) continue ;
+            pq.push({neigh.second , neigh.first , node});
+        }
+    }
+    return res ;
+}
+```
+
+97. [0/1 knap sack](https://www.codingninjas.com/codestudio/problems/0-1-knapsack_1072980?topList=striver-sde-sheet-problems&leftPanelTab=0)
+```cpp
+#include<bits/stdc++.h>
+int dp[1001][1001] ;
+
+int helper(int pos ,int w , vector<int> &values , vector<int> &weights){
+    if(pos < 0) return 0 ;
+    if(dp[pos][w] != -1) return dp[pos][w] ;
+    
+    int maxp = 0 ;
+    if(w - weights[pos] >= 0){
+        maxp = values[pos]+helper(pos-1 , w-weights[pos] , values , weights);
+    }
+    return dp[pos][w]=max(maxp , helper(pos-1 , w , values , weights));
+}
+int maxProfit(vector<int> &values, vector<int> &weights, int n, int w)
+{
+    memset(dp , -1 ,sizeof(dp));
+    return helper(n-1 , w , values , weights);
+}
+```
+
+98. []()
+```cpp
+
 ```
