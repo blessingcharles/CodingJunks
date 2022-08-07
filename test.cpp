@@ -2,29 +2,47 @@
 #include<bits/stdc++.h>
 
 using namespace std ;
+class Animal{
 
-#include <bits/stdc++.h> 
-void sort012(vector<int> arr, int n)
-{
-    int ptr1 = 0 , ptr2 = 0 , ptr3 = n-1 ;
+    public:
+        string name = "animal" ;
+        void display(){
+            cout << "Animal" ;
+        }
+
+        // virtual void move() = 0 ;
+};
+
+class Dog : public Animal {
+public:
+string name ;
     
-    while(ptr2 <= ptr3){
-		cout << ptr2 << endl ;
-        if(arr[ptr2] == 0){
-            swap(arr[ptr1] , arr[ptr2]) ;
-            ptr1++ ; ptr2++ ;
-        }
-        else if(arr[ptr2] == 2){
-            swap(arr[ptr2] , arr[ptr3]);
-            ptr3++ ;
-        }
-        else{
-            ptr2++ ;
-        }
+    static void display(){
+        cout << "Dog" << endl ;
     }
-    
+
+    string operator ()(string mm){
+        cout << mm  << endl ;
+      
+        return "hello" ; 
+    }
+
+    void move() ;
+};
+
+void Dog::move(){
+
 }
+
 int main(){
-	vector<int>arr = {0 ,1 ,2 ,2 ,1 ,0};
-	sort012(arr , 6);
+
+    Dog d1 = Dog() ;
+
+    d1.name = "d1" ;
+    Dog d2 = d1 ;
+
+    long long a = 1LL ;
+
+    cout << a ;
+    // cout << d->name << endl ;
 }
