@@ -28,6 +28,24 @@ public:
 
         return tree[cur_node] = constructTree(ss , mid , 2*cur_node+1) + constructTree(mid+1 , se , 2*cur_node+2);
     }
+    
+    int pointUpdate(int ss , int se , int idx , int val , int curnode){
+        if(idx < ss or idx > se or ss > se) return 0 ;
+        
+        if(ss == se){
+            return tree[curnode] = val ;
+        }
+        
+        int mid = getmid(ss , se) ;
+        
+        if(idx <= mid)
+            pointUpdate(ss , mid  , idx , val , 2*curnode+1) ;
+        else
+            pointUpdate(mid+1 ,se , idx , val , 2*curnode+2) ;
+        
+        return tree[curnode] = tree[2*curnode+1] + tree[2*curnode+2] ;
+    }
+
     int query(int qs , int qe , int ss , int se , int cur_node){
         if(ss > qe or se < qs)
             return 0 ;
