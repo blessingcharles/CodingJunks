@@ -116,12 +116,7 @@ public:
             cout << it->second << " " ;
         }
     }
-
-
 };
-
-
 int main(){
-
     return 0 ;
 }

@@ -1,0 +1,366 @@
+1. [max xor of two elements in array]()
+```cpp
+#include<bits/stdc++.h>
+
+class Node{
+public:
+    Node* children[2] ;
+    Node(){
+        memset(children , NULL , sizeof(children));
+    }
+};
+class Trie{
+public:
+    Node* root ;
+    Trie(){
+        root = new Node() ;
+    }
+    void insert(int num){
+        Node* crawler = root ;
+        for(int i = 31 ; i >= 0 ; i--){
+            bool isSet = (num >> i)&1 ;
+            if(crawler->children[isSet] == NULL){
+                crawler->children[isSet] = new Node() ;
+            }
+            crawler = crawler->children[isSet] ;
+        }
+    }
+    int search(int num){
+        Node* crawler = root ;
+        int maxval = 0 ;
+        for(int i = 31 ; i >= 0 ; i--){
+            bool isSet = (num >> i)&1 ;
+            bool need = not isSet ;
+            if(crawler->children[need] != NULL){
+                maxval = maxval | (1 << i) ;
+                crawler = crawler->children[need] ;
+            }
+            else{
+                crawler = crawler->children[isSet] ;
+            }
+        }
+        return maxval ;
+    }
+};
+int maximumXor(vector<int> A)
+{
+    Trie* t = new Trie();
+    for(int ele : A){
+        t->insert(ele) ;
+    }
+    int maxval = 0 ;
+    for(int ele : A){
+        maxval = max(maxval , t->search(ele));
+    }
+    return maxval ; 
+}
+```
+
+2. [Prefix Tree](https://leetcode.com/problems/implement-trie-prefix-tree/)
+```cpp
+class Node{
+public:
+    Node* children[26] ;
+    bool isterminal ;
+    Node(){
+        isterminal = false ;
+        memset(children , 0 , sizeof(children));
+    }
+};
+class Trie {
+public:
+    Node* root ;
+    Trie() {
+        root = new Node() ;
+    }
+    void insert(string word) {
+        Node* crawler = root ;
+        
+        for(char ch : word){
+            if(crawler->children[ch-'a'] == NULL){
+                crawler->children[ch - 'a'] = new Node() ;
+            }
+            crawler = crawler->children[ch - 'a'];
+        }
+        crawler->isterminal = true ;
+    }
+    bool search(string word) {
+        Node* crawler = root ;
+        for(char ch : word){
+            if(crawler->children[ch - 'a'] == NULL)
+                return false ;
+            crawler = crawler->children[ch - 'a'];
+        }
+        return crawler->isterminal ;
+    }
+    
+    bool startsWith(string prefix) {
+        Node* crawler = root ;
+        for(char ch : prefix){
+            if(crawler->children[ch - 'a'] == NULL)
+                return false ;
+            crawler = crawler->children[ch - 'a'];
+        }
+        return true ;
+    }
+};
+```
+
+3. [maximum genetic query difference](https://leetcode.com/problems/maximum-genetic-difference-query/)
+```cpp
+// O (32* (N+M))
+
+class Node{
+public:
+    Node* children[2] ;
+    int count ;
+    Node(){
+        count = 0 ;
+        memset(children , NULL , sizeof(children));
+    }
+};
+class Trie{
+public:
+    Node* root ;
+    Trie(){
+        root = new Node() ;
+    }
+    void insert(int num , int op){
+        Node* crawler = root ;
+        for(int i = 31 ; i >= 0 ; i--){
+            bool isSet = (num >> i)&1 ;
+            if(crawler->children[isSet] == NULL){
+                crawler->children[isSet] = new Node() ;
+            }
+            crawler = crawler->children[isSet] ;
+            crawler->count += op ;
+        }
+    }
+    int search(int num){
+        Node* crawler = root ;
+        int maxval = 0 ;
+        for(int i = 31 ; i >= 0 ; i--){
+            bool isSet = (num >> i)&1 ;
+            bool need = not isSet ;
+            if(crawler->children[need] != NULL and crawler->children[need]->count > 0){
+                maxval = maxval | (1 << i) ;
+                crawler = crawler->children[need] ;
+            }
+            else{
+                crawler = crawler->children[isSet] ;
+            }
+        }
+        return maxval ;
+    }
+};
+
+class Solution {
+public:
+    Trie *t ;
+    void dfs(int node , vector<vector<pair<int,int>>> &queries 
+                , vector<vector<int>> &graph , vector<int> &ans){
+        // insert this node into the trie with addition operation
+        t->insert(node , 1) ;
+        // find any queries are present in this
+        for(pair<int,int> &q : queries[node]){
+            int val = q.first ;
+            int idx = q.second ;
+            
+            int maxval = t->search(val) ;
+            ans[idx] = maxval ;
+        }
+        
+        // find its childrens queries
+        for(int neigh : graph[node]){
+            dfs(neigh , queries , graph , ans);
+        }
+        t->insert(node , -1) ;
+    }
+    vector<int> maxGeneticDifference(vector<int>& parents, vector<vector<int>>& qs ) {
+        t = new Trie() ;
+        
+        int N = parents.size() ;
+        vector<vector<pair<int,int>>> queries(N);
+        
+        for(int i = 0 ; i < qs.size() ; i++){
+            int node = qs[i][0] ;
+            int val = qs[i][1] ;
+            queries[node].push_back({val , i}) ;
+        }
+        int root = 0 ;
+        vector<vector<int>> graph(N) ;
+        for(int i = 0 ; i < N ; i++){
+            if(parents[i] == -1){
+                root = i ;
+                continue ;
+            }
+            graph[parents[i]].push_back(i) ;
+        }
+        vector<int> ans(qs.size()) ;
+        dfs(root , queries , graph , ans);
+        return ans ;
+    }
+};
+```
+
+4. [Word Search 2](https://leetcode.com/problems/word-search-ii/)
+```cpp
+class Node{
+public:
+    Node* children[26] ;
+    string *endWord ;
+    Node(){
+        endWord = NULL ;
+        memset(children , 0 , sizeof(children));
+    }
+};
+class Trie{
+public:
+    Node* root ;
+    Trie(){
+        root = new Node() ;
+    }
+    void insert(string &word){
+        Node* crawler = root ;
+        for(char ch : word){
+            if(crawler->children[ch - 'a'] == NULL){
+                crawler->children[ch - 'a'] = new Node() ;
+            }
+            crawler = crawler->children[ch-'a'] ;
+        }
+        crawler->endWord = &word ;
+    }
+};
+class Solution {
+    int M , N ;
+    const int dx[4] = {1,-1,0,0};
+    const int dy[4] = {0,0,1,-1};
+    
+public:
+    bool isInvalid(int row , int col){
+        return row < 0 or col < 0 or row >= M or col >= N ;
+    }
+    void helper(int row , int col , vector<vector<char>> &board , Node* root , vector<string> &ans){
+        if(board[row][col] == '#')
+            return ;
+        char curChar = board[row][col] ;
+
+        Node* nxt = root->children[curChar - 'a'] ;
+        if(not nxt) return ;
+        if(nxt->endWord != NULL){
+            ans.push_back(*nxt->endWord);
+            nxt->endWord = NULL ;
+        }
+        
+        board[row][col] = '#' ;
+        
+        for(int i = 0 ; i < 4 ; i++){
+            int neigh_r = row + dx[i] ;
+            int neigh_c = col + dy[i] ;
+            
+            if(isInvalid(neigh_r , neigh_c)) continue ;
+            helper(neigh_r , neigh_c , board , nxt , ans);
+        }
+        
+        board[row][col] = curChar ;
+    }
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words){
+        Trie *root = new Trie() ;
+        for(string &w : words){
+            root->insert(w);
+        }
+        M = board.size() ; N = board[0].size() ;
+        vector<string> ans ;
+        for(int i = 0 ; i < M ; i++){
+            for(int j = 0 ; j < N ; j++){
+                helper(i , j , board , root->root , ans);
+                if(ans.size() == words.size())
+                    return ans ;
+            }
+        }
+        return ans ;
+    }
+};
+```
+
+5. [Implement Magic dictionary](https://leetcode.com/problems/implement-magic-dictionary/)
+```cpp
+class Node{
+public:
+    Node* children[26] ;
+    bool isTerminal ;
+    Node(){
+        isTerminal = false ;
+        memset(children , 0 , sizeof(children));
+    }
+};
+class Trie{
+public:
+    Node* root ;
+    Trie(){
+        root = new Node() ;
+    }
+    void insert(string &word){
+        Node* crawler = root ;
+        
+        for(char ch :word){
+            if(crawler->children[ch - 'a'] == NULL){
+                crawler->children[ch - 'a'] = new Node() ;
+            }
+            crawler = crawler->children[ch - 'a'] ;
+        }
+        crawler->isTerminal = true ;
+    }
+    
+    bool exactlyOnce(int pos , string &word , Node* crawler , bool isused){
+        if(not crawler)
+            return false ;
+        if(pos == word.size()){
+            return crawler->isTerminal and isused ;
+        }
+        char ch = word[pos] ;        
+        
+        // if already used no way u need to match now
+        if(isused){
+            return exactlyOnce(pos+1 , word , crawler->children[word[pos] - 'a'] , true);
+        }
+        // use this chance to explore what are the other possibilites
+        for(int i = 0 ; i < 26 ; i++){
+            if(crawler->children[i]){
+                if(i == ch-'a'){
+                    if(exactlyOnce(pos+1 , word , crawler->children[i] , false)){
+                        return true ;
+                    }
+                }
+                else{
+                    if(exactlyOnce(pos+1 , word , crawler->children[i] , true)){
+                        return true ;
+                    }
+                }
+            }
+        }
+        return false ;
+    }
+    
+};
+class MagicDictionary {
+public:
+    Trie *t ;
+    MagicDictionary() {
+        t = new Trie() ;
+    }
+    void buildDict(vector<string> dictionary) {
+        for(string &w : dictionary){
+            t->insert(w) ;
+        }        
+    }
+    bool search(string searchWord) {
+        return t->exactlyOnce(0 , searchWord , t->root , false)   ;
+    }
+};
+```
+
+6. []()
+```cpp
+
+```
