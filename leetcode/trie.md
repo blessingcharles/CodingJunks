@@ -360,7 +360,76 @@ public:
 };
 ```
 
-6. []()
+6. [Map Sum pairs](https://leetcode.com/problems/map-sum-pairs/)
+```cpp
+class Node{
+public:
+    Node* children[26] ;
+    int val ; 
+    bool isTerminal ;
+    Node(){
+        isTerminal = false ;
+        val = 0 ;
+        memset(children , 0 , sizeof(children)) ;
+    }
+};
+class Trie{
+public:
+    Node* root ;
+    unordered_map<string , int> memo ;
+    Trie(){
+        root = new Node() ;
+    }
+    void insert(string &word , int val){
+        
+        if(memo.find(word) != memo.end()){
+            int prev = memo[word] ;
+            memo[word] = val ;
+            val = val - prev ;
+        }
+        else{
+            memo[word] = val        ;
+        }
+        // add these values all to the childrens
+        Node* crawler = root ;
+        for(char ch : word){
+            if(crawler->children[ch - 'a'] == NULL){
+                crawler->children[ch - 'a'] = new Node() ;
+            }
+            crawler = crawler->children[ch-'a'] ;
+            crawler->val += val ;
+        }
+        crawler->isTerminal = true ;
+    }
+    
+    int prefixSum(string &word){
+        Node* crawler = root ;
+        for(char ch : word){
+            if(crawler->children[ch-'a'] == NULL){
+                return 0 ;
+            }
+            crawler = crawler->children[ch-'a'] ;
+        }
+        return crawler->val ;
+    }
+};
+class MapSum {
+public:
+    Trie* t ;
+    
+    MapSum() {
+        t = new Trie() ;    
+    }
+    void insert(string key, int val) {
+        t->insert(key , val);   
+    }
+    int sum(string prefix) {
+        return t->prefixSum(prefix);   
+    }
+};
+```
+
+7. []()
 ```cpp
 
 ```
