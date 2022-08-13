@@ -429,7 +429,82 @@ public:
 };
 ```
 
-7. []()
+7. [Longest word in dictionary](https://leetcode.com/problems/longest-word-in-dictionary/)
+```cpp
+class Node{
+public:
+    Node* children[26] ;
+    bool isTerminal ;
+    Node(){
+        isTerminal = false ;
+        memset(children , 0 ,sizeof(children));
+    }
+};
+class Trie{
+public:
+    Node* root ;
+    Trie(){
+        root = new Node() ;
+    }
+    
+    void insert(string &word){
+        Node* crawler = root ;
+        
+        for(char ch : word){
+            if(crawler->children[ch - 'a'] == NULL){
+                crawler->children[ch - 'a'] = new Node() ;
+            }
+            crawler = crawler->children[ch - 'a'];
+        }
+        crawler->isTerminal = true ;
+    }
+    string findMaxStr(){
+        string res = "" ;
+        string curr = "" ;
+        
+        for(int i = 0 ; i < 26 ; i++){
+            if(root->children[i] and root->children[i]->isTerminal ){
+                curr.push_back('a'+i) ;
+                dfs(root->children[i] , res , curr);
+                curr.pop_back() ;                
+            }
+        }
+        return res ;
+    }
+    void dfs(Node* node , string &res, string &curr){
+
+        if(res.size() == curr.size()){
+            res = min(res , curr);
+        }
+        else if(res.size() < curr.size()){
+            res = curr ;
+        }
+        
+        //explore my children who can build from me
+        for(int i = 0 ; i < 26 ; i++){
+            if(node->children[i] 
+                and node->children[i]->isTerminal ){
+                curr.push_back('a'+i);
+                dfs(node->children[i] , res , curr);
+                curr.pop_back() ;
+            }
+        }
+    }
+};
+class Solution {
+public:
+    Trie* t ;
+    string longestWord(vector<string>& words) {
+        t = new Trie() ;
+        for(string &w : words){
+            t->insert(w) ;
+        }
+        return t->findMaxStr() ;
+    }
+};
+```
+
+8. []()
 ```cpp
 
 ```
