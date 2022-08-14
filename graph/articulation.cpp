@@ -9,7 +9,7 @@ vector<int> gr[N];
 int vis[N], disc[N], low[N], tme = 1;
 
 vector<pair<int, int>> bridges;
-set<int> arti_points;
+set<int> arti_points;	
 
 void dfs(int cur, int par) {
 	vis[cur] = 1;

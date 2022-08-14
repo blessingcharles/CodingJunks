@@ -504,7 +504,220 @@ public:
 };
 ```
 
-8. []()
+8. [search suggestion system](https://leetcode.com/problems/search-suggestions-system/)
+```cpp
+class Node{
+public:
+    Node* children[26] ;
+    bool isTerminal ;
+    Node(){
+        isTerminal = false ;
+        memset(children , 0 , sizeof(children));
+    }
+};
+class Trie{
+public:
+    Node* root ;
+    Trie(){
+        root = new Node() ;
+    }
+    
+    void insert(string &word){
+        Node* crawler = root ;
+        for(char ch : word){
+            if(crawler->children[ch- 'a'] == NULL){
+                crawler->children[ch-'a'] = new Node() ;
+            }
+            crawler = crawler->children[ch-'a'] ;
+        }
+        crawler->isTerminal = true ;
+    }
+    
+    Node* search(string &word , Node* crawler){
+        for(char ch : word){
+            if(crawler->children[ch- 'a'] == NULL){
+                return NULL ;
+            }
+            crawler = crawler->children[ch-'a'] ;
+        }
+        return crawler ;
+    }
+    
+    bool dfs(Node* crawler , vector<string> &res , string &curr){
+        if(not crawler)
+            return false ;
+        if(crawler->isTerminal){
+            res.push_back(curr) ;
+            if(res.size() == 3)
+                return true ;
+        }        
+        for(int i = 0 ; i < 26 ; i++){
+            if(crawler->children[i]){
+                curr.push_back('a'+i) ;
+                if(dfs(crawler->children[i] , res , curr)){
+                    return true ;
+                }
+                curr.pop_back();
+            }
+        }
+        return false ;
+    }
+};
+class Solution {
+public:
+    vector<vector<string>> suggestedProducts(vector<string>& products, string searchWord) {
+        Trie *t = new Trie() ;
+        for(string &p : products){
+            t->insert(p) ;
+        }
+        
+        vector<vector<string>> res ;
+        
+        string temp = "" ;
+        for(char ch : searchWord){
+            temp.push_back(ch) ;
+            Node* curr = t->search(temp , t->root) ;
+            if(not curr){
+                res.push_back({}) ;
+            }
+            else{
+                string newone = temp ;
+                vector<string> holder ;
+                t->dfs(curr , holder , newone);
+                res.push_back(holder) ;
+            }
+        }
+        
+        return res ;
+    }
+};
+```
+
+9. [Remove subfolders](https://leetcode.com/problems/remove-sub-folders-from-the-filesystem/)
+```cpp
+class Node{
+public:
+    bool isTerminal ;
+    Node* children[128] ;
+    Node(){
+        isTerminal = false ;
+        memset(children , 0 , sizeof(children));
+    }
+};
+class Trie{
+public:
+    Node* root ;
+    Trie(){
+        root = new Node() ;
+    }
+    void insert(string &word){
+        Node* crawler = root ;
+        for(char ch : word){
+            if(crawler->children[ch] == NULL){
+                crawler->children[ch] = new Node() ;
+            }
+            crawler = crawler->children[ch] ;
+        }
+        crawler->isTerminal = true ;
+    }
+    
+    bool searchPrefix(string &word){
+        Node* crawler = root ;
+        for(char ch : word){
+            if(ch == '/'){
+                // check if someone actually ends here
+                // then i'm a subfolder
+                if(crawler->isTerminal)
+                    return true ;
+            }
+            crawler = crawler->children[ch] ;
+        }
+        return false ;
+    }
+};
+
+class Solution {
+public:
+    vector<string> removeSubfolders(vector<string>& folder) {
+        vector<string> res ;
+        Trie* t = new Trie() ;
+        
+        for(string &w : folder){
+            t->insert(w) ;
+        }
+        
+        for(string &w : folder){
+            if(not t->searchPrefix(w)){
+                res.push_back(w) ;
+            }
+        }
+        return res ;
+    }
+};
+```
+
+10. [short Encoding of Words](https://leetcode.com/problems/short-encoding-of-words/)
+```cpp
+class Node{
+public:
+    Node* children[26] ;
+    int count ;
+    Node(){
+        count = 0 ;
+        memset(children , 0 , sizeof(children));
+    }
+};
+class STrie{
+public:
+    Node* root ;
+    STrie(){
+        root = new Node() ;
+    }
+    void insert(string word){
+        Node* crawler = root ;
+        for(int i = word.size()-1 ; i >=0 ;i--){
+            char ch = word[i] ;
+            
+            if(crawler->children[ch - 'a'] == NULL){
+                crawler->children[ch- 'a'] = new Node() ;
+            }
+            crawler = crawler->children[ch - 'a'] ;
+            crawler->count++ ;
+        }
+    }
+    bool searchSuffix(string word){
+        Node* crawler = root ;
+        for(int i = word.size()-1 ; i >= 0 ; i--){
+            char ch = word[i] ;
+            
+            crawler = crawler->children[ch - 'a'] ;
+        }
+        // cout << word << crawler->count << endl ;
+        return (crawler->count != 1) ;
+    }
+};
+
+class Solution {
+public:
+    int minimumLengthEncoding(vector<string>& words) {
+        STrie *t = new STrie() ;
+        unordered_set<string> hh(words.begin() , words.end());
+        
+        for(auto it = hh.begin() ; it != hh.end() ; it++){
+            t->insert(*it) ;
+        }
+        int count = 0 ;
+        for(auto it = hh.begin() ; it != hh.end() ; it++){
+            if(not t->searchSuffix(*it)){
+                count = count + 1 + (*it).size() ; 
+            }
+        }
+        return count ;
+    }
+};
+```
+
+11. []()
 ```cpp
 
 ```
