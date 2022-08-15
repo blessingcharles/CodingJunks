@@ -68,7 +68,7 @@ void permute_with_combinations(vector<int> arr , int cur_start ){
         swap(arr[i] , arr[cur_start]);
         permute_with_combinations(arr , cur_start+1);
     }
-}
+}  
 string kthPermutation(int n, int k) {
     string str = "" ;
     vector<int> arr ;
