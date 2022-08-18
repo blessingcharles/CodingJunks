@@ -103,6 +103,7 @@ void permute_without_duplicates(vector<int> &arr , int cur_start = 0){
         swap(arr[cur_start] , arr[i]);
     }
 }
+
 int main(){
     vector<int> arr = {1,2,3};
     permute_with_combinations(arr,0);
