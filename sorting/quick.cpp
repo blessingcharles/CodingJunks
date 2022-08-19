@@ -27,8 +27,6 @@ int kthLargest(vector<int>& arr, int size, int K)
 {
     return quickSelect(arr , 0 , size-1 , K);
 }
-
-
 int main(){
 
 }

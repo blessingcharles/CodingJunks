@@ -3,7 +3,6 @@
 
 using namespace std ;
 
-
 class MinHeap{
 public:
     vector<int> arr ;
