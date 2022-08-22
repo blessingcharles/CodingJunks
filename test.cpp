@@ -1,15 +1,32 @@
 #include<bits/stdc++.h>
-
+#define VIJAY main
 using namespace std ;
 
+class Object{
+public:
+    virtual void draw(){
+        cout << "parent" ;
+    }
+    void eat(){
+        cout << "parent eating" ;
+    }
+};
 
-int main(){
+class Derived : public Object{
+public:
+    void draw(){
+        cout << "child " ;
+    }
 
-    char *p[] = {"aaa" , "bbb" , "cccc" , "dddd"} ;
-    char **ptr[]  = {p+3 , p+2 , p+1 , p} ;
-    char ***pptr = ptr ;
+    void eat(){
+        cout << " child eating" ;
+    }
+};
+
+int VIJAY(){
+    Object *o = new Derived() ;
+    o->draw() ;
+    o->eat() ;
     
-    printf("%p ------ [%p %p %p %p]\n" , &p , *p , *(p+1) , *(p+2), *(p+3)) ;
-    printf("%p ----- [%p]" , &ptr , **(ptr));
     return 0 ;
 }
