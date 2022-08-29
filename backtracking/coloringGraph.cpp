@@ -10,6 +10,7 @@ bool canIPlace(int cc , int node , vector<int> &color , vector<vector<int>> &adj
     }
     return true ;
 }
+
 bool canColor(int node , vector<vector<int>> &adj , int m , vector<int> &color){
     if(node == N) return true ;
     for(int c = 1 ; c<= m ; c++){
