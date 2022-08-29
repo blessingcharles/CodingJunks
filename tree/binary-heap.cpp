@@ -22,7 +22,6 @@ public:
     int rightchild(int i){
         return (2*i)+2 ;
     }
-
     void push(int val){
         arr.push_back(val);
         size++ ;
@@ -33,9 +32,7 @@ public:
             curr = get_parent(curr);
         }
     }
-
     void heapify(int curr){
-
         // the method assumes all the subtrees are already heapified
         int left = leftchild(curr);
         int right = rightchild(curr);

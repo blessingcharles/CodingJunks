@@ -3,9 +3,7 @@
 using namespace std;
 
 const int N = 1e5;
-
 vector<int> gr[N];
-
 int vis[N], disc[N], low[N], tme = 1;
 
 vector<pair<int, int>> bridges;
@@ -26,7 +24,7 @@ void dfs(int cur, int par) {
 			// bridges
 			if (low[x] > disc[cur]) {
 				bridges.push_back({cur, x});
-			}
+			} 
 
 			// articulation points
 			if (par != 0 && low[x] >= disc[cur]) {
